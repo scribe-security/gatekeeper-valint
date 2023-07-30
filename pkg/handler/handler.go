@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
+	"github.com/google/go-containerregistry/pkg/name"
+	"github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/externaldata"
 	"github.com/scribe-security/gatekeeper-valint/pkg/utils"
+	gensbomPkg "github.com/scribe-security/gensbom/pkg"
 	"k8s.io/klog/v2"
 )
 
@@ -47,6 +49,10 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		err := gensbomPkg.VerifyAdmissionImage(c.Image, id.String(), &gensbomConfig, v.logger, ociremote.WithRemoteOptions(
+			remote.WithAuthFromKeychain(kc),
+			remote.WithAuthFromKeychain(kcScribe),
+		))
 		// TODO Call valint
 	}
 	utils.SendResponse(&results, "", w)
