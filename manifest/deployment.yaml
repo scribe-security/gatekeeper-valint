@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: valint-gatekeeper-provider
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valint-gatekeeper-provider
+  namespace: valint-gatekeeper-provider
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: valint-gatekeeper-provider
+  template:
+    metadata:
+      labels:
+        run: valint-gatekeeper-provider
+    spec:
+      containers:
+      - image: valint-gatekeeper-provider:latest
+        imagePullPolicy: IfNotPresent
+        name: valint-gatekeeper-provider
+        ports:
+        - containerPort: 8090
+          protocol: TCP
+      restartPolicy: Always
+      nodeSelector:
+        kubernetes.io/os: linux

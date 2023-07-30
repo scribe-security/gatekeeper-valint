@@ -1,0 +1,8 @@
+apiVersion: externaldata.gatekeeper.sh/v1alpha1
+kind: Provider
+metadata:
+  name: valint-gatekeeper-provider
+spec:
+  url: http://valint-gatekeeper-provider.valint-gatekeeper-provider:8090/validate
+  timeout: 30
+  insecureTLSSkipVerify: true
