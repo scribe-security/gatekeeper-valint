@@ -41,8 +41,6 @@ define title
 endef
 
 
-include env
-
 ## Tasks
 .PHONY: help
 help:
