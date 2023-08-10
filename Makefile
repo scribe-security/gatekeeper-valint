@@ -130,7 +130,7 @@ release: clean-dist ## goreleaser release and push packages.
 	# build release snapshots
 	BUILD_GIT_TREE_STATE=$(GITTREESTATE) \
 	VERSION=$(VERSION:v%=%) \
-	$(TEMPDIR)/latest/goreleaser release --debug  --skip-sign --clean --config $(TEMPDIR)/goreleaser.yaml
+	$(TEMPDIR)/latest/goreleaser release --debug  --skip-sign --clean --config $(TEMPDIR)/goreleaser.yml
 
 .PHONY: dev-release
 dev-release: clean-dist ## goreleaser dev-release and push packages.
