@@ -112,6 +112,33 @@ $(SNAPSHOTDIR): ## Build snapshot release binaries and packages
 	# build release snapshots
 	BUILD=true BUILD_GIT_TREE_STATE=$(GITTREESTATE) $(TEMPDIR)/latest/goreleaser release --debug ${BUILD:+--skip-publish2} --snapshot --skip-sign --clean --skip-validate --config $(TEMPDIR)/goreleaser.yml
 
+.PHONY: binary
+binary: ## Build snapshot binaries only
+	$(call title,Building snapshot artifacts)
+	#@DIR=$(SNAPSHOTDIR) make mod-goreleaser
+	# build release snapshots
+	# $(TEMPDIR)/latest/goreleaser build --clean --snapshot --config $(TEMPDIR)/goreleaser.yaml
+	$(call title,Building snapshot artifacts)
+	@DIR=$(SNAPSHOTDIR) make mod-goreleaser
+	# build release snapshots
+	BUILD=true BUILD_GIT_TREE_STATE=$(GITTREESTATE) $(TEMPDIR)/latest/goreleaser build --single-target --debug --snapshot --clean --config $(TEMPDIR)/goreleaser.yml
+
+
+.PHONY: release
+release: clean-dist ## goreleaser release and push packages.
+	$(call title,Building snapshot artifacts)
+	# create a config with the dist dir overridden
+	@DIR=$(DISTDIR) make mod-goreleaser
+	# build release snapshots
+	BUILD_GIT_TREE_STATE=$(GITTREESTATE) \
+	VERSION=$(VERSION:v%=%) \
+	$(TEMPDIR)/latest/goreleaser release --debug  --skip-sign --clean --config $(TEMPDIR)/goreleaser.yaml
+
+.PHONY: dev-release
+dev-release: clean-dist ## goreleaser dev-release and push packages.
+	IsDev=true make release
+
+
 .PHONY: mod-goreleaser 
 mod-goreleaser:
 	# create a config with the dist dir overridden

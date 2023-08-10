@@ -1,11 +1,17 @@
 project_name: gatekeeper-valint
 
+# env:
+#   - GO111MODULE=on
+#   - CGO_ENABLED=1
+#   - DOCKER_CLI_EXPERIMENTAL=enabled
+#   - COSIGN_EXPERIMENTAL=true
+#   - DESCRIPTION="Test"
+
 env:
+  - DESCRIPTION="Boiler plate CLI description"
+  - IMAGE_TAG={{ if index .Env "IsDev" }}dev-latest{{ else }}latest{{ end }}
+  - BUCKET={{ if index .Env "IsDev" }}dev/{{ end }}
   - GO111MODULE=on
-  - CGO_ENABLED=1
-  - DOCKER_CLI_EXPERIMENTAL=enabled
-  - COSIGN_EXPERIMENTAL=true
-  - DESCRIPTION="Test"
 
 # Prevents parallel builds from stepping on each others toes downloading modules
 before:
@@ -19,25 +25,45 @@ before:
 # sboms:
 #   - artifacts: binary
 
+# builds:
+#   - id: main
+#     flags:
+#       - -trimpath
+#     mod_timestamp: '{{ .CommitTimestamp }}'
+#     binary: gatekeeper-valint
+#     goos:
+#       - linux
+#       - darwin
+#     goarch:
+#       - amd64
+#       # - arm64
+#       # - arm
+#       # - s390x
+#       # - ppc64le
+#     goarm:
+#       - '7'
+#     env:
+#       - CGO_ENABLED=0
+
+
 builds:
   - id: main
-    flags:
-      - -trimpath
-    mod_timestamp: '{{ .CommitTimestamp }}'
-    binary: gatekeeper-valint
+    binary: '{{ tolower .ProjectName }}'
+    env:
+      - CGO_ENABLED=0
     goos:
       - linux
-      - darwin
+      # - darwin
     goarch:
       - amd64
       # - arm64
-      # - arm
-      # - s390x
-      # - ppc64le
-    goarm:
-      - '7'
-    env:
-      - CGO_ENABLED=0
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    ldflags: |
+      -w
+      -s
+      -extldflags '-static'
+      -X {{ .ModulePath }}/cmd.version={{.Version}}
+
 
 # kos:
 #   - repository: ghcr.io/scribe-security/gatekeeper-valint
@@ -56,7 +82,7 @@ builds:
 #       # - linux/arm
 
 dockers:
-  - dockerfile: Dockerfile
+  - dockerfile: docker/Dockerfile
     image_templates:
       - "scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:dev"
       # - "scribesecuriy.jfrog.io/scribe-docker-public-local/{{ tolower .ProjectName }}:{{ .Env.IMAGE_TAG }}-provider"
@@ -69,11 +95,13 @@ dockers:
       - "--build-arg=VCS_REF={{.FullCommit}}"
       - "--build-arg=VCS_URL={{.GitURL}}"
       - "--build-arg=BUILD_VERSION={{.Version}}"
-      - "--build-arg=DISCRIPTION={{.Env.DESCRIPTION}}"
+      - "--build-arg=DESCRIPTION={{.Env.DESCRIPTION}}"
       - "--build-arg=PROJECT_NAME={{.ProjectName}}"
       
     use: buildx
     skip_push: false
+    extra_files:
+      - docker/entrypoint.sh
 
 # signs:
 #   # Keyless
