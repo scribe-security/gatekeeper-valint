@@ -1,0 +1,5 @@
+/gatekeeper-valint
+dist/*
+**/snapshot
+**/.tmp
+**/env

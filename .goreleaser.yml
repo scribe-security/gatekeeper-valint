@@ -1,0 +1,111 @@
+project_name: gatekeeper-valint
+
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=1
+  - DOCKER_CLI_EXPERIMENTAL=enabled
+  - COSIGN_EXPERIMENTAL=true
+  - DESCRIPTION="Test"
+
+# Prevents parallel builds from stepping on each others toes downloading modules
+before:
+  hooks:
+    - go mod tidy
+    # - /bin/bash -c 'if [ -n "$(git --no-pager diff --exit-code go.mod go.sum)" ]; then exit 1; fi'
+
+# gomod:
+#   proxy: true
+
+# sboms:
+#   - artifacts: binary
+
+builds:
+  - id: main
+    flags:
+      - -trimpath
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    binary: gatekeeper-valint
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      # - arm64
+      # - arm
+      # - s390x
+      # - ppc64le
+    goarm:
+      - '7'
+    env:
+      - CGO_ENABLED=0
+
+# kos:
+#   - repository: ghcr.io/scribe-security/gatekeeper-valint
+#     tags:
+#       - 'v{{.Version}}'
+#     main: .
+#     bare: true
+#     preserve_import_paths: false
+#     sbom: spdx
+#     base_image: cgr.dev/chainguard/static:latest
+#     platforms:
+#       - linux/amd64
+#       # - linux/arm64
+#       # - linux/s390x
+#       # - linux/ppc64le
+#       # - linux/arm
+
+dockers:
+  - dockerfile: Dockerfile
+    image_templates:
+      - "scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:dev"
+      # - "scribesecuriy.jfrog.io/scribe-docker-public-local/{{ tolower .ProjectName }}:{{ .Env.IMAGE_TAG }}-provider"
+    ids:
+      - main
+    goarch: amd64
+    build_flag_templates:
+      - "--build-arg=BUILD_DATE={{.Date}}"
+      - "--build-arg=BUILD_VERSION={{.Version}}"
+      - "--build-arg=VCS_REF={{.FullCommit}}"
+      - "--build-arg=VCS_URL={{.GitURL}}"
+      - "--build-arg=BUILD_VERSION={{.Version}}"
+      - "--build-arg=DISCRIPTION={{.Env.DESCRIPTION}}"
+      - "--build-arg=PROJECT_NAME={{.ProjectName}}"
+      
+    use: buildx
+    skip_push: false
+
+# signs:
+#   # Keyless
+#   - id: binary
+#     signature: "${artifact}.sig"
+#     certificate: "${artifact}.pem"
+#     cmd: cosign
+#     args: ["sign-blob", "--output-signature", "${artifact}.sig", "--output-certificate", "${artifact}.pem", "${artifact}"]
+#     artifacts: binary
+#   - id: checksum-keyless
+#     signature: "${artifact}.sig"
+#     certificate: "${artifact}.pem"
+#     cmd: cosign
+#     args: ["sign-blob", "--output-signature", "${artifact}.sig", "--output-certificate", "${artifact}.pem", "${artifact}"]
+#     artifacts: checksum
+
+# archives:
+#   - format: binary
+#     name_template: "{{ .Binary }}"
+#     allow_different_binary_count: true
+
+# checksum:
+#   name_template: "{{ .ProjectName }}_checksums.txt"
+
+# snapshot:
+#   name_template: latest
+
+# release:
+#   prerelease: allow # remove this when we start publishing non-prerelease or set to auto
+#   draft: true # allow for manual edits
+#   github:
+#     owner: sigstore
+#     name: gatekeeper-valint
+#   footer: |
+#     ### Thanks for all contributors!
