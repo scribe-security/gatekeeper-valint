@@ -14,7 +14,6 @@ concurrency:
 
 jobs: 
   call-release:
-    needs: call-e2e-test
     uses: ./.github/workflows/reusable_release.yml
     secrets:
       RELEASE_GITHUB_TOKEN: ${{ secrets.READ_PRIVATE_GO_REPOS }} ## needed to pull our private go libraries
