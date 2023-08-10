@@ -12,12 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # call-tests:
-  #   uses: ./.github/workflows/reusable_tests.yml
-  #   secrets:
-  #     READ_PRIVATE_GO_REPOS: ${{ secrets.READ_PRIVATE_GO_REPOS }} ## needed to pull our private go libraries
-  #   with:
-  #     GITHUB_USER: houdini91
   call-release:
     uses: ./.github/workflows/reusable_release.yml
     secrets:
