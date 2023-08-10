@@ -1,0 +1,24 @@
+
+name: dev-release
+
+on:
+  push:
+    tags:
+      - "*-*"
+  workflow_dispatch:
+  # pull_request:
+
+concurrency: 
+  group: dev-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  call-release:
+    uses: ./.github/workflows/reusable_release.yml
+    secrets:
+      RELEASE_GITHUB_TOKEN: ${{ secrets.READ_PRIVATE_GO_REPOS }} ## needed to pull our private go libraries
+      RELEASE_ARTIFACTORY_TOKEN: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
+    with:
+      RELEASE_ARTIFACTORY_USERNAME: mikey@scribesecurity.com
+      GITHUB_USER: houdini91
+      IS_DEV: true
