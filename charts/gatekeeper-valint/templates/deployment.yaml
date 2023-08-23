@@ -16,7 +16,7 @@ spec:
       containers:
       - image: scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:dev
         imagePullPolicy: IfNotPresent
-        name: external-data-provider
+        name: gatekeeper-valint
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
