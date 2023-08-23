@@ -1,0 +1,8 @@
+apiVersion: v2
+description: A Helm chart for a Valint GateKeeper provider
+name: gatekeeper-valint
+version: 0.0.2
+home: https://github.com/scribe-security/gatekeeper-valint
+sources:
+  - https://github.com/scribe-security/gatekeeper-valint.git
+appVersion: 0.0.2
