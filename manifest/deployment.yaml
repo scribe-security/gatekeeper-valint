@@ -27,6 +27,25 @@ data:
             enable: true
             # -- OCI evidence repo location 
             repo: ""
+        policies:
+          enable: true
+          name: my_policy
+          modules:
+            - type: verify-artifact
+              enable: true
+              name: verify_rego
+              input:
+                rego:
+                  args:
+                    some: user_input
+                  script: |
+                    package verify
+
+                    verify = v {
+                      v := {
+                        "allow": true
+                      }
+                    }
 ---
 apiVersion: v1
 kind: Secret
@@ -64,6 +83,8 @@ spec:
         - "--config=/valint/config.yaml"
         # - --port={{ .Values.port }}
         env:
+        - name: POLICIES_TMP_ROOT
+          value: "/policies"
         - name: SIGSTORE_NO_CACHE
           value: "true"
         - name: DEBUG
@@ -87,6 +108,9 @@ spec:
         - name: valint-config
           mountPath: /valint
           readOnly: true
+        - name: policies
+          mountPath: /policies
+          readOnly: false
       restartPolicy: Always
       nodeSelector:
         kubernetes.io/os: linux
@@ -94,3 +118,6 @@ spec:
         - name: valint-config
           configMap:
             name: valint-config
+        - name: policies
+          emptyDir:
+            sizeLimit: 100Mi
