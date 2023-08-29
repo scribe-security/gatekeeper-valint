@@ -6,7 +6,7 @@ RED := $(shell tput -T linux setaf 1)
 RESET := $(shell tput -T linux sgr0)
 TITLE := $(BOLD)$(PURPLE)
 SUCCESS := $(BOLD)$(GREEN)
-NAMESPACE=gatekeeper-valint-provider
+NAMESPACE=gatekeeper-valint
 NAME=gatekeeper-valint-provider
 ADMISSION_PRE_RELASE=$(ADMISSION_IMAGE):dev-latest-gk-provider
 ## Build variables
@@ -173,7 +173,7 @@ minikube_dashboard: ## Minikube dashboard
 
 .PHONY: logs
 logs: ## Read admission logs
-	@kubectl logs --all-containers=true --tail=-1 -l gatekeeper-valint-provider -n  $(NAMESPACE)  | grep '^{' | jq -C -r '.' | sed 's/\\n/\n/g; s/\\t/\t/g'
+	@kubectl logs --all-containers=true --tail=-1 -l gatekeeper-valint -n  $(NAMESPACE)  | grep '^{' | jq -C -r '.' | sed 's/\\n/\n/g; s/\\t/\t/g'
 
 .PHONY: clean_namespace
 clean_namespace: clean ## Delete admission namespace

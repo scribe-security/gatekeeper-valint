@@ -7,7 +7,7 @@ require (
 	github.com/magefile/mage v1.14.0
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20211029184625-8b4a99a9a65a
 	github.com/scribe-security/basecli v0.0.0-20230828130102-dfa1553b4a24
-	github.com/scribe-security/gensbom v0.0.21-0.20230828130133-ea83b70f5cba
+	github.com/scribe-security/gensbom v0.0.21-0.20230829103336-eeb86c0cd62c
 	github.com/sigstore/cosign/v2 v2.1.1
 	github.com/spf13/cobra v1.7.0
 	k8s.io/klog/v2 v2.100.1
