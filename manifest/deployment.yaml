@@ -29,8 +29,8 @@ spec:
         run: gatekeeper-valint
     spec:
       containers:
-      - image: scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:dev
-        imagePullPolicy: IfNotPresent
+      - image: scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:dev-latest
+        imagePullPolicy: Always
         name: gatekeeper-valint
         ports:
         - containerPort: 8090
