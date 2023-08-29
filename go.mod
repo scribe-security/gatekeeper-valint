@@ -6,8 +6,8 @@ require (
 	github.com/google/go-containerregistry v0.15.2
 	github.com/magefile/mage v1.14.0
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20211029184625-8b4a99a9a65a
-	github.com/scribe-security/basecli v0.0.0-20230824123352-9162817dc8c2
-	github.com/scribe-security/gensbom v0.0.21-0.20230801083459-f76c183df779
+	github.com/scribe-security/basecli v0.0.0-20230828130102-dfa1553b4a24
+	github.com/scribe-security/gensbom v0.0.21-0.20230828130133-ea83b70f5cba
 	github.com/sigstore/cosign/v2 v2.1.1
 	github.com/spf13/cobra v1.7.0
 	k8s.io/klog/v2 v2.100.1
