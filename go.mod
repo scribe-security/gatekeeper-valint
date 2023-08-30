@@ -230,7 +230,7 @@ require (
 	github.com/sassoftware/go-rpmutils v0.2.0 // indirect
 	github.com/sassoftware/relic v7.2.1+incompatible // indirect
 	github.com/scribe-security/KML v0.0.0-20230731094701-463589363d3e // indirect
-	github.com/scribe-security/cocosign v0.0.0-20230824101833-c7395809812b // indirect
+	github.com/scribe-security/cocosign v0.0.0-20230829103012-e0d9a907e356 // indirect
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.6.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect

@@ -3,16 +3,6 @@ kind: Namespace
 metadata:
   name: gatekeeper-valint
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: scribe-cred-secret
-  namespace: gatekeeper-valint
-stringData:
-  scribe_client_id: "<your client secret>"
-  scribe_client_secret: "<your client secret>"
-  scribe_enable: "false"
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

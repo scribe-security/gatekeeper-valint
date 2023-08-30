@@ -3408,10 +3408,8 @@ github.com/scribe-security/KML v0.0.0-20230731094701-463589363d3e h1:qEI3mYlxWc7
 github.com/scribe-security/KML v0.0.0-20230731094701-463589363d3e/go.mod h1:Ns2ZaiHYB2vNl77w032dcaIl1sA7BmkfJRQo4Qhd5F0=
 github.com/scribe-security/basecli v0.0.0-20230828130102-dfa1553b4a24 h1:Ms+axzkOGWy/9OAQDn01fEPrU7OIMQx2IAES1OigUkA=
 github.com/scribe-security/basecli v0.0.0-20230828130102-dfa1553b4a24/go.mod h1:9otLNhKwolfp9nsSqVoejm0zncS5WVlDijwHgRBCSs4=
-github.com/scribe-security/cocosign v0.0.0-20230824101833-c7395809812b h1:q8FohHWpr055dZL86mJvkV9CswL6GAWbUgdIRqdMLg4=
-github.com/scribe-security/cocosign v0.0.0-20230824101833-c7395809812b/go.mod h1:yHzVqPvuojy7igUND6pF8BfZIGGpba2upnaeU4wbyP0=
-github.com/scribe-security/gensbom v0.0.21-0.20230828130133-ea83b70f5cba h1:KuRJrqVBcuhpO5xoTEHExqkbchKQnYegJmuLBldoxn0=
-github.com/scribe-security/gensbom v0.0.21-0.20230828130133-ea83b70f5cba/go.mod h1:qUhN0n9jMavl9Gz3AGqO647N23px/zpFvcGrDlx6WbI=
+github.com/scribe-security/cocosign v0.0.0-20230829103012-e0d9a907e356 h1:6rSNS+vgG6bQ/lf0ymqkxIAIQYZZt+fPD4cQswXYotM=
+github.com/scribe-security/cocosign v0.0.0-20230829103012-e0d9a907e356/go.mod h1:yHzVqPvuojy7igUND6pF8BfZIGGpba2upnaeU4wbyP0=
 github.com/scribe-security/syft v0.20.1-0.20230704073618-3aac89a3889f h1:9fqdnIYvhQ7GzLaET+dr3uWaCU1YnSUdK0SrUXVWH70=
 github.com/scribe-security/syft v0.20.1-0.20230704073618-3aac89a3889f/go.mod h1:S5Zo4noxPCkUXb6UFEBBhgykO1iDv1THVgQC8XhYSVY=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e h1:7q6NSFZDeGfvvtIRwBrU/aegEYJYmvev0cHAwo17zZQ=
