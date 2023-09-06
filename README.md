@@ -14,6 +14,7 @@ helm install gatekeeper/gatekeeper  \
     --namespace gatekeeper-system --create-namespace \
     --set enableExternalData=true \
     --set controllerManager.dnsPolicy=ClusterFirst,audit.dnsPolicy=ClusterFirst \
+    --set validatingWebhookTimeoutSeconds=30 \
     --version 3.10.0
 ```
 _Note: This repository is currently only working with Gatekeeper 3.10 and the `externalData` feature in `alpha`. There is an open issue to track the support of Gatekeeper 3.11 and `externalData` feature in `beta`: https://github.com/scribe-security/gatekeeper-valint/issues/20._
@@ -153,7 +154,7 @@ kubectl apply -f policy/examples/valid.yaml
 Request should be successfully deploy.
 
 ```
-  TBD output expected
+  deployment.apps/valid-deployment created
 ```
 
 ## Uploading signed evidence
