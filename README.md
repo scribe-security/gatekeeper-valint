@@ -144,14 +144,15 @@ kubectl apply -f policy/examples/error.yaml
 Request should be rejected as the image was not signed.
 
 ```
-  TBD output expected
+  Error from server (Forbidden): error when creating "policy/examples/error.yaml": admission webhook "validation.gatekeeper.sh" denied the request
 ```
 
 This will successfully create the pod demo using a demo signed image.
 ```bash
 kubectl apply -f policy/examples/valid.yaml
 ```
-Request should be successfully deploy.
+
+Request should result in a successful deploy.
 
 ```
   deployment.apps/valid-deployment created
@@ -164,4 +165,6 @@ valint [bom, slsa] my_image -o attest [--oci OR --scribe.enable]
 ```
 
 ## Adding custom policies
-TBD
+The configuration of the Valint provider is done via a ConfigMap.
+The same parameters and flags as in Valint can be set.
+See manigest/configmap.yaml and Valint documentation for more details.
