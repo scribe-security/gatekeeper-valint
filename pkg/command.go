@@ -168,7 +168,7 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 
 		select {
 		case <-ctx.Done():
-			sendResponse(nil, "operation timed out", w)
+			utils.SendResponse(nil, "operation timed out", w)
 		case <-processDone:
 		}
 	}
