@@ -6,8 +6,8 @@ require (
 	github.com/google/go-containerregistry v0.15.2
 	github.com/magefile/mage v1.14.0
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20211029184625-8b4a99a9a65a
-	github.com/scribe-security/basecli v0.0.0-20230801083430-c53fe4e90750
-	github.com/scribe-security/gensbom v0.0.21-0.20230801083459-f76c183df779
+	github.com/scribe-security/basecli v0.0.0-20230828130102-dfa1553b4a24
+	github.com/scribe-security/gensbom v0.0.21-0.20230829103336-eeb86c0cd62c
 	github.com/sigstore/cosign/v2 v2.1.1
 	github.com/spf13/cobra v1.7.0
 	k8s.io/klog/v2 v2.100.1
@@ -29,7 +29,6 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/CycloneDX/cyclonedx-go v0.7.1 // indirect
-	github.com/CycloneDX/cyclonedx-go/old v0.0.0-00010101000000-000000000000 // indirect
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
@@ -231,7 +230,7 @@ require (
 	github.com/sassoftware/go-rpmutils v0.2.0 // indirect
 	github.com/sassoftware/relic v7.2.1+incompatible // indirect
 	github.com/scribe-security/KML v0.0.0-20230731094701-463589363d3e // indirect
-	github.com/scribe-security/cocosign v0.0.0-20230801083355-12f379e38297 // indirect
+	github.com/scribe-security/cocosign v0.0.0-20230829103012-e0d9a907e356 // indirect
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.6.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
@@ -332,5 +331,3 @@ require (
 // replace github.com/scribe-security/gensbom => ../../base/gensbom
 
 replace github.com/anchore/syft => github.com/scribe-security/syft v0.20.1-0.20230704073618-3aac89a3889f
-
-replace github.com/CycloneDX/cyclonedx-go/old => github.com/CycloneDX/cyclonedx-go v0.5.2
