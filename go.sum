@@ -788,8 +788,6 @@ github.com/BurntSushi/toml v1.3.2/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbi
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53/go.mod h1:+3IMCy2vIlbG1XG/0ggNQv0SvxCAIpPM5b1nCz56Xno=
 github.com/CloudyKit/jet/v6 v6.1.0/go.mod h1:d3ypHeIRNo2+XyqnGA8s+aphtcVpjP5hPwP/Lzo7Ro4=
-github.com/CycloneDX/cyclonedx-go v0.5.2 h1:CkdGw2R/tZWmEbSypJVZG+3+2SAsDjJirfIrG/RbIVg=
-github.com/CycloneDX/cyclonedx-go v0.5.2/go.mod h1:nQCiF4Tvrg5Ieu8qPhYMvzPGMu5I7fANZkrSsJjl5mg=
 github.com/CycloneDX/cyclonedx-go v0.7.1 h1:5w1SxjGm9MTMNTuRbEPyw21ObdbaagTWF/KfF0qHTRE=
 github.com/CycloneDX/cyclonedx-go v0.7.1/go.mod h1:N/nrdWQI2SIjaACyyDs/u7+ddCkyl/zkNs8xFsHF2Ps=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
@@ -1248,7 +1246,6 @@ github.com/bombsimon/wsl/v3 v3.3.0/go.mod h1:st10JtZYLE4D5sC7b8xV4zTKZwAQjCH/Hy2
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d/go.mod h1:H0wQNHz2YrLsuXOZozoeDmnHXkNCRmMW0gwFWDfEZDA=
-github.com/bradleyjkemp/cupaloy/v2 v2.7.0/go.mod h1:bm7JXdkRd4BHJk9HpwqAI8BoAY1lps46Enkdqw6aRX0=
 github.com/bradleyjkemp/cupaloy/v2 v2.8.0 h1:any4BmKE+jGIaMpnU8YgH/I2LPiLBufr6oMMlVBbn9M=
 github.com/bradleyjkemp/cupaloy/v2 v2.8.0/go.mod h1:bm7JXdkRd4BHJk9HpwqAI8BoAY1lps46Enkdqw6aRX0=
 github.com/brunoscheufler/aws-ecs-metadata-go v0.0.0-20220812150832-b6b31c6eeeaf/go.mod h1:CeKhh8xSs3WZAc50xABMxu+FlfAAd5PNumo7NfOv7EE=
@@ -3409,12 +3406,10 @@ github.com/sclevine/spec v1.2.0/go.mod h1:W4J29eT/Kzv7/b9IWLB055Z+qvVC9vt0Arko24
 github.com/sclevine/spec v1.4.0/go.mod h1:LvpgJaFyvQzRvc1kaDs0bulYwzC70PbiYjC4QnFHkOM=
 github.com/scribe-security/KML v0.0.0-20230731094701-463589363d3e h1:qEI3mYlxWc7WSAByf1WJw01U/PNQtOirNZO/s0VaN08=
 github.com/scribe-security/KML v0.0.0-20230731094701-463589363d3e/go.mod h1:Ns2ZaiHYB2vNl77w032dcaIl1sA7BmkfJRQo4Qhd5F0=
-github.com/scribe-security/basecli v0.0.0-20230824123352-9162817dc8c2 h1:xN0rwap1uoh7wOdVCFZCZo3mlMpAKnEAaJ9sbCXJ5Ng=
-github.com/scribe-security/basecli v0.0.0-20230824123352-9162817dc8c2/go.mod h1:9otLNhKwolfp9nsSqVoejm0zncS5WVlDijwHgRBCSs4=
-github.com/scribe-security/cocosign v0.0.0-20230824101833-c7395809812b h1:q8FohHWpr055dZL86mJvkV9CswL6GAWbUgdIRqdMLg4=
-github.com/scribe-security/cocosign v0.0.0-20230824101833-c7395809812b/go.mod h1:yHzVqPvuojy7igUND6pF8BfZIGGpba2upnaeU4wbyP0=
-github.com/scribe-security/gensbom v0.0.21-0.20230801083459-f76c183df779 h1:5we5pPMpZwJ6gvu02Rk9iMMfv53SC4lytujP4CzYX74=
-github.com/scribe-security/gensbom v0.0.21-0.20230801083459-f76c183df779/go.mod h1:+RcH3oShrLf9qehFgPBuEId7aQ/YNjAVKCpvKmowgpg=
+github.com/scribe-security/basecli v0.0.0-20230828130102-dfa1553b4a24 h1:Ms+axzkOGWy/9OAQDn01fEPrU7OIMQx2IAES1OigUkA=
+github.com/scribe-security/basecli v0.0.0-20230828130102-dfa1553b4a24/go.mod h1:9otLNhKwolfp9nsSqVoejm0zncS5WVlDijwHgRBCSs4=
+github.com/scribe-security/cocosign v0.0.0-20230829103012-e0d9a907e356 h1:6rSNS+vgG6bQ/lf0ymqkxIAIQYZZt+fPD4cQswXYotM=
+github.com/scribe-security/cocosign v0.0.0-20230829103012-e0d9a907e356/go.mod h1:yHzVqPvuojy7igUND6pF8BfZIGGpba2upnaeU4wbyP0=
 github.com/scribe-security/syft v0.20.1-0.20230704073618-3aac89a3889f h1:9fqdnIYvhQ7GzLaET+dr3uWaCU1YnSUdK0SrUXVWH70=
 github.com/scribe-security/syft v0.20.1-0.20230704073618-3aac89a3889f/go.mod h1:S5Zo4noxPCkUXb6UFEBBhgykO1iDv1THVgQC8XhYSVY=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e h1:7q6NSFZDeGfvvtIRwBrU/aegEYJYmvev0cHAwo17zZQ=

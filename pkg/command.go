@@ -37,6 +37,7 @@ import (
 
 const (
 	apiVersion = "externaldata.gatekeeper.sh/v1alpha1"
+	timeout    = 30 * time.Second
 )
 
 type ProviderCmd struct {
@@ -63,7 +64,7 @@ func (cmd *ProviderCmd) Run() error {
 
 	fmt.Println("starting server ...")
 
-	http.HandleFunc("/validate", cmd.Validate)
+	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeout))
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
@@ -103,7 +104,9 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 	results := make([]externaldata.Item, 0)
 
-	ctx := req.Context()
+	ctx, cancel := context.WithTimeout(req.Context(), timeout)
+	defer cancel()
+
 	ro := options.RegistryOptions{}
 	co, err := ro.ClientOpts(ctx)
 	if err != nil {
@@ -148,4 +151,25 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	utils.SendResponse(&results, "", w)
+}
+
+func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(r.Context(), duration)
+		defer cancel()
+
+		r = r.WithContext(ctx)
+
+		processDone := make(chan bool)
+		go func() {
+			h(w, r)
+			processDone <- true
+		}()
+
+		select {
+		case <-ctx.Done():
+			utils.SendResponse(nil, "operation timed out", w)
+		case <-processDone:
+		}
+	}
 }
