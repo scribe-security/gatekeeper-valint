@@ -19,7 +19,7 @@ spec:
         run: gatekeeper-valint
     spec:
       containers:
-      - image: scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:v0.0.1-8
+      - image: scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:dev
         imagePullPolicy: Always
         name: gatekeeper-valint
         ports:
@@ -54,6 +54,9 @@ spec:
         - name: valint-config
           mountPath: /valint
           readOnly: true
+        - name: valint-certs
+          mountPath: /valint-certs
+          readOnly: true
         - name: policies
           mountPath: /policies
           readOnly: false
@@ -64,6 +67,9 @@ spec:
         - name: valint-config
           configMap:
             name: valint-config
+        - name: valint-certs
+          secret:
+            secretName: valint-certs
         - name: policies
           emptyDir:
             sizeLimit: 100Mi

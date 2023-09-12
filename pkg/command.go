@@ -36,7 +36,9 @@ import (
 )
 
 const (
-	apiVersion = "externaldata.gatekeeper.sh/v1alpha1"
+	apiVersion = "externaldata.gatekeeper.sh/v1beta1"
+	tlsCert    = "/valint-certs/tls.crt"
+	tlsKey     = "/valint-certs/tls.key"
 	timeout    = 30 * time.Second
 )
 
@@ -62,7 +64,7 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 
 func (cmd *ProviderCmd) Run() error {
 
-	fmt.Println("starting server ...")
+	fmt.Println("starting HTTPS server...")
 
 	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeout))
 
@@ -73,7 +75,7 @@ func (cmd *ProviderCmd) Run() error {
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
+	if err := srv.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
 		return err
 	}
 

@@ -5,7 +5,7 @@ To integrate [OPA Gatekeeper's new ExternalData feature](https://open-policy-age
 
 ## Installation
 
-### Installing gatekeeper
+### Installing Gatekeeper
 - Deploy Gatekeeper with external data enabled (`--enable-external-data`)
 ```sh
 helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
@@ -15,15 +15,27 @@ helm install gatekeeper/gatekeeper  \
     --set enableExternalData=true \
     --set controllerManager.dnsPolicy=ClusterFirst,audit.dnsPolicy=ClusterFirst \
     --set validatingWebhookTimeoutSeconds=30 \
-    --version 3.10.0
 ```
-_Note: This repository is currently only working with Gatekeeper 3.10 and the `externalData` feature in `alpha`. There is an open issue to track the support of Gatekeeper 3.11 and `externalData` feature in `beta`: https://github.com/scribe-security/gatekeeper-valint/issues/20._
+
+### Generate TLS certificate and key for the provider
+Gatekeeper enforces TLS when communicating with the provider, so certificates must be provided.
+
+To generate new certificates, use the script:
+- `scripts/generate-tls-cert.sh`
+
+This will create CA and certificate files in `certs` directory.
+Copy the contents of `tls.crt` and `tls.key` to the corresponding field in `manifest/certs.yaml`.
+
+Base64 encode the CA certificate and update the `caBundle` field in `policy/provider.yaml` with the resulting value.
+
+`cat ca.crt | base64 | tr -d '\n'`
 
 ### Installing Valint Gatekeeper provider
+
 - `kubectl apply -f manifest`
 
 - `kubectl apply -f policy/provider.yaml`
-  - > Update `url` if it's not `http://gatekeeper-valint.gatekeeper-valint:8090` (default)
+  - > Update `url` if it's not `https://gatekeeper-valint.gatekeeper-valint:8090` (default)
 
 - `kubectl apply -f policy/template.yaml`
 
