@@ -24,7 +24,7 @@ To generate new certificates, use the script:
 - `scripts/generate-tls-cert.sh`
 
 This will create CA and certificate files in `certs` directory.
-Copy the contents of `tls.crt` and `tls.key` to the corresponding field in `manifest/certs.yaml`.
+Copy the contents of `tls.crt` and `tls.key` to the corresponding fields in `manifest/certs.yaml`.
 
 Base64 encode the CA certificate and update the `caBundle` field in `policy/provider.yaml` with the resulting value.
 

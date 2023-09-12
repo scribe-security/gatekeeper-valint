@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: valint-certs
+  namespace: gatekeeper-valint
+type: kubernetes.io/tls
+stringData:
+  tls.crt: |
+    <certificate file content>
+  tls.key: |
+    <private key file content>
