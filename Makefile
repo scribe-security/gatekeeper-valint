@@ -86,7 +86,7 @@ install_local_scribe:  ## Install admission with scribe
 
 .PHONY: install_local_oci
 install_local_oci: ## Install admission with oci from local dir
-		@kubectl apply -f manifest
+		@kubectl apply -f manifest -n gatekeeper-valint
 		@kubectl apply -f policy/template.yaml
 		@kubectl apply -f policy/constraint.yaml
 
@@ -98,8 +98,6 @@ clean-local: ## Clean admission from local dir
 .PHONY: uninstall
 uninstall:
 	@helm uninstall gatekeeper-valint-provider -n gatekeeper-valint-provider 
-
-
 
 .PHONY: build
 build: $(SNAPSHOTDIR) ## Build release snapshot binaries and packages
