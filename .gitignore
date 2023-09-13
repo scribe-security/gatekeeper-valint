@@ -3,3 +3,6 @@ dist/*
 **/snapshot
 **/.tmp
 **/env
+**/certs
+**/.tmp
+env
