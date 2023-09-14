@@ -116,9 +116,9 @@ Or
 - ```sh
    helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
    --namespace gatekeeper-valint --create-namespace \
-   --set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n')
-   --set certs.tlsCrt=$(cat certs/tls.crt | base64 | tr -d '\n')
-   --set certs.tlsKey=$(cat certs/tls.key | base64 | tr -d '\n')
+   --set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
+   --set certs.tlsCrt="$(cat certs/tls.crt)" \
+   --set certs.tlsKey="$(cat certs/tls.key)"
   ```
 
 In case of using 
