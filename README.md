@@ -111,6 +111,18 @@ spec:
 
 - `kubectl apply -f manifest`
 
+Or
+
+- ```sh
+   helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
+   --namespace gatekeeper-valint --create-namespace \
+   --set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n')
+   --set certs.tlsCrt=$(cat certs/tls.crt | base64 | tr -d '\n')
+   --set certs.tlsKey=$(cat certs/tls.key | base64 | tr -d '\n')
+  ```
+
+In case of using 
+
 - `kubectl apply -f policy/provider.yaml`
   - > Update `url` if it's not `https://gatekeeper-valint.gatekeeper-valint:8090` (default)
 
@@ -233,8 +245,7 @@ kubectl apply -f policy/examples/error.yaml
 Request should be rejected.
 
 ```
-  Error from server (Forbidden): error when creating "policy/examples/valid.yaml": admission webhook "validation.gatekeeper.sh" denied the request: [gatekeeper-valint] image not accepted: {"errors": [], "responses": [], "status_code": 200, "system_error": "ERROR (VerifyAdmissionImage(\"scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest\")): [rule] [my_policy] [verify-artifact] [verify_rego] verify, Err: [my_policy] [verify-artifact] [verify_rego] rule failed"}
-  Error from server (Forbidden): error when creating "policy/examples/error.yaml": admission webhook "validation.gatekeeper.sh" denied the request
+  Error from server (Forbidden): error when creating "policy/examples/error.yaml": admission webhook "validation.gatekeeper.sh" denied the request: [gatekeeper-valint] image not accepted: {"errors": [], "responses": [], "status_code": 200, "system_error": "ERROR (VerifyAdmissionImage(\"scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest\")): [rule] [my_policy] [verify-artifact] [verify_rego] verify, Err: [my_policy] [verify-artifact] [verify_rego] rule failed"}
 ```
 
 This will successfully create the pod demo using a demo signed image.

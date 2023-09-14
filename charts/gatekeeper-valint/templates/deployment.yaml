@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gatekeeper-valint
+  labels:
+  {{- include "gatekeeper-valint.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      run: gatekeeper-valint
+      {{- include "gatekeeper-valint.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        run: gatekeeper-valint
+        {{- include "gatekeeper-valint.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - args:
+        - "--config=/valint/config.yaml"
+        env:
+        - name: POLICIES_TMP_ROOT
+          value: "/policies"
+        - name: SIGSTORE_NO_CACHE
+          value: {{ quote .Values.gatekeeperValint.sigstoreNoCache }}
+        - name: DEBUG
+          value: {{ quote .Values.gatekeeperValint.debug }}
+        - name: VALINT_SCRIBE_AUTH_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: scribe_client_id
+              name: scribe-cred-secret
+        - name: VALINT_SCRIBE_AUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: scribe_client_secret
+              name: scribe-cred-secret
+        - name: VALINT_SCRIBE_ENABLE
+          valueFrom:
+            secretKeyRef:
+              key: scribe_enable
+              name: scribe-cred-secret
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        name: gatekeeper-valint
+        ports:
+        - containerPort: 8090
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /valint
+          name: valint-config
+          readOnly: true
+        - mountPath: /valint-certs
+          name: valint-certs
+          readOnly: true
+        - mountPath: /policies
+          name: policies
+      nodeSelector: {{- toYaml .Values.gatekeeperValint.nodeSelector | nindent 8 }}
+      restartPolicy: Always
+      volumes:
+      - configMap:
+          name: gatekeeper-valint-config
+        name: valint-config
+      - name: valint-certs
+        secret:
+          secretName: gatekeeper-valint-certs
+      - emptyDir:
+          sizeLimit: 100Mi
+        name: policies

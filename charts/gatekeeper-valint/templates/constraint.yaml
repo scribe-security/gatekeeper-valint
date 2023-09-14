@@ -6,7 +6,7 @@ spec:
   enforcementAction: deny
   match:
     namespaces:
-      - default
+      - {{ .Values.constraint.namespace }}
     kinds:
       - apiGroups: ["apps"]
         kinds: ["Deployment"]
