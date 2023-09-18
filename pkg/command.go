@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/scribe-security/basecli/logger"
@@ -65,6 +66,8 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 func (cmd *ProviderCmd) Run() error {
 
 	fmt.Println("starting HTTPS server...")
+
+	fmt.Println(os.Environ())
 
 	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeout))
 
