@@ -56,8 +56,13 @@ spec:
           name: valint-certs
           readOnly: true
         {{- if .Values.valint.config.verifier.x509.enable -}}
-        - mountPath: /valint-verify-certs
+        - mountPath: {{ .Values.valint.config.verifier.x509.cert }}
           name: valint-verify-certs
+          subPath: cert.pem
+          readOnly: true
+        - mountPath: {{ .Values.valint.config.verifier.x509.ca }}
+          name: valint-verify-certs
+          subPath: ca.pem
           readOnly: true
         {{- end -}}
         - mountPath: /policies
