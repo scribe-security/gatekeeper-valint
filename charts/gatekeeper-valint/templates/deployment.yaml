@@ -55,6 +55,11 @@ spec:
         - mountPath: /valint-certs
           name: valint-certs
           readOnly: true
+        {{- if .Values.valint.config.verifier.x509.enable -}}
+        - mountPath: /valint-verify-certs
+          name: valint-verify-certs
+          readOnly: true
+        {{- end -}}
         - mountPath: /policies
           name: policies
       nodeSelector: {{- toYaml .Values.gatekeeperValint.nodeSelector | nindent 8 }}
@@ -66,6 +71,11 @@ spec:
       - name: valint-certs
         secret:
           secretName: gatekeeper-valint-certs
+      {{- if .Values.valint.config.verifier.x509.enable -}}
+      - name: valint-verify-certs
+        secret:
+          secretName: gatekeeper-valint-certs
+      {{- end -}}
       - emptyDir:
           sizeLimit: 100Mi
         name: policies

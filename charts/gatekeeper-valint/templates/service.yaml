@@ -5,9 +5,11 @@ metadata:
   labels:
   {{- include "gatekeeper-valint.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
   selector:
     run: gatekeeper-valint
   {{- include "gatekeeper-valint.selectorLabels" . | nindent 4 }}
   ports:
-  {{- .Values.service.ports | toYaml | nindent 2 -}}
+    - port: {{ .Values.port }}
+      protocol: TCP
+      targetPort: {{ .Values.port }}
