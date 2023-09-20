@@ -19,8 +19,6 @@ spec:
       containers:
       - args:
         - "--config=/valint/config.yaml"
-
-        - "--attest.default=x509-env"
         env:
         - name: POLICIES_TMP_ROOT
           value: "/policies"

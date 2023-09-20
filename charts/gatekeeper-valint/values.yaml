@@ -34,13 +34,16 @@ x509:
   cert: "" 
   ca: ""
 
-config:
-  verify:
-    # -- Evidence format
-    input-format: statement
-  attest:
-    # -- Signature verification type (sigstore, x509-env)
-    default: sigstore
+valint:
+  config:
+    logger:
+      level: debug
+    verify:
+      # -- Evidence format
+      input-format: attest
+    attest:
+      # -- Signature verification type (sigstore, x509-env)
+      default: x509-env
     cocosign:
       storer:
         OCI:
