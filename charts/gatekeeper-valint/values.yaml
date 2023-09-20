@@ -18,14 +18,33 @@ gatekeeperValint:
   nodeSelector:
     kubernetes.io/os: linux
 
-scribeCredSecret:
-  scribeClientId: ""
-  scribeClientSecret: ""
-  scribeEnable: ""
-
 constraint:
   namespace: "default"
 
-verifyCerts:
-  cert: ""
+
+scribe:
+  # -- Scribe Client ID
+  client_id: ""
+  # -- Scribe Client Secret
+  client_secret: ""
+    # -- Scribe Client Enable
+  enable: false
+
+x509:
+  cert: "" 
   ca: ""
+
+config:
+  verify:
+    # -- Evidence format
+    input-format: statement
+  attest:
+    # -- Signature verification type (sigstore, x509-env)
+    default: sigstore
+    cocosign:
+      storer:
+        OCI:
+          # -- OCI evidence enable
+          enable: false
+          # -- OCI evidence repo location 
+          repo: ""
