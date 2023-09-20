@@ -21,7 +21,6 @@ gatekeeperValint:
 constraint:
   namespace: "default"
 
-
 scribe:
   # -- Scribe Client ID
   client_id: ""
