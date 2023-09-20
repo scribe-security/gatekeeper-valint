@@ -7,7 +7,7 @@ RESET := $(shell tput -T linux sgr0)
 TITLE := $(BOLD)$(PURPLE)
 SUCCESS := $(BOLD)$(GREEN)
 NAMESPACE=gatekeeper-valint
-NAME=gatekeeper-valint-provider
+NAME=gatekeeper-valint
 ADMISSION_PRE_RELASE=$(ADMISSION_IMAGE):dev-latest-gk-provider
 ## Build variables
 TEMPDIR = ./.tmp
@@ -63,41 +63,47 @@ bootstrap-go:
 bootstrap: bootstrap-tools ## Download and install all go dependencies (+ prep tooling in the ./tmp dir)
 	$(call title,Bootstrapping dependencies)
 
-
-.PHONY: install_namespace
-install_namespace:  ## Install Namespace
-	@kubectl create namespace $(NAMESPACE)
-	
 .PHONY: install_local_scribe
 install_local_scribe:  ## Install admission with scribe
 	@if helm status $(NAME) -n $(NAMESPACE) > /dev/null 2>&1; then \
 		helm upgrade --debug --reset-values --force \
-			--set scribe.service.enable=true \
-			--set scribe.auth.client_id=$(SCRIBE_CLIENT_ID) \
-			--set scribe.auth.client_secret=$(SCRIBE_CLIENT_SECRET) \
-			$(NAME) -n $(NAMESPACE) ./manifest --devel; \
+			--set scribe.enable=true \
+			--set scribe.client_id=$(SCRIBE_CLIENT_ID) \
+			--set scribe.client_secret=$(SCRIBE_CLIENT_SECRET) \
+			--set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
+			--set certs.tlsCrt="$(cat certs/tls.crt)" \
+			--set certs.tlsKey="$(cat certs/tls.key)" \
+			$(NAME) -n $(NAMESPACE) ./charts/gatekeeper-valint --devel; \
 	else \
 		helm install --debug  \
-			--set scribe.service.enable=true \
-			--set scribe.auth.client_id=$(SCRIBE_CLIENT_ID) \
-			--set scribe.auth.client_secret=$(SCRIBE_CLIENT_SECRET) \
-			$(NAME) -n $(NAMESPACE) ./manifest --devel; \
+			--set scribe.enable=true \
+			--set scribe.client_id=$(SCRIBE_CLIENT_ID) \
+			--set scribe.client_secret=$(SCRIBE_CLIENT_SECRET) \
+			--set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
+			--set certs.tlsCrt="$(cat certs/tls.crt)" \
+			--set certs.tlsKey="$(cat certs/tls.key)" \
+			$(NAME) -n $(NAMESPACE) ./charts/gatekeeper-valint --devel; \
 	fi
 
 .PHONY: install_local_oci
 install_local_oci: ## Install admission with oci from local dir
-		@kubectl apply -f manifest -n gatekeeper-valint
-		@kubectl apply -f policy/template.yaml
-		@kubectl apply -f policy/constraint.yaml
-
-.PHONY: install_local
-clean-local: ## Clean admission from local dir
-		@kubectl delete -f manifest
-		@kubectl delete -f policy
+	@if helm status $(NAME) -n $(NAMESPACE) > /dev/null 2>&1; then \
+		helm upgrade --debug --reset-values --force \
+			--set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
+			--set certs.tlsCrt="$(cat certs/tls.crt)" \
+			--set certs.tlsKey="$(cat certs/tls.key)" \
+			$(NAME) -n $(NAMESPACE) ./charts/gatekeeper-valint --devel; \
+	else \
+		helm install --debug  \
+			--set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
+			--set certs.tlsCrt="$(cat certs/tls.crt)" \
+			--set certs.tlsKey="$(cat certs/tls.key)" \
+			$(NAME) -n $(NAMESPACE) ./charts/gatekeeper-valint --devel; \
+	fi
 
 .PHONY: uninstall
 uninstall:
-	@helm uninstall gatekeeper-valint-provider -n gatekeeper-valint-provider 
+	@helm uninstall $(NAME) -n $(NAMESPACE)
 
 .PHONY: build
 build: $(SNAPSHOTDIR) ## Build release snapshot binaries and packages
@@ -155,11 +161,6 @@ clean-dist:
 .PHONY: upstream-gensbom
 upstream-gensbom:
 	GOPRIVATE=github.com/scribe-security/* go get github.com/scribe-security/gensbom@master
-
-.PHONY: clean-namespace
-clean-namespace: ## Delete admission namespace
-	@kubectl delete namespace $(NAMESPACE)  || true
-
 
 .PHONY: minikube_start
 minikube_start: ## Install admission on minikube

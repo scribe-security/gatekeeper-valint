@@ -41,6 +41,16 @@ spec:
             secretKeyRef:
               key: scribe_enable
               name: scribe-cred-secret
+        - name: ATTEST_CA
+          valueFrom:
+            secretKeyRef:
+              key: ATTEST_CA
+              name: scribe-x509-secret
+        - name: ATTEST_CERT
+          valueFrom:
+            secretKeyRef:
+              key: ATTEST_CERT
+              name: scribe-x509-secret
         image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}
         name: gatekeeper-valint
@@ -55,16 +65,6 @@ spec:
         - mountPath: /valint-certs
           name: valint-certs
           readOnly: true
-        {{- if (((.Values.valint.config).verifier).x509).enable }}
-        - mountPath: {{ .Values.valint.config.verifier.x509.cert }}
-          name: valint-verify-certs
-          subPath: cert.pem
-          readOnly: true
-        - mountPath: {{ .Values.valint.config.verifier.x509.ca }}
-          name: valint-verify-certs
-          subPath: ca.pem
-          readOnly: true
-        {{- end -}}
         - mountPath: /policies
           name: policies
       nodeSelector: {{- toYaml .Values.gatekeeperValint.nodeSelector | nindent 8 }}
@@ -76,11 +76,6 @@ spec:
       - name: valint-certs
         secret:
           secretName: gatekeeper-valint-certs
-      {{- if (((.Values.valint.config).verifier).x509).enable }}
-      - name: valint-verify-certs
-        secret:
-          secretName: gatekeeper-valint-certs
-      {{- end -}}
       - emptyDir:
           sizeLimit: 100Mi
         name: policies

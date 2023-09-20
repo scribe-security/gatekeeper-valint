@@ -6,4 +6,4 @@ metadata:
   {{- include "gatekeeper-valint.labels" . | nindent 4 }}
 data:
   config.yaml: |
-    {{ .Values.valint.config | toYaml | indent 1 }}
+{{ .Values.valint.config | toYaml | indent 4 }}
