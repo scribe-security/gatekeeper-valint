@@ -18,12 +18,6 @@ gatekeeperValint:
   nodeSelector:
     kubernetes.io/os: linux
 
-valint:
-  config:
-    verifier:
-      x509:
-        enable: true
-
 scribeCredSecret:
   scribeClientId: ""
   scribeClientSecret: ""
@@ -31,3 +25,7 @@ scribeCredSecret:
 
 constraint:
   namespace: "default"
+
+verifyCerts:
+  cert: ""
+  ca: ""

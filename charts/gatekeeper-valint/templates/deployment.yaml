@@ -55,7 +55,7 @@ spec:
         - mountPath: /valint-certs
           name: valint-certs
           readOnly: true
-        {{- if .Values.valint.config.verifier.x509.enable -}}
+        {{- if (((.Values.valint.config).verifier).x509).enable }}
         - mountPath: {{ .Values.valint.config.verifier.x509.cert }}
           name: valint-verify-certs
           subPath: cert.pem
@@ -76,7 +76,7 @@ spec:
       - name: valint-certs
         secret:
           secretName: gatekeeper-valint-certs
-      {{- if .Values.valint.config.verifier.x509.enable -}}
+      {{- if (((.Values.valint.config).verifier).x509).enable }}
       - name: valint-verify-certs
         secret:
           secretName: gatekeeper-valint-certs
