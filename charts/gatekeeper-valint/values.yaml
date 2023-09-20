@@ -1,0 +1,52 @@
+image:
+  repository: scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint
+  tag: dev
+  imagePullPolicy: Always
+
+certs:
+  caBundle: ""
+  tlsCrt: ""
+  tlsKey: ""
+
+port: 8090
+
+replicas: 1
+
+gatekeeperValint:
+  debug: "true"
+  sigstoreNoCache: "true"
+  nodeSelector:
+    kubernetes.io/os: linux
+
+constraint:
+  namespace: "default"
+
+scribe:
+  # -- Scribe Client ID
+  client_id: ""
+  # -- Scribe Client Secret
+  client_secret: ""
+    # -- Scribe Client Enable
+  enable: false
+
+x509:
+  cert: "" 
+  ca: ""
+
+valint:
+  config:
+    logger:
+      level: debug
+    verify:
+      # -- Evidence format
+      input-format: attest
+    attest:
+      # -- Signature verification type (sigstore, x509-env)
+      default: x509-env
+    cocosign:
+      storer:
+        OCI:
+          # -- OCI evidence enable
+          enable: false
+          # -- OCI evidence repo location 
+          repo: ""

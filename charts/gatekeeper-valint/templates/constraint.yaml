@@ -1,12 +1,12 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sExternalDataCosign
+kind: K8sExternalDataValint
 metadata:
   name: gatekeeper-valint
 spec:
   enforcementAction: deny
   match:
     namespaces:
-      - default
+      - {{ .Values.constraint.namespace }}
     kinds:
       - apiGroups: ["apps"]
         kinds: ["Deployment"]

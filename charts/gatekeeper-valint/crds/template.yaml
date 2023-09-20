@@ -1,12 +1,12 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: k8sexternaldatacosign
+  name: k8sexternaldatavalint
 spec:
   crd:
     spec:
       names:
-        kind: K8sExternalDataCosign
+        kind: K8sExternalDataValint
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |

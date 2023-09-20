@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gatekeeper-valint
+  labels:
+  {{- include "gatekeeper-valint.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    run: gatekeeper-valint
+  {{- include "gatekeeper-valint.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.port }}
+      protocol: TCP
+      targetPort: {{ .Values.port }}
