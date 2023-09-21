@@ -27,12 +27,11 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/externaldata"
 
-	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/scribe-security/gatekeeper-valint/internal/config"
 	"github.com/scribe-security/gatekeeper-valint/pkg/utils"
 	gensbomPkg "github.com/scribe-security/gensbom/pkg"
-	"github.com/sigstore/cosign/v2/cmd/cosign/cli/options"
-	ociremote "github.com/sigstore/cosign/v2/pkg/oci/remote"
+
+	"github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
 const (
@@ -109,13 +108,6 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), timeout)
 	defer cancel()
 
-	ro := options.RegistryOptions{}
-	co, err := ro.ClientOpts(ctx)
-	if err != nil {
-		utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), w)
-		return
-	}
-
 	// iterate over all keys
 	for _, key := range providerRequest.Request.Keys {
 		fmt.Println("valint verify signature for:", key)
@@ -125,23 +117,21 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		// This is a carefully optimized sequence for fetching the signatures of the
-		// entity that minimizes registry requests when supplied with a digest input
-		digest, err := ociremote.ResolveDigest(ref, co...)
+		img, err := remote.Image(ref, remote.WithContext(ctx))
 		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (ResolveDigest(%q)): %v", key, err), w)
+			utils.SendResponse(nil, fmt.Sprintf("ERROR (Image(%q)): %v", key, err), w)
 			return
 		}
 
-		h, err := v1.NewHash(digest.Identifier())
+		imageID, err := img.ConfigName()
 		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (NewHash(%q)): %v", key, err), w)
+			utils.SendResponse(nil, fmt.Sprintf("ERROR (ConfigName(%q)): %v", key, err), w)
 			return
 		}
 
 		cfg := cmd.cfg.GetGensbomConfig()
 		err = gensbomPkg.VerifyAdmissionImage(ref.String(),
-			h.String(),
+			imageID.String(),
 			&cfg,
 			cmd.logger,
 			co...,
