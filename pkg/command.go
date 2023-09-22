@@ -30,8 +30,8 @@ import (
 	"github.com/scribe-security/gatekeeper-valint/internal/config"
 	"github.com/scribe-security/gatekeeper-valint/pkg/utils"
 	gensbomPkg "github.com/scribe-security/gensbom/pkg"
-
-	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"github.com/sigstore/cosign/v2/cmd/cosign/cli/options"
+	ociremote "github.com/sigstore/cosign/v2/pkg/oci/remote"
 )
 
 const (
@@ -108,6 +108,13 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), timeout)
 	defer cancel()
 
+	ro := options.RegistryOptions{}
+	co, err := ro.ClientOpts(ctx)
+	if err != nil {
+		utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), w)
+		return
+	}
+
 	// iterate over all keys
 	for _, key := range providerRequest.Request.Keys {
 		fmt.Println("valint verify signature for:", key)
@@ -117,7 +124,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		img, err := remote.Image(ref, remote.WithContext(ctx))
+		img, err := ociremote.SignedImage(ref, co...)
 		if err != nil {
 			utils.SendResponse(nil, fmt.Sprintf("ERROR (Image(%q)): %v", key, err), w)
 			return
