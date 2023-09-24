@@ -27,7 +27,6 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/externaldata"
 
-	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/scribe-security/gatekeeper-valint/internal/config"
 	"github.com/scribe-security/gatekeeper-valint/pkg/utils"
 	gensbomPkg "github.com/scribe-security/gensbom/pkg"
@@ -125,23 +124,21 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		// This is a carefully optimized sequence for fetching the signatures of the
-		// entity that minimizes registry requests when supplied with a digest input
-		digest, err := ociremote.ResolveDigest(ref, co...)
+		img, err := ociremote.SignedImage(ref, co...)
 		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (ResolveDigest(%q)): %v", key, err), w)
+			utils.SendResponse(nil, fmt.Sprintf("ERROR (Image(%q)): %v", key, err), w)
 			return
 		}
 
-		h, err := v1.NewHash(digest.Identifier())
+		imageID, err := img.ConfigName()
 		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (NewHash(%q)): %v", key, err), w)
+			utils.SendResponse(nil, fmt.Sprintf("ERROR (ConfigName(%q)): %v", key, err), w)
 			return
 		}
 
 		cfg := cmd.cfg.GetGensbomConfig()
 		err = gensbomPkg.VerifyAdmissionImage(ref.String(),
-			h.String(),
+			imageID.String(),
 			&cfg,
 			cmd.logger,
 			co...,
