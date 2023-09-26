@@ -26,6 +26,8 @@ spec:
           value: {{ quote .Values.gatekeeperValint.sigstoreNoCache }}
         - name: DEBUG
           value: {{ quote .Values.gatekeeperValint.debug }}
+        - name: DOCKER_CONFIG
+          value: "/docker"
         - name: VALINT_SCRIBE_AUTH_CLIENT_ID
           valueFrom:
             secretKeyRef:
@@ -59,6 +61,9 @@ spec:
           protocol: TCP
         resources: {}
         volumeMounts:
+        - mountPath: /docker/
+          name: valint-pull-secret
+          readOnly: true
         - mountPath: /valint
           name: valint-config
           readOnly: true
@@ -73,6 +78,13 @@ spec:
       - configMap:
           name: gatekeeper-valint-config
         name: valint-config
+      - name: valint-pull-secret
+        secret:
+          secretName: gatekeeper-valint-pull-secret
+          optional: true
+          items:
+            - key: .dockerconfigjson
+              path: config.json
       - name: valint-certs
         secret:
           secretName: gatekeeper-valint-certs

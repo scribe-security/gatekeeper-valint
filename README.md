@@ -86,7 +86,20 @@ Using OCI registry as an evidence store allows you to upload and verify evidence
 Related configmap flags:
 >* `config.attest.cocosign.storer.OCI.enable` - Enable OCI store.
 >* `config.attest.cocosign.storer.OCI.repo` - Evidence store location.
-<!-- * `imagePullSecrets` - Secret name for private registry. -->
+
+## Private registries
+To verify images from registries that require authentication, create a Kubernetes image pull secret named `gatekeeper-valint-pull-secret`.
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gatekeeper-valint-pull-secret
+  namespace: gatekeeper-valint
+data:
+  .dockerconfigjson: ewoJImF1...g==
+type: kubernetes.io/dockerconfigjson
+```
 
 ### Dockerhub limitation
 Dockerhub does not support the subpath format, `oci-repo` should be set to your Dockerhub Username.
