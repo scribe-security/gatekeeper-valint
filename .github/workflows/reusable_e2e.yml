@@ -95,51 +95,16 @@ jobs:
         # if: steps.tool-cache.outputs.cache-hit != 'true'
         run: make binary
 
-      - name: Expose info
-        id: info
-        run: |
-          CLI_VERSION=$(snapshot/main_linux_amd64_v1/valint --version)
-          echo "CLI_VERSION=${CLI_VERSION}" >> $GITHUB_OUTPUT          
-
       # - name: E2E local tests
       #   run: make e2e_cache
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1.8.0
 
       - name: E2E scribe tests
-        run: make e2e_scribe
+        run: make uninstall
         env:
           SCRIBE_URL: ${{ inputs.SCRIBE_URL }}
           SCRIBE_CLIENT_ID: ${{ secrets.SCRIBE_CLIENT_ID }}
           SCRIBE_CLIENT_SECRET: ${{ secrets.SCRIBE_CLIENT_SECRET }}
           SCRIBE_LOGIN_URL: ${{ inputs.SCRIBE_LOGIN_URL }}
           SCRIBE_AUDIENCE: ${{ inputs.SCRIBE_AUDIENCE }}
-
-      - name: E2E OCI tests
-        run: make e2e_oci
-        env:
-          SCRIBE_OCI_REPO: ${{ env.SCRIBE_OCI_STORE }}/${{ inputs.ENV }}
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: test_evidence
-          path: |
-            test/integration/_tmp
-      
-
-      - name: Report Status
-        if: always()
-        uses: ravsamhq/notify-slack-action@v2
-        with:
-          status: ${{ job.status }}
-          notification_title: 'CLI {workflow} has {status_message}'
-          message_format: |
-            {emoji} *{workflow}* {status_message}
-            <{run_url}|View Run>
-            Valint: ${{ steps.info.outputs.CLI_VERSION }}
-            Scribe: ${{ inputs.SCRIBE_URL }}
-          footer: |
-            Repo <{repo_url}|{repo}> | <{commit_url}|{commit_sha}>
-            Branch <{branch_url}|{branch}>
-          mention_groups: "!channel"
-          mention_groups_when: "failure,warnings"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -1,5 +1,5 @@
 
-name: valint_dev_e2e
+name: dev_e2e
 
 on:
   # push:
