@@ -1,0 +1,145 @@
+
+name: .e2e
+
+env:
+  GITHUB_USER: "houdini91" # TODO CHANGE TO A SCRIBE USER.
+  RELEASE_ARTIFACTORY_USERNAME: mikey@scribesecurity.com
+  ARTIFACTORY_URL: "https://scribesecuriy.jfrog.io"
+  GOPRIVATE: "github.com/scribe-security/*"
+  GO_VERSION: "1.20"
+  SCRIBE_OCI_STORE: scribesecuriy.jfrog.io/scribe-docker-local/attestation/e2e
+
+on:
+  workflow_call:
+    secrets:
+      RELEASE_GITHUB_TOKEN:
+        required: true
+      RELEASE_ARTIFACTORY_TOKEN:
+        required: true
+      SCRIBE_CLIENT_ID:
+        required: true
+      SCRIBE_CLIENT_SECRET:
+        required: true
+      SLACK_WEBHOOK_URL:
+        required: true
+    inputs:
+      SCRIBE_URL:
+        type: string
+        required: true
+        default: https://airflow.dev.scribesecurity.com 
+      SCRIBE_LOGIN_URL:
+        type: string
+        required: true
+        default: https://scribe-hub-dev.us.auth0.com
+      SCRIBE_AUDIENCE:
+        type: string
+        required: true
+        default: api.dev.scribesecurity.com
+      GITHUB_USER:
+        type: string
+        required: true
+      RELEASE_ARTIFACTORY_USERNAME:
+        type: string
+        required: true
+      ENV:
+        type: string
+        required: true
+        default: dev
+
+jobs:
+  e2e-test:
+    name: "e2e tests"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Restore tool cache
+        id: tool-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .tmp
+            snapshot
+          key: ${{ runner.os }}-tool-${{ hashFiles('Makefile') }}
+
+      - name: Restore go cache
+        id: go-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-${{ env.GO_VERSION }}-
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.ARTIFACTORY_URL }}
+          username: ${{ inputs.RELEASE_ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
+
+      - name: Configure git for private modules
+        env:
+          TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        run: git config --global url."https://${{ inputs.GITHUB_USER }}:${TOKEN}@github.com".insteadOf "https://github.com"
+
+      - name: Bootstrap
+        if: steps.tool-cache.outputs.cache-hit != 'true' || steps.go-cache.outputs.cache-hit != 'true'
+        run: make bootstrap
+        
+      - name: Build binary
+        # if: steps.tool-cache.outputs.cache-hit != 'true'
+        run: make binary
+
+      - name: Expose info
+        id: info
+        run: |
+          CLI_VERSION=$(snapshot/main_linux_amd64_v1/valint --version)
+          echo "CLI_VERSION=${CLI_VERSION}" >> $GITHUB_OUTPUT          
+
+      # - name: E2E local tests
+      #   run: make e2e_cache
+
+      - name: E2E scribe tests
+        run: make e2e_scribe
+        env:
+          SCRIBE_URL: ${{ inputs.SCRIBE_URL }}
+          SCRIBE_CLIENT_ID: ${{ secrets.SCRIBE_CLIENT_ID }}
+          SCRIBE_CLIENT_SECRET: ${{ secrets.SCRIBE_CLIENT_SECRET }}
+          SCRIBE_LOGIN_URL: ${{ inputs.SCRIBE_LOGIN_URL }}
+          SCRIBE_AUDIENCE: ${{ inputs.SCRIBE_AUDIENCE }}
+
+      - name: E2E OCI tests
+        run: make e2e_oci
+        env:
+          SCRIBE_OCI_REPO: ${{ env.SCRIBE_OCI_STORE }}/${{ inputs.ENV }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test_evidence
+          path: |
+            test/integration/_tmp
+      
+
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notification_title: 'CLI {workflow} has {status_message}'
+          message_format: |
+            {emoji} *{workflow}* {status_message}
+            <{run_url}|View Run>
+            Valint: ${{ steps.info.outputs.CLI_VERSION }}
+            Scribe: ${{ inputs.SCRIBE_URL }}
+          footer: |
+            Repo <{repo_url}|{repo}> | <{commit_url}|{commit_sha}>
+            Branch <{branch_url}|{branch}>
+          mention_groups: "!channel"
+          mention_groups_when: "failure,warnings"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
