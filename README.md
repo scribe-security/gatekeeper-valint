@@ -38,13 +38,14 @@ Gatekeeper enforces TLS when communicating with the provider, so certificates mu
 If Valint verification is to be performed with x509 certificate, provide additional flags.
 
 - ```sh
-helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
+   helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
    --namespace gatekeeper-valint --create-namespace \
    --set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
    --set certs.tlsCrt="$(cat certs/tls.crt)" \
    --set certs.tlsKey="$(cat certs/tls.key)" \
    --set x509.cert="$(cat valint/tls.crt)" \
    --set x509.ca="$(cat valint/ca.crt)"
+  ```
 
 ### Evidence Stores
 Each storer can be used to store, find and download evidence, unifying all the supply chain evidence into a system is an important part to be able to query any subset for policy validation.
@@ -68,7 +69,7 @@ Integrating Scribe Hub with admission controller requires the following credenti
 Enable Scribe client and add related `Client ID` and `Client Secret`.
 
 - ```sh
-helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
+   helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
    --namespace gatekeeper-valint --create-namespace \
    --set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
    --set certs.tlsCrt="$(cat certs/tls.crt)" \
@@ -76,7 +77,7 @@ helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
    --set scribe.enable=true \
    --set scribe.client_id=$SCRIBE_CLIENT_ID \
    --set scribe.client_secret=$SCRIBE_CLIENT_SECRET
-
+  ```
 > Credentials will be stored as a secret named `scribe-cred-secret`.
 
 ## OCI Evidence store
