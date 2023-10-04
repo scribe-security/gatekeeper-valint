@@ -147,6 +147,10 @@ mod-goreleaser:
 	echo "dist: $(DIR)" > $(TEMPDIR)/goreleaser.yml
 	cat .goreleaser.yml >> $(TEMPDIR)/goreleaser.yml
 
+.PHONY: test
+test:
+	go test ./...
+
 .PHONY: clean
 clean: clean-dist clean-snapshot ## Remove previous builds, result reports, and test cache
 
@@ -157,6 +161,11 @@ clean-snapshot:
 .PHONY: clean-dist
 clean-dist:
 	rm -rf $(DISTDIR) $(TEMPDIR)/goreleaser.yaml
+
+.PHONY: clean-test
+clean-test:
+	@helm -ngatekeeper-system delete gatekeeper
+	@helm -ngatekeeper-valint delete gatekeeper-valint
 
 .PHONY: upstream-gensbom
 upstream-gensbom:

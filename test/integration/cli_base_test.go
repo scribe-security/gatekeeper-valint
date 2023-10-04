@@ -2,6 +2,7 @@ package integration
 
 import (
 	// "context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/exec"
@@ -24,6 +25,7 @@ import (
 
 var (
 	gatekeeperNamespace = "gatekeeper-system"
+	providerNamespace   = "gatekeeper-valint"
 )
 
 /* func PrepareScribeE2E(t *testing.T) []string {
@@ -106,25 +108,62 @@ func InstallGatekeeper(t *testing.T) {
 	require.NoError(t, err)
 
 	client := action.NewInstall(actionConfig)
-	chartPath, err := client.LocateChart("https://open-policy-agent.github.io/gatekeeper/charts/", settings)
+	client.RepoURL = "https://open-policy-agent.github.io/gatekeeper/charts"
+	client.ReleaseName = "gatekeeper"
+	client.CreateNamespace = true
+	client.NameTemplate = "gatekeeper"
+	client.Namespace = gatekeeperNamespace
+
+	chartPath, err := client.LocateChart("gatekeeper", settings)
 	require.NoError(t, err)
 
 	chart, err := loader.Load(chartPath)
 	require.NoError(t, err)
 
-	_, err = client.Run(chart, nil)
+	vals := MakeGatekeeperValues()
+	_, err = client.Run(chart, vals)
 	require.NoError(t, err)
 }
 
+func InstallProvider(t *testing.T) {
+	settings := cli.New()
+
+	actionConfig := new(action.Configuration)
+	err := actionConfig.Init(settings.RESTClientGetter(), providerNamespace, os.Getenv("HELM_DRIVER"), t.Logf)
+	require.NoError(t, err)
+
+	client := action.NewInstall(actionConfig)
+	client.ReleaseName = "gatekeeper-valint"
+	client.CreateNamespace = true
+	client.NameTemplate = "gatekeeper-valint"
+	client.Namespace = providerNamespace
+	chartPath, err := client.LocateChart("../../charts/gatekeeper-valint", settings)
+	require.NoError(t, err)
+
+	chart, err := loader.Load(chartPath)
+	require.NoError(t, err)
+
+	vals := LoadCertificates(t)
+	r, err := client.Run(chart, vals)
+	require.NoError(t, err)
+
+	t.Logf("Deployed at %v", r.Namespace)
+}
+
 func GenerateCertificates(t *testing.T) {
-	cmd := []string{"../../scripts/generate-tls-cert.sh"}
-	RunCmd(t, cmd)
+	cmd := []string{"./generate-tls-cert.sh"}
+	_, _, err := RunCmd(t, cmd)
+	require.NoError(t, err)
 }
 
 func TestInitial(t *testing.T) {
 	// clientset := ConfigureK8s(t)
-	// InstallGatekeeper(t)
+	InstallGatekeeper(t)
+
 	GenerateCertificates(t)
+
+	InstallProvider(t)
+
 }
 
 func RunCmd(t testing.TB, cmd []string) (*exec.Cmd, string, error) {
@@ -137,7 +176,39 @@ func RunCmd(t testing.TB, cmd []string) (*exec.Cmd, string, error) {
 	if err != nil {
 		t.Logf("[COMMAND] exec fail, Command: %v", cmd)
 	} else {
-		t.Logf("[COMMAND] exec success, Command: %v, %v", cmd, string(out))
+		t.Logf("[COMMAND] exec success, Command: %v", cmd)
 	}
 	return execCmd, string(out), err
+}
+
+func LoadCertificates(t *testing.T) map[string]interface{} {
+	res := make(map[string]interface{})
+	ca, err := os.ReadFile("../../certs/ca.crt")
+	require.NoError(t, err)
+
+	crt, err := os.ReadFile("../../certs/tls.crt")
+	require.NoError(t, err)
+
+	key, err := os.ReadFile("../../certs/tls.key")
+	require.NoError(t, err)
+
+	res["certs"] = make(map[string]string)
+	res["certs"].(map[string]string)["caBundle"] = base64.StdEncoding.EncodeToString(ca)
+	res["certs"].(map[string]string)["tlsCrt"] = string(crt)
+	res["certs"].(map[string]string)["tlsKey"] = string(key)
+	return res
+}
+
+func MakeGatekeeperValues() map[string]interface{} {
+	res := make(map[string]interface{})
+
+	res["validatingWebhookTimeoutSeconds"] = 30
+	res["enableExternalData"] = true
+	res["controllerManager"] = make(map[string]interface{})
+	res["controllerManager"].(map[string]interface{})["dnsPolicy"] = "ClusterFirst"
+
+	res["audit"] = make(map[string]interface{})
+	res["audit"].(map[string]interface{})["dnsPolicy"] = "ClusterFirst"
+
+	return res
 }
