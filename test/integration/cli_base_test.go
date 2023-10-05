@@ -1,9 +1,11 @@
 package integration
 
 import (
-	// "context"
+	"bytes"
+	"context"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -12,7 +14,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	// metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
@@ -121,12 +124,16 @@ func InstallGatekeeper(t *testing.T) {
 	require.NoError(t, err)
 
 	vals := MakeGatekeeperValues()
-	_, err = client.Run(chart, vals)
+	r, err := client.Run(chart, vals)
 	require.NoError(t, err)
+
+	t.Logf("Deployed Gatekeeper at %v", r.Namespace)
 }
 
 func InstallProvider(t *testing.T) {
 	settings := cli.New()
+
+	settings.Debug = true
 
 	actionConfig := new(action.Configuration)
 	err := actionConfig.Init(settings.RESTClientGetter(), providerNamespace, os.Getenv("HELM_DRIVER"), t.Logf)
@@ -147,7 +154,7 @@ func InstallProvider(t *testing.T) {
 	r, err := client.Run(chart, vals)
 	require.NoError(t, err)
 
-	t.Logf("Deployed at %v", r.Namespace)
+	t.Logf("Deployed Provider at %v", r.Namespace)
 }
 
 func GenerateCertificates(t *testing.T) {
@@ -157,13 +164,15 @@ func GenerateCertificates(t *testing.T) {
 }
 
 func TestInitial(t *testing.T) {
-	// clientset := ConfigureK8s(t)
 	InstallGatekeeper(t)
-
 	GenerateCertificates(t)
-
 	InstallProvider(t)
 
+	clientset := ConfigureK8s(t)
+	WaitForProviderPod(t, clientset)
+	logs := GetProviderLogs(t, clientset)
+
+	t.Logf("%v", logs)
 }
 
 func RunCmd(t testing.TB, cmd []string) (*exec.Cmd, string, error) {
@@ -192,10 +201,10 @@ func LoadCertificates(t *testing.T) map[string]interface{} {
 	key, err := os.ReadFile("../../certs/tls.key")
 	require.NoError(t, err)
 
-	res["certs"] = make(map[string]string)
-	res["certs"].(map[string]string)["caBundle"] = base64.StdEncoding.EncodeToString(ca)
-	res["certs"].(map[string]string)["tlsCrt"] = string(crt)
-	res["certs"].(map[string]string)["tlsKey"] = string(key)
+	res["certs"] = make(map[string]interface{})
+	res["certs"].(map[string]interface{})["caBundle"] = base64.StdEncoding.EncodeToString(ca)
+	res["certs"].(map[string]interface{})["tlsCrt"] = string(crt)
+	res["certs"].(map[string]interface{})["tlsKey"] = string(key)
 	return res
 }
 
@@ -211,4 +220,34 @@ func MakeGatekeeperValues() map[string]interface{} {
 	res["audit"].(map[string]interface{})["dnsPolicy"] = "ClusterFirst"
 
 	return res
+}
+
+func WaitForProviderPod(t *testing.T, clientset *kubernetes.Clientset) {
+	/* pods, err := clientset.CoreV1().Pods(providerNamespace).List(context.Background(), metav1.ListOptions{})
+	require.NoError(t, err)
+	require.Equal(t, len(pods.Items), 1)
+
+	w, err := clientset.CoreV1().Pods(providerNamespace).Watch(context.Background(), metav1.ListOptions{})
+	require.NoError(t, err)
+	*/
+	time.Sleep(10 * time.Second)
+}
+
+func GetProviderLogs(t *testing.T, clientset *kubernetes.Clientset) string {
+
+	pods, err := clientset.CoreV1().Pods(providerNamespace).List(context.Background(), metav1.ListOptions{})
+	require.NoError(t, err)
+	require.Equal(t, len(pods.Items), 1)
+
+	request := clientset.CoreV1().Pods(providerNamespace).GetLogs(pods.Items[0].Name, &corev1.PodLogOptions{})
+
+	logs, err := request.Stream(context.Background())
+	require.NoError(t, err)
+	defer logs.Close()
+
+	buf := new(bytes.Buffer)
+	_, err = io.Copy(buf, logs)
+	require.NoError(t, err)
+
+	return buf.String()
 }

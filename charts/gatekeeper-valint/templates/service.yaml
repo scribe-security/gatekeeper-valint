@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gatekeeper-valint
-  namespace: '{{ .Release.namespace }}'
+  namespace: '{{ .Release.Namespace }}'
   labels:
   {{- include "gatekeeper-valint.labels" . | nindent 4 }}
 spec:

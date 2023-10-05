@@ -149,7 +149,7 @@ mod-goreleaser:
 
 .PHONY: test
 test:
-	go test ./...
+	go test -test.v ./...
 
 .PHONY: clean
 clean: clean-dist clean-snapshot ## Remove previous builds, result reports, and test cache
