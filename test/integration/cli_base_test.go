@@ -9,11 +9,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -76,12 +78,17 @@ func ConfigureK8s(t *testing.T) *kubernetes.Clientset {
 	return clientset
 }
 
-func HelmInstall(t *testing.T, chart string, values string) {
+func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 	tests := []struct {
-		name string
+		name          string
+		image         string
+		expectedError string
+		valintConfig  map[string]interface{}
 	}{
 		{
-			name: "valid-deployment",
+			name:          "OCI no evidence deployment",
+			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+			expectedError: "Err: no evidence found",
 		},
 	}
 
@@ -90,10 +97,12 @@ func HelmInstall(t *testing.T, chart string, values string) {
 
 		t.Run(test.name, func(t *testing.T) {
 
-			for _, name := range test.name {
-				t.Log("###### Testing ", name, "######")
-				var err error
+			t.Log("###### Testing ", test.name, "######")
+			err := ApplyK8sManifest(t, clientset, test.image)
+			if test.expectedError == "" {
 				require.NoError(t, err)
+			} else {
+				require.True(t, strings.Contains(err.Error(), test.expectedError))
 			}
 
 		})
@@ -103,58 +112,45 @@ func HelmInstall(t *testing.T, chart string, values string) {
 	}
 }
 
-func InstallGatekeeper(t *testing.T) {
+func HelmInstall(t *testing.T, namespace string, repo string, chart string, releaseName string, vals map[string]interface{}) {
 	settings := cli.New()
 
 	actionConfig := new(action.Configuration)
-	err := actionConfig.Init(settings.RESTClientGetter(), gatekeeperNamespace, os.Getenv("HELM_DRIVER"), t.Logf)
+	err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), t.Logf)
 	require.NoError(t, err)
 
 	client := action.NewInstall(actionConfig)
-	client.RepoURL = "https://open-policy-agent.github.io/gatekeeper/charts"
-	client.ReleaseName = "gatekeeper"
 	client.CreateNamespace = true
-	client.NameTemplate = "gatekeeper"
-	client.Namespace = gatekeeperNamespace
+	if strings.HasPrefix(repo, "http") {
+		client.RepoURL = repo
+	}
+	client.ReleaseName = releaseName
+	client.NameTemplate = releaseName
+	client.Namespace = namespace
 
-	chartPath, err := client.LocateChart("gatekeeper", settings)
+	var chartPath string
+	if strings.HasPrefix(repo, "http") {
+		chartPath, err = client.LocateChart(chart, settings)
+		require.NoError(t, err)
+	} else {
+		chartPath = repo
+	}
+
+	helmChart, err := loader.Load(chartPath)
 	require.NoError(t, err)
 
-	chart, err := loader.Load(chartPath)
+	_, err = client.Run(helmChart, vals)
 	require.NoError(t, err)
+}
 
-	vals := MakeGatekeeperValues()
-	r, err := client.Run(chart, vals)
-	require.NoError(t, err)
-
-	t.Logf("Deployed Gatekeeper at %v", r.Namespace)
+func InstallGatekeeper(t *testing.T) {
+	HelmInstall(t, gatekeeperNamespace, "https://open-policy-agent.github.io/gatekeeper/charts",
+		"gatekeeper", "gatekeeper", MakeGatekeeperValues())
 }
 
 func InstallProvider(t *testing.T) {
-	settings := cli.New()
-
-	settings.Debug = true
-
-	actionConfig := new(action.Configuration)
-	err := actionConfig.Init(settings.RESTClientGetter(), providerNamespace, os.Getenv("HELM_DRIVER"), t.Logf)
-	require.NoError(t, err)
-
-	client := action.NewInstall(actionConfig)
-	client.ReleaseName = "gatekeeper-valint"
-	client.CreateNamespace = true
-	client.NameTemplate = "gatekeeper-valint"
-	client.Namespace = providerNamespace
-	chartPath, err := client.LocateChart("../../charts/gatekeeper-valint", settings)
-	require.NoError(t, err)
-
-	chart, err := loader.Load(chartPath)
-	require.NoError(t, err)
-
-	vals := LoadCertificates(t)
-	r, err := client.Run(chart, vals)
-	require.NoError(t, err)
-
-	t.Logf("Deployed Provider at %v", r.Namespace)
+	HelmInstall(t, providerNamespace, "../../charts/gatekeeper-valint",
+		"gatekeeper-valint", "gatekeeper-valint", LoadCertificates(t))
 }
 
 func GenerateCertificates(t *testing.T) {
@@ -169,9 +165,11 @@ func TestInitial(t *testing.T) {
 	InstallProvider(t)
 
 	clientset := ConfigureK8s(t)
-	WaitForProviderPod(t, clientset)
-	logs := GetProviderLogs(t, clientset)
 
+	WaitForProviderPod(t, clientset)
+	HelmInstallTable(t, clientset)
+
+	logs := GetProviderLogs(t, clientset)
 	t.Logf("%v", logs)
 }
 
@@ -251,3 +249,42 @@ func GetProviderLogs(t *testing.T, clientset *kubernetes.Clientset) string {
 
 	return buf.String()
 }
+
+func ApplyK8sManifest(t *testing.T, clientset *kubernetes.Clientset, image string) error {
+	deployment := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-deployment",
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: int32Ptr(0),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": "test-deployment",
+				},
+			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"app": "test-deployment",
+					},
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "test-container",
+							Image: image,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	deploymentsClient := clientset.AppsV1().Deployments("default")
+	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
+
+	t.Logf("Deployed manifest %v \n %v", result.Status, err)
+	return err
+}
+
+func int32Ptr(i int32) *int32 { return &i }
