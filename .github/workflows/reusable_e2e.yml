@@ -101,7 +101,7 @@ jobs:
         uses: helm/kind-action@v1.8.0
 
       - name: E2E scribe tests
-        run: make uninstall
+        run: make test
         env:
           SCRIBE_URL: ${{ inputs.SCRIBE_URL }}
           SCRIBE_CLIENT_ID: ${{ secrets.SCRIBE_CLIENT_ID }}
