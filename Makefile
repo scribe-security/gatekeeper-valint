@@ -54,6 +54,7 @@ bootstrap-tools: $(TEMPDIR)
 	# curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- -b $(TEMPDIR)/latest
 	mkdir -p ./$(TEMPDIR)/latest
 	GOBIN=$(shell realpath $(TEMPDIR)/latest) go install github.com/goreleaser/goreleaser@v1.18.2
+	curl -sSfL https://get.scribesecurity.com/install.sh  | sh -s -- -t valint -D -d -b $(TEMPDIR)
 
 .PHONY: bootstrap-go
 bootstrap-go:
@@ -164,8 +165,8 @@ clean-dist:
 
 .PHONY: clean-test
 clean-test:
-	@helm -ngatekeeper-system delete gatekeeper
-	@helm -ngatekeeper-valint delete gatekeeper-valint
+	@helm -ngatekeeper-system delete gatekeeper || true
+	@helm -ngatekeeper-valint delete gatekeeper-valint || true
 
 .PHONY: upstream-gensbom
 upstream-gensbom:

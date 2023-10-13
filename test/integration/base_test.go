@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -32,24 +31,6 @@ var (
 	gatekeeperNamespace = "gatekeeper-system"
 	providerNamespace   = "gatekeeper-valint"
 )
-
-/* func PrepareScribeE2E(t *testing.T) []string {
-	scribeURL, found := os.LookupEnv("SCRIBE_URL")
-	require.True(t, found, "Scribe url not found")
-
-	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
-	require.True(t, found, "Scribe client id not found")
-
-	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
-	require.True(t, found, "Scribe client secret not found")
-
-	scribeCLientLoginURL, found := os.LookupEnv("SCRIBE_LOGIN_URL")
-	require.True(t, found, "Scribe client login url")
-
-	scribeClientAudience, found := os.LookupEnv("SCRIBE_AUDIENCE")
-	require.True(t, found, "Scribe client login audience")
-}
-*/
 
 /*
 func ReadFileAndSetEnv(t *testing.T, filename, envVarName string) {
@@ -83,12 +64,22 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		name          string
 		image         string
 		expectedError string
+		bomFlags      []string
 		valintConfig  map[string]interface{}
+		scribeConfig  map[string]interface{}
 	}{
 		{
-			name:          "OCI no evidence deployment",
+			name:          "No evidence deployment",
 			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
 			expectedError: "Err: no evidence found",
+		},
+		{
+			name:          "Scribe evidence deployment",
+			image:         "busybox",
+			expectedError: "",
+			bomFlags:      MakeBomFlags(t),
+			scribeConfig:  MakeScribeConfig(t),
+			valintConfig:  MakeValintScribeConfig(t),
 		},
 	}
 
@@ -98,18 +89,38 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		t.Run(test.name, func(t *testing.T) {
 
 			t.Log("###### Testing ", test.name, "######")
+			InstallProvider(t, test.scribeConfig)
+			WaitForProviderPod(t, clientset)
+			if test.bomFlags != nil {
+				runCmd(t, test.bomFlags...)
+			}
 			err := ApplyK8sManifest(t, clientset, test.image)
 			if test.expectedError == "" {
 				require.NoError(t, err)
 			} else {
 				require.True(t, strings.Contains(err.Error(), test.expectedError))
 			}
+			logs := GetProviderLogs(t, clientset)
+			t.Logf("%v", logs)
 
+			UninstallProvider(t)
 		})
 		endTime := time.Now()
 		elapsed := endTime.Sub(startTime)
 		fmt.Printf("Elapsed: %s\n", elapsed)
 	}
+}
+
+func HelmUninstall(t *testing.T, namespace string, releaseName string) {
+	settings := cli.New()
+
+	actionConfig := new(action.Configuration)
+	err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), t.Logf)
+	require.NoError(t, err)
+
+	client := action.NewUninstall(actionConfig)
+	_, err = client.Run(releaseName)
+	require.NoError(t, err)
 }
 
 func HelmInstall(t *testing.T, namespace string, repo string, chart string, releaseName string, vals map[string]interface{}) {
@@ -121,15 +132,13 @@ func HelmInstall(t *testing.T, namespace string, repo string, chart string, rele
 
 	client := action.NewInstall(actionConfig)
 	client.CreateNamespace = true
-	if strings.HasPrefix(repo, "http") {
-		client.RepoURL = repo
-	}
 	client.ReleaseName = releaseName
 	client.NameTemplate = releaseName
 	client.Namespace = namespace
-
 	var chartPath string
+
 	if strings.HasPrefix(repo, "http") {
+		client.RepoURL = repo
 		chartPath, err = client.LocateChart(chart, settings)
 		require.NoError(t, err)
 	} else {
@@ -148,9 +157,13 @@ func InstallGatekeeper(t *testing.T) {
 		"gatekeeper", "gatekeeper", MakeGatekeeperValues())
 }
 
-func InstallProvider(t *testing.T) {
+func InstallProvider(t *testing.T, scribeConfig map[string]interface{}) {
 	HelmInstall(t, providerNamespace, "../../charts/gatekeeper-valint",
-		"gatekeeper-valint", "gatekeeper-valint", LoadCertificates(t))
+		"gatekeeper-valint", "gatekeeper-valint", MakeProviderValues(t, scribeConfig))
+}
+
+func UninstallProvider(t *testing.T) {
+	HelmUninstall(t, providerNamespace, "gatekeeper-valint")
 }
 
 func GenerateCertificates(t *testing.T) {
@@ -162,34 +175,14 @@ func GenerateCertificates(t *testing.T) {
 func TestInitial(t *testing.T) {
 	InstallGatekeeper(t)
 	GenerateCertificates(t)
-	InstallProvider(t)
 
 	clientset := ConfigureK8s(t)
 
-	WaitForProviderPod(t, clientset)
 	HelmInstallTable(t, clientset)
 
-	logs := GetProviderLogs(t, clientset)
-	t.Logf("%v", logs)
 }
 
-func RunCmd(t testing.TB, cmd []string) (*exec.Cmd, string, error) {
-	HEAD := cmd[0]
-	CMD := cmd[1:]
-	execCmd := exec.Command(HEAD, CMD...)
-	execCmd.Env = os.Environ()
-
-	out, err := execCmd.CombinedOutput()
-	if err != nil {
-		t.Logf("[COMMAND] exec fail, Command: %v", cmd)
-	} else {
-		t.Logf("[COMMAND] exec success, Command: %v", cmd)
-	}
-	return execCmd, string(out), err
-}
-
-func LoadCertificates(t *testing.T) map[string]interface{} {
-	res := make(map[string]interface{})
+func LoadCertificates(t *testing.T, values map[string]interface{}) {
 	ca, err := os.ReadFile("../../certs/ca.crt")
 	require.NoError(t, err)
 
@@ -199,25 +192,33 @@ func LoadCertificates(t *testing.T) map[string]interface{} {
 	key, err := os.ReadFile("../../certs/tls.key")
 	require.NoError(t, err)
 
-	res["certs"] = make(map[string]interface{})
-	res["certs"].(map[string]interface{})["caBundle"] = base64.StdEncoding.EncodeToString(ca)
-	res["certs"].(map[string]interface{})["tlsCrt"] = string(crt)
-	res["certs"].(map[string]interface{})["tlsKey"] = string(key)
+	values["certs"] = map[string]interface{}{
+		"caBundle": base64.StdEncoding.EncodeToString(ca),
+		"tlsCrt":   string(crt),
+		"tlsKey":   string(key),
+	}
+}
+
+func MakeProviderValues(t *testing.T, scribeConfig map[string]interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+
+	LoadCertificates(t, res)
+	res["scribe"] = scribeConfig
+
 	return res
 }
 
 func MakeGatekeeperValues() map[string]interface{} {
-	res := make(map[string]interface{})
-
-	res["validatingWebhookTimeoutSeconds"] = 30
-	res["enableExternalData"] = true
-	res["controllerManager"] = make(map[string]interface{})
-	res["controllerManager"].(map[string]interface{})["dnsPolicy"] = "ClusterFirst"
-
-	res["audit"] = make(map[string]interface{})
-	res["audit"].(map[string]interface{})["dnsPolicy"] = "ClusterFirst"
-
-	return res
+	return map[string]interface{}{
+		"validatingWebhookTimeoutSeconds": 30,
+		"enableExternalData":              true,
+		"controllerManager": map[string]interface{}{
+			"dnsPolicy": "ClusterFirst",
+		},
+		"audit": map[string]interface{}{
+			"dnsPolicy": "ClusterFirst",
+		},
+	}
 }
 
 func WaitForProviderPod(t *testing.T, clientset *kubernetes.Clientset) {
@@ -232,7 +233,6 @@ func WaitForProviderPod(t *testing.T, clientset *kubernetes.Clientset) {
 }
 
 func GetProviderLogs(t *testing.T, clientset *kubernetes.Clientset) string {
-
 	pods, err := clientset.CoreV1().Pods(providerNamespace).List(context.Background(), metav1.ListOptions{})
 	require.NoError(t, err)
 	require.Equal(t, len(pods.Items), 1)
@@ -288,3 +288,64 @@ func ApplyK8sManifest(t *testing.T, clientset *kubernetes.Clientset, image strin
 }
 
 func int32Ptr(i int32) *int32 { return &i }
+
+func MakeScribeConfig(t *testing.T) map[string]interface{} {
+	// scribeURL, found := os.LookupEnv("SCRIBE_URL")
+	// require.True(t, found, "Scribe url not found")
+
+	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
+	require.True(t, found, "Scribe client id not found")
+
+	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
+	require.True(t, found, "Scribe client secret not found")
+
+	// scribeCLientLoginURL, found := os.LookupEnv("SCRIBE_LOGIN_URL")
+	// require.True(t, found, "Scribe client login url")
+
+	// scribeClientAudience, found := os.LookupEnv("SCRIBE_AUDIENCE")
+	// require.True(t, found, "Scribe client login audience")
+
+	return map[string]interface{}{
+		"client_id":     scribeClientID,
+		"client_secret": scribeClientSecret,
+		"enable":        true,
+	}
+}
+
+func MakeValintScribeConfig(t *testing.T) map[string]interface{} {
+	return map[string]interface{}{
+		"config": map[string]interface{}{
+			"logger": map[string]interface{}{
+				"level": "debug",
+			},
+			"verify": map[string]interface{}{
+				"input-format": "attest",
+			},
+			"attest": map[string]interface{}{
+				"default": "x509-env",
+			},
+			"cocosign": map[string]interface{}{
+				"storer": map[string]interface{}{
+					"OCI": map[string]interface{}{
+						"enable": false,
+					},
+					"scribe": map[string]interface{}{
+						"enable": true,
+					},
+				},
+			},
+		},
+	}
+}
+
+func MakeBomFlags(t *testing.T) []string {
+	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
+	require.True(t, found, "Scribe client id not found")
+
+	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
+	require.True(t, found, "Scribe client secret not found")
+
+	return []string{
+		"bom", "-o statement", "-E", "-U", scribeClientID, "-P", scribeClientSecret,
+	}
+}
