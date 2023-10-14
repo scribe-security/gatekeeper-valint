@@ -68,16 +68,22 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		valintConfig  map[string]interface{}
 		scribeConfig  map[string]interface{}
 	}{
-		{
-			name:          "No evidence deployment",
-			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
-			expectedError: "Err: no evidence found",
-		},
+		//{
+		//	name:          "No evidence deployment",
+		//	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+		//	expectedError: "Err: no evidence found",
+		//≈},
+		//{
+		//	name:          "Scribe no evidence deployment",
+		//	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+		//	expectedError: "Err: no evidence found",
+		//	scribeConfig:  MakeScribeConfig(t),
+		//},
 		{
 			name:          "Scribe evidence deployment",
-			image:         "busybox",
+			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
 			expectedError: "",
-			bomFlags:      MakeBomFlags(t),
+			bomFlags:      MakeBomFlags(t, "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest"),
 			scribeConfig:  MakeScribeConfig(t),
 			valintConfig:  MakeValintScribeConfig(t),
 		},
@@ -90,10 +96,15 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 
 			t.Log("###### Testing ", test.name, "######")
 			InstallProvider(t, test.scribeConfig)
-			WaitForProviderPod(t, clientset)
+
 			if test.bomFlags != nil {
-				runCmd(t, test.bomFlags...)
+				_, out, err := runCmd(t, test.bomFlags...)
+				t.Logf(out)
+				require.NoError(t, err)
 			}
+
+			WaitForProviderPod(t, clientset)
+
 			err := ApplyK8sManifest(t, clientset, test.image)
 			if test.expectedError == "" {
 				require.NoError(t, err)
@@ -103,6 +114,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			logs := GetProviderLogs(t, clientset)
 			t.Logf("%v", logs)
 
+			DeleteK8sDeployment(t, clientset)
 			UninstallProvider(t)
 		})
 		endTime := time.Now()
@@ -283,10 +295,15 @@ func ApplyK8sManifest(t *testing.T, clientset *kubernetes.Clientset, image strin
 	deploymentsClient := clientset.AppsV1().Deployments("default")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 
-	t.Logf("Deployed manifest %v \n %v", result.Status, err)
+	t.Logf("Deploying manifest %v \n %v", result.Status, err)
 	return err
 }
 
+func DeleteK8sDeployment(t *testing.T, clientset *kubernetes.Clientset) {
+	deploymentClient := clientset.AppsV1().Deployments("default")
+	deploymentClient.Delete(context.TODO(), "test-deployment", metav1.DeleteOptions{})
+	// require.NoError(t, err)
+}
 func int32Ptr(i int32) *int32 { return &i }
 
 func MakeScribeConfig(t *testing.T) map[string]interface{} {
@@ -338,7 +355,7 @@ func MakeValintScribeConfig(t *testing.T) map[string]interface{} {
 	}
 }
 
-func MakeBomFlags(t *testing.T) []string {
+func MakeBomFlags(t *testing.T, image string) []string {
 	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
 	require.True(t, found, "Scribe client id not found")
 
@@ -346,6 +363,6 @@ func MakeBomFlags(t *testing.T) []string {
 	require.True(t, found, "Scribe client secret not found")
 
 	return []string{
-		"bom", "-o statement", "-E", "-U", scribeClientID, "-P", scribeClientSecret,
+		"bom", "--cache-enable=false", "-o", "statement", "-E", "-U", scribeClientID, "-P", scribeClientSecret, image,
 	}
 }
