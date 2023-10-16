@@ -68,17 +68,17 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		valintConfig  map[string]interface{}
 		scribeConfig  map[string]interface{}
 	}{
-		//{
-		//	name:          "No evidence deployment",
-		//	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
-		//	expectedError: "Err: no evidence found",
-		//≈},
-		//{
-		//	name:          "Scribe no evidence deployment",
-		//	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
-		//	expectedError: "Err: no evidence found",
-		//	scribeConfig:  MakeScribeConfig(t),
-		//},
+		{
+			name:          "No evidence deployment",
+			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+			expectedError: "Err: no evidence found",
+		},
+		{
+			name:          "Scribe no evidence deployment",
+			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+			expectedError: "Err: no evidence found",
+			scribeConfig:  MakeScribeConfig(t),
+		},
 		{
 			name:          "Scribe evidence deployment",
 			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
@@ -95,6 +95,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		t.Run(test.name, func(t *testing.T) {
 
 			t.Log("###### Testing ", test.name, "######")
+			InstallGatekeeper(t)
 			InstallProvider(t, test.scribeConfig)
 
 			if test.bomFlags != nil {
@@ -106,16 +107,19 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			WaitForProviderPod(t, clientset)
 
 			err := ApplyK8sManifest(t, clientset, test.image)
+
+			logs := GetProviderLogs(t, clientset)
+			t.Logf("%v", logs)
+
 			if test.expectedError == "" {
 				require.NoError(t, err)
 			} else {
 				require.True(t, strings.Contains(err.Error(), test.expectedError))
 			}
-			logs := GetProviderLogs(t, clientset)
-			t.Logf("%v", logs)
 
 			DeleteK8sDeployment(t, clientset)
 			UninstallProvider(t)
+			UninstallGatekeeper(t)
 		})
 		endTime := time.Now()
 		elapsed := endTime.Sub(startTime)
@@ -169,6 +173,10 @@ func InstallGatekeeper(t *testing.T) {
 		"gatekeeper", "gatekeeper", MakeGatekeeperValues())
 }
 
+func UninstallGatekeeper(t *testing.T) {
+	HelmUninstall(t, gatekeeperNamespace, "gatekeeper")
+}
+
 func InstallProvider(t *testing.T, scribeConfig map[string]interface{}) {
 	HelmInstall(t, providerNamespace, "../../charts/gatekeeper-valint",
 		"gatekeeper-valint", "gatekeeper-valint", MakeProviderValues(t, scribeConfig))
@@ -185,13 +193,11 @@ func GenerateCertificates(t *testing.T) {
 }
 
 func TestInitial(t *testing.T) {
-	InstallGatekeeper(t)
 	GenerateCertificates(t)
 
 	clientset := ConfigureK8s(t)
 
 	HelmInstallTable(t, clientset)
-
 }
 
 func LoadCertificates(t *testing.T, values map[string]interface{}) {
@@ -336,7 +342,7 @@ func MakeValintScribeConfig(t *testing.T) map[string]interface{} {
 				"level": "debug",
 			},
 			"verify": map[string]interface{}{
-				"input-format": "attest",
+				"input-format": "statement",
 			},
 			"attest": map[string]interface{}{
 				"default": "x509-env",
