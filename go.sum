@@ -3659,8 +3659,6 @@ github.com/scribe-security/basecli v0.0.0-20231003063937-34cb5441c4a6 h1:n1+dZL+
 github.com/scribe-security/basecli v0.0.0-20231003063937-34cb5441c4a6/go.mod h1:V4Nb4HxrQ0AtdxdQSWfXe5c5vnsNfDUOoERkLCdtkqw=
 github.com/scribe-security/cocosign v0.0.0-20231002133640-2198f63167bf h1:Vrxts6vqN8LQUZrvOhL/VNIYx9pQv3cRo9u2y481pBA=
 github.com/scribe-security/cocosign v0.0.0-20231002133640-2198f63167bf/go.mod h1:+xTk3oLw5OV58FOIRWV7x9OlfQuTLQdWHi2SFXlwSBU=
-github.com/scribe-security/gensbom v0.0.21-0.20230906111315-58a29ea37ade h1:5+m5goYjnsenBzlTlvnvpmecIWifjWmkzN/4GRSUSzk=
-github.com/scribe-security/gensbom v0.0.21-0.20230906111315-58a29ea37ade/go.mod h1:nyxUFyeVSMi/B9PQxzZK9z1BFgJI+o0LHYPJKqAadSk=
 github.com/scribe-security/gensbom v0.0.21-0.20231003064010-c728fd17ea93 h1:yn5H2NzSnpdJsbYdUIpjvU+Hl2UlEv2C1Mp2POZj54U=
 github.com/scribe-security/gensbom v0.0.21-0.20231003064010-c728fd17ea93/go.mod h1:SkfigKjlfS8+EhSxjCZg3IBFhsfQEpFw/ldW5J5SjSU=
 github.com/scribe-security/syft v0.20.1-0.20230704073618-3aac89a3889f h1:9fqdnIYvhQ7GzLaET+dr3uWaCU1YnSUdK0SrUXVWH70=
@@ -3963,8 +3961,8 @@ github.com/vektah/gqlparser/v2 v2.2.0/go.mod h1:i3mQIGIrbK2PD1RrCeMTlVbkF2FJ6WkU
 github.com/vektah/gqlparser/v2 v2.4.5/go.mod h1:flJWIR04IMQPGz+BXLrORkrARBxv/rtyIAFvd/MceW0=
 github.com/veraison/go-cose v1.0.0-rc.1/go.mod h1:7ziE85vSq4ScFTg6wyoMXjucIGOf4JkFEZi/an96Ct4=
 github.com/veraison/go-cose v1.1.0/go.mod h1:7ziE85vSq4ScFTg6wyoMXjucIGOf4JkFEZi/an96Ct4=
-github.com/vifraa/gopom v1.0.0 h1:L9XlKbyvid8PAIK8nr0lihMApJQg/12OBvMA28BcWh0=
-github.com/vifraa/gopom v1.0.0/go.mod h1:oPa1dcrGrtlO37WPDBm5SqHAT+wTgF8An1Q71Z6Vv4o=
+github.com/vifraa/gopom v0.2.1 h1:MYVMAMyiGzXPPy10EwojzKIL670kl5Zbae+o3fFvQEM=
+github.com/vifraa/gopom v0.2.1/go.mod h1:oPa1dcrGrtlO37WPDBm5SqHAT+wTgF8An1Q71Z6Vv4o=
 github.com/vishvananda/netlink v0.0.0-20181108222139-023a6dafdcdf/go.mod h1:+SR5DhBJrl6ZM7CoCKvpw5BKroDKQ+PJqOg65H/2ktk=
 github.com/vishvananda/netlink v1.1.0/go.mod h1:cTgwzPIzzgDAYoQrMm0EdrjRUBkTqKYppBueQtXaqoE=
 github.com/vishvananda/netlink v1.1.1-0.20201029203352-d40f9887b852/go.mod h1:twkDnbuQxJYemMlGd4JFIcuhgX83tXhKS2B/PRMpOho=
