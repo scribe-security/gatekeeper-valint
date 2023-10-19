@@ -71,6 +71,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		image         string
 		expectedError string
 		bomFlags      []string
+		format        string
 		valintConfig  map[string]interface{}
 		scribeConfig  map[string]interface{}
 	}{
@@ -89,8 +90,9 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			name:          "Scribe evidence deployment",
 			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
 			expectedError: "",
-			bomFlags:      MakeBomFlags(t, PrepareScribeE2E(t, "bom", ConfigPath), "statement", "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest"),
-			scribeConfig:  MakeScribeConfig(t),
+			format:        "statement",
+			bomFlags:      PrepareScribeE2E(t, "bom", ConfigPath),
+			scribeConfig:  PrepraeScribeConfigE2E(t),
 			valintConfig:  MakeValintScribeConfig(t),
 		},
 	}
@@ -99,14 +101,15 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		startTime := time.Now()
 
 		t.Run(test.name, func(t *testing.T) {
+			bomFlags := MakeBomFlags(t, test.bomFlags, test.format, test.image)
 
 			t.Log("###### Testing ", test.name, "######")
 			InstallGatekeeper(t)
-			InstallProvider(t, test.scribeConfig)
+			InstallProvider(t, test.scribeConfig, test.format)
 
-			if test.bomFlags != nil {
-				t.Log("###### Running ", test.bomFlags, "######")
-				_, out, err := runCmd(t, test.bomFlags...)
+			if bomFlags != nil {
+				t.Log("###### Running ", bomFlags, "######")
+				_, out, err := runCmd(t, bomFlags...)
 				t.Logf(out)
 				require.NoError(t, err)
 			}
@@ -184,9 +187,9 @@ func UninstallGatekeeper(t *testing.T) {
 	HelmUninstall(t, gatekeeperNamespace, "gatekeeper")
 }
 
-func InstallProvider(t *testing.T, scribeConfig map[string]interface{}) {
+func InstallProvider(t *testing.T, scribeConfig map[string]interface{}, format string) {
 	HelmInstall(t, providerNamespace, "../../charts/gatekeeper-valint",
-		"gatekeeper-valint", "gatekeeper-valint", MakeProviderValues(t, scribeConfig))
+		"gatekeeper-valint", "gatekeeper-valint", MakeProviderValues(t, scribeConfig, format))
 }
 
 func UninstallProvider(t *testing.T) {
@@ -224,7 +227,14 @@ func LoadCertificates(t *testing.T, values map[string]interface{}) {
 	}
 }
 
-func MakeProviderValues(t *testing.T, scribeConfig map[string]interface{}) map[string]interface{} {
+func LoadFormat(t *testing.T, format string, scribeConfig map[string]interface{}) {
+	res := scribeConfig
+	res["verify"] = map[string]interface{}{
+		"input-format": format,
+	}
+}
+
+func MakeProviderValues(t *testing.T, scribeConfig map[string]interface{}, format string) map[string]interface{} {
 	res := scribeConfig
 	LoadCertificates(t, res)
 
@@ -319,7 +329,7 @@ func DeleteK8sDeployment(t *testing.T, clientset *kubernetes.Clientset) {
 }
 func int32Ptr(i int32) *int32 { return &i }
 
-func MakeScribeConfig(t *testing.T) map[string]interface{} {
+func PrepraeScribeConfigE2E(t *testing.T) map[string]interface{} {
 	scribeURL, found := os.LookupEnv("SCRIBE_URL")
 	require.True(t, found, "Scribe url not found")
 
@@ -354,6 +364,9 @@ func MakeScribeConfig(t *testing.T) map[string]interface{} {
 				},
 			},
 		},
+		// "verify": map[string]interface{}{
+		// 	"input-format": format,
+		// },
 	}
 }
 
