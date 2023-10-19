@@ -350,10 +350,10 @@ func MakeScribeConfig(t *testing.T) map[string]interface{} {
 						"enable":     true,
 						"audience":   scribeClientAudience,
 					},
+					"url": scribeURL,
 				},
 			},
 		},
-		"url": scribeURL,
 	}
 }
 
