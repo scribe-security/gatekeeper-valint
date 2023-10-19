@@ -6,7 +6,7 @@ env:
   RELEASE_ARTIFACTORY_USERNAME: mikey@scribesecurity.com
   ARTIFACTORY_URL: "https://scribesecuriy.jfrog.io"
   GOPRIVATE: "github.com/scribe-security/*"
-  GO_VERSION: "1.20"
+  GO_VERSION: "1.21"
   SCRIBE_OCI_STORE: scribesecuriy.jfrog.io/scribe-docker-local/attestation/e2e
 
 on:

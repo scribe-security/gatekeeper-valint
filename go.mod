@@ -1,8 +1,8 @@
 module github.com/scribe-security/gatekeeper-valint
 
-go 1.21.0
+go 1.21
 
-toolchain go1.21.3
+// toolchain go1.21.3
 
 require (
 	github.com/google/go-containerregistry v0.16.1
