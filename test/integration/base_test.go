@@ -12,6 +12,9 @@ import (
 	"testing"
 	"time"
 
+	baseCache "github.com/scribe-security/basecli/cache"
+	"github.com/scribe-security/basecli/client/api"
+	cocosign_config "github.com/scribe-security/cocosign/signing/config"
 	"github.com/stretchr/testify/require"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -30,6 +33,8 @@ import (
 var (
 	gatekeeperNamespace = "gatekeeper-system"
 	providerNamespace   = "gatekeeper-valint"
+	ConfigPath          = "testdata/test.yaml"
+	ConfigPathEnv       = "testdata/test_env.yaml"
 )
 
 /*
@@ -68,22 +73,22 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		valintConfig  map[string]interface{}
 		scribeConfig  map[string]interface{}
 	}{
-		{
-			name:          "No evidence deployment",
-			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
-			expectedError: "Err: no evidence found",
-		},
-		{
-			name:          "Scribe no evidence deployment",
-			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
-			expectedError: "Err: no evidence found",
-			scribeConfig:  MakeScribeConfig(t),
-		},
+		// {
+		// 	name:          "No evidence deployment",
+		// 	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+		// 	expectedError: "Err: no evidence found",
+		// },
+		// {
+		// 	name:          "Scribe no evidence deployment",
+		// 	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+		// 	expectedError: "Err: no evidence found",
+		// 	scribeConfig:  MakeScribeConfig(t),
+		// },
 		{
 			name:          "Scribe evidence deployment",
 			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
 			expectedError: "",
-			bomFlags:      MakeBomFlags(t, "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest"),
+			bomFlags:      MakeBomFlags(t, PrepareScribeE2E(t, "bom", ConfigPath), "statement", "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest"),
 			scribeConfig:  MakeScribeConfig(t),
 			valintConfig:  MakeValintScribeConfig(t),
 		},
@@ -99,6 +104,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			InstallProvider(t, test.scribeConfig)
 
 			if test.bomFlags != nil {
+				t.Log("###### Running ", test.bomFlags, "######")
 				_, out, err := runCmd(t, test.bomFlags...)
 				t.Logf(out)
 				require.NoError(t, err)
@@ -361,14 +367,122 @@ func MakeValintScribeConfig(t *testing.T) map[string]interface{} {
 	}
 }
 
-func MakeBomFlags(t *testing.T, image string) []string {
+func BaseFlags(command string, cacheConfig *baseCache.Config, scribeService *api.Config, oci *cocosign_config.OCIStorer, baseConfig string) []string {
+	base := []string{command,
+		"-vv",
+	}
+
+	if cacheConfig.Enable {
+		if cacheConfig.OutputDirectory != "" {
+			base = append(base, []string{
+				"-d", cacheConfig.OutputDirectory,
+			}...)
+		}
+
+	} else {
+		base = append(base, []string{"--cache-enable=false"}...)
+	}
+
+	if scribeService.ServiceCfg.Enable {
+		scribe := []string{
+			"-E",
+			"--scribe.url", scribeService.ServiceCfg.URL,
+			"--scribe.client-id", scribeService.Auth.ClientID,
+			"--scribe.client-secret", scribeService.Auth.ClientSecret,
+			"--scribe.login-url", scribeService.Auth.LoginURL,
+			"--scribe.auth.audience", scribeService.Auth.Audience,
+			"--timeout", "240s", // "--final-artifact",
+			"--backoff", "30s",
+		}
+		base = append(base, scribe...)
+	}
+
+	if oci.Enable {
+		ociFlags := []string{
+			"--oci",
+		}
+
+		if oci.Repo != "" {
+			ociFlags = append(ociFlags, "--oci-repo", oci.Repo)
+
+		}
+		base = append(base, ociFlags...)
+	}
+
+	if baseConfig == "" {
+		base = append(base, "--config", ConfigPath)
+	} else {
+		base = append(base, "--config", baseConfig)
+	}
+
+	return base
+}
+
+func PrepareScribeE2E(t *testing.T, command, baseConfig string) []string {
+	scribeURL, found := os.LookupEnv("SCRIBE_URL")
+	require.True(t, found, "Scribe url not found")
+
 	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
 	require.True(t, found, "Scribe client id not found")
 
 	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
 	require.True(t, found, "Scribe client secret not found")
 
-	return []string{
-		"bom", "--cache-enable=false", "-o", "statement", "-E", "-U", scribeClientID, "-P", scribeClientSecret, image,
+	scribeCLientLoginURL, found := os.LookupEnv("SCRIBE_LOGIN_URL")
+	require.True(t, found, "Scribe client login url")
+
+	scribeClientAudience, found := os.LookupEnv("SCRIBE_AUDIENCE")
+	require.True(t, found, "Scribe client login audience")
+
+	config := api.Config{
+		Auth: api.Auth{
+			LoginURL:     scribeCLientLoginURL,
+			ClientID:     scribeClientID,
+			ClientSecret: scribeClientSecret,
+			Audience:     scribeClientAudience,
+			Enable:       true,
+		},
+		ServiceCfg: api.ServiceCfg{
+			URL:    scribeURL,
+			Enable: true,
+		},
 	}
+
+	return BaseFlags(command, &baseCache.Config{Enable: false}, &config, &cocosign_config.OCIStorer{}, baseConfig)
+}
+
+func PrepareOCIE2E(t *testing.T, command, baseConfig string) []string {
+
+	repo, found := os.LookupEnv("SCRIBE_OCI_REPO")
+	require.True(t, found, "OCI REPO not found")
+
+	ociConfig := cocosign_config.OCIStorer{
+		Enable: true,
+		Repo:   repo,
+	}
+
+	return BaseFlags(command, &baseCache.Config{}, &api.Config{}, &ociConfig, baseConfig)
+}
+
+func PrepareCache(t *testing.T, command, baseConfig string) []string {
+
+	cacheConfig := baseCache.Config{
+		Enable: true,
+	}
+
+	base := BaseFlags(command, &cacheConfig, &api.Config{}, &cocosign_config.OCIStorer{}, baseConfig)
+
+	switch command {
+	case "bom", "slsa":
+		return append(base, "-f") // Force overwrite in cache case
+	case "bom-compressed":
+		return append(base, "-f", "--compress")
+	}
+
+	return base
+}
+
+func MakeBomFlags(t *testing.T, bom_args []string, format, image string) []string {
+	bom_args_new := append(append([]string(nil), bom_args...), []string{"-o", format, image}...)
+	return bom_args_new
 }

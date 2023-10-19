@@ -1,0 +1,14 @@
+attest:
+  default: ""
+  cocosign:
+    signer:
+      x509:
+        enable: true
+        private: env://test_key
+        cert: env://test_cert
+        ca: env://test_ca
+    verifier:
+      x509:
+        enable: true
+        cert: env://test_cert
+        ca: env://test_ca
