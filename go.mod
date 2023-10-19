@@ -13,7 +13,7 @@ require (
 	github.com/sigstore/cosign/v2 v2.2.0
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
-	helm.sh/helm/v3 v3.13.0
+	helm.sh/helm/v3 v3.13.1
 	k8s.io/client-go v0.28.2
 	k8s.io/klog/v2 v2.100.1
 )
@@ -144,7 +144,7 @@ require (
 	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
 	github.com/digitorus/timestamp v0.0.0-20230821155606-d1ad5ca9624c // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
-	github.com/docker/cli v24.0.0+incompatible // indirect
+	github.com/docker/cli v24.0.6+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/docker v24.0.6+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
@@ -281,7 +281,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/open-policy-agent/opa v0.55.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0-rc4 // indirect
+	github.com/opencontainers/image-spec v1.1.0-rc5 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/otiai10/copy v1.6.0 // indirect
 	github.com/outcaste-io/ristretto v0.2.1 // indirect
@@ -409,7 +409,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
 	k8s.io/kubectl v0.28.2 // indirect
 	k8s.io/utils v0.0.0-20230505201702-9f6742963106 // indirect
-	oras.land/oras-go v1.2.3 // indirect
+	oras.land/oras-go v1.2.4 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/kustomize/api v0.13.5-0.20230601165947-6ce0bf390ce3 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.14.3-0.20230601165947-6ce0bf390ce3 // indirect
