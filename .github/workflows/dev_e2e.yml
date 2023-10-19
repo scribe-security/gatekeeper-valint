@@ -9,6 +9,7 @@ on:
     #   - "pre-release/**"
     #   - "release/**"
     #   - "feature/policy-flow-readyness-pass1"
+  pull_request:
   workflow_dispatch:
     inputs:
       SCRIBE_CLIENT_ID:
