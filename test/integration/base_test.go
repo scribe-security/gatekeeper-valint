@@ -97,6 +97,10 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		},
 	}
 
+	defer DeleteK8sDeployment(t, clientset)
+	defer UninstallProvider(t)
+	defer UninstallGatekeeper(t)
+
 	for _, test := range tests {
 		startTime := time.Now()
 
@@ -210,7 +214,7 @@ func TestInitial(t *testing.T) {
 	HelmInstallTable(t, clientset)
 }
 
-func LoadCertificates(t *testing.T, values map[string]interface{}) {
+func LoadCertificates(t *testing.T, res map[string]interface{}) {
 	ca, err := os.ReadFile("../../certs/ca.crt")
 	require.NoError(t, err)
 
@@ -220,7 +224,7 @@ func LoadCertificates(t *testing.T, values map[string]interface{}) {
 	key, err := os.ReadFile("../../certs/tls.key")
 	require.NoError(t, err)
 
-	values["certs"] = map[string]interface{}{
+	res["certs"] = map[string]interface{}{
 		"caBundle": base64.StdEncoding.EncodeToString(ca),
 		"tlsCrt":   string(crt),
 		"tlsKey":   string(key),
@@ -237,6 +241,7 @@ func LoadFormat(t *testing.T, format string, scribeConfig map[string]interface{}
 func MakeProviderValues(t *testing.T, scribeConfig map[string]interface{}, format string) map[string]interface{} {
 	res := scribeConfig
 	LoadCertificates(t, res)
+	LoadFormat(t, format, res)
 
 	v, err := yaml.Marshal(res)
 	t.Log("Values\n", string(v), err) //2DO would love to see this file under the test generated data
