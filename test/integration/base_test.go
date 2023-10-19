@@ -16,6 +16,7 @@ import (
 	"github.com/scribe-security/basecli/client/api"
 	cocosign_config "github.com/scribe-security/cocosign/signing/config"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v2"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -224,11 +225,11 @@ func LoadCertificates(t *testing.T, values map[string]interface{}) {
 }
 
 func MakeProviderValues(t *testing.T, scribeConfig map[string]interface{}) map[string]interface{} {
-	res := make(map[string]interface{})
-
+	res := scribeConfig
 	LoadCertificates(t, res)
-	res["scribe"] = scribeConfig
 
+	v, err := yaml.Marshal(res)
+	t.Log("Values\n", string(v), err) //2DO would love to see this file under the test generated data
 	return res
 }
 
@@ -319,8 +320,8 @@ func DeleteK8sDeployment(t *testing.T, clientset *kubernetes.Clientset) {
 func int32Ptr(i int32) *int32 { return &i }
 
 func MakeScribeConfig(t *testing.T) map[string]interface{} {
-	// scribeURL, found := os.LookupEnv("SCRIBE_URL")
-	// require.True(t, found, "Scribe url not found")
+	scribeURL, found := os.LookupEnv("SCRIBE_URL")
+	require.True(t, found, "Scribe url not found")
 
 	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
 	require.True(t, found, "Scribe client id not found")
@@ -328,16 +329,31 @@ func MakeScribeConfig(t *testing.T) map[string]interface{} {
 	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
 	require.True(t, found, "Scribe client secret not found")
 
-	// scribeCLientLoginURL, found := os.LookupEnv("SCRIBE_LOGIN_URL")
-	// require.True(t, found, "Scribe client login url")
+	scribeCLientLoginURL, found := os.LookupEnv("SCRIBE_LOGIN_URL")
+	require.True(t, found, "Scribe client login url")
 
-	// scribeClientAudience, found := os.LookupEnv("SCRIBE_AUDIENCE")
-	// require.True(t, found, "Scribe client login audience")
+	scribeClientAudience, found := os.LookupEnv("SCRIBE_AUDIENCE")
+	require.True(t, found, "Scribe client login audience")
 
 	return map[string]interface{}{
-		"client_id":     scribeClientID,
-		"client_secret": scribeClientSecret,
-		"enable":        true,
+		"scribe": map[string]interface{}{
+			"enable":        true,
+			"client-id":     scribeClientID,
+			"client-secret": scribeClientSecret,
+		},
+		"valint": map[string]interface{}{
+			"config": map[string]interface{}{
+				"scribe": map[string]interface{}{
+					"auth": map[string]interface{}{
+						"login-url":  scribeCLientLoginURL,
+						"grant-type": "client_credentials",
+						"enable":     true,
+						"audience":   scribeClientAudience,
+					},
+				},
+			},
+		},
+		"url": scribeURL,
 	}
 }
 
