@@ -92,7 +92,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			expectedError: "",
 			format:        "statement",
 			bomFlags:      PrepareScribeE2E(t, "bom", ConfigPath),
-			scribeConfig:  PrepraeScribeConfigE2E(t),
+			scribeConfig:  PrepraeScribeConfigE2E(t, "statement"),
 			valintConfig:  MakeValintScribeConfig(t),
 		},
 	}
@@ -254,7 +254,7 @@ func LoadFormat(t *testing.T, format string, scribeConfig map[string]interface{}
 func MakeProviderValues(t *testing.T, scribeConfig map[string]interface{}, format string) map[string]interface{} {
 	res := scribeConfig
 	LoadCertificates(t, res)
-	LoadFormat(t, format, res)
+	// LoadFormat(t, format, res)
 
 	v, err := yaml.Marshal(res)
 	t.Log("Values\n", string(v), err) //2DO would love to see this file under the test generated data
@@ -347,7 +347,7 @@ func DeleteK8sDeployment(t *testing.T, clientset *kubernetes.Clientset) {
 }
 func int32Ptr(i int32) *int32 { return &i }
 
-func PrepraeScribeConfigE2E(t *testing.T) map[string]interface{} {
+func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface{} {
 	scribeURL, found := os.LookupEnv("SCRIBE_URL")
 	require.True(t, found, "Scribe url not found")
 
@@ -379,6 +379,9 @@ func PrepraeScribeConfigE2E(t *testing.T) map[string]interface{} {
 						"audience":   scribeClientAudience,
 					},
 					"url": scribeURL,
+				},
+				"verify": map[string]interface{}{
+					"input-format": statement,
 				},
 			},
 		},
