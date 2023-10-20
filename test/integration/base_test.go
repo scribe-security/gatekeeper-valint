@@ -366,8 +366,8 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 	return map[string]interface{}{
 		"scribe": map[string]interface{}{
 			"enable":        true,
-			"client-id":     scribeClientID,
-			"client-secret": scribeClientSecret,
+			"client_id":     scribeClientID,
+			"client_secret": scribeClientSecret,
 		},
 		"valint": map[string]interface{}{
 			"config": map[string]interface{}{
