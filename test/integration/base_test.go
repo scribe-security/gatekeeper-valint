@@ -378,7 +378,8 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 						"enable":     true,
 						"audience":   scribeClientAudience,
 					},
-					"url": scribeURL,
+					"url":    scribeURL,
+					"enable": true,
 				},
 				"verify": map[string]interface{}{
 					"input-format": statement,
