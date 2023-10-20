@@ -233,8 +233,21 @@ func LoadCertificates(t *testing.T, res map[string]interface{}) {
 
 func LoadFormat(t *testing.T, format string, scribeConfig map[string]interface{}) {
 	res := scribeConfig
-	res["verify"] = map[string]interface{}{
-		"input-format": format,
+
+	if valintF, ok := res["valint"]; ok {
+		if configF, ok := valintF.(map[string]interface{})["config"]; ok {
+			if _, ok := valintF.(map[string]interface{})["verify"]; ok {
+			} else {
+				configM := configF.(map[string]interface{})
+				configM["verify"] = map[string]interface{}{
+					"input-format": format,
+				}
+
+				res["valint"] = map[string]interface{}{
+					"conifg": configM,
+				}
+			}
+		}
 	}
 }
 
