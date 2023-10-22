@@ -97,9 +97,9 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		},
 	}
 
-	defer DeleteK8sDeployment(t, clientset)
-	defer UninstallProvider(t)
-	defer UninstallGatekeeper(t)
+	// defer DeleteK8sDeployment(t, clientset)
+	// defer UninstallProvider(t)
+	// defer UninstallGatekeeper(t)
 
 	for _, test := range tests {
 		startTime := time.Now()
