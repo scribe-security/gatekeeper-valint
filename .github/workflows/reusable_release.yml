@@ -3,7 +3,7 @@ name: .release
 env:
   GOPRIVATE: "github.com/scribe-security/*"
   ARTIFACTORY_URL: "https://scribesecuriy.jfrog.io"
-  GO_VERSION: "1.20"
+  GO_VERSION: "1.21"
 
 on:
   workflow_call:

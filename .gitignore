@@ -6,3 +6,4 @@ dist/*
 **/certs
 **/.tmp
 env
+**/*env

@@ -2,6 +2,7 @@ apiVersion: externaldata.gatekeeper.sh/v1beta1
 kind: Provider
 metadata:
   name: gatekeeper-valint
+  namespace: '{{ .Release.Namespace }}'
 spec:
   url: https://gatekeeper-valint.{{ .Release.Namespace }}:{{ .Values.port }}/validate
   timeout: 30
