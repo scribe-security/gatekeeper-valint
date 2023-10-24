@@ -2,44 +2,25 @@ package config
 
 import (
 	basecli "github.com/scribe-security/basecli"
-	gensbomPkg "github.com/scribe-security/gensbom/pkg"
+	valintPkg "github.com/scribe-security/valint/pkg"
 )
 
 const (
 	defaultRekorURL = "https://rekor.sigstore.dev"
-	ApplicationName = "valint"
+	ApplicationName = "gatekeeper-valint"
 	defaultPort     = 8090
 )
 
 type Application struct {
 	basecli.BaseConfig `yaml:",omitempty,inline" json:",omitempty,inline" mapstructure:",squash"`
-	Provider           ProviderConfig          `yaml:"provider,omitempty" json:"provider,omitempty" mapstructure:"provider"`
-	version            string                  `yaml:"-" json:"-" mapstructure:"-"`
-	Bom                gensbomPkg.BomConfig    `yaml:"bom,omitempty" json:"bom,omitempty" mapstructure:"bom"`
-	SLSA               gensbomPkg.SLSAConfig   `yaml:"slsa,omitempty" json:"slsa,omitempty" mapstructure:"slsa"`
-	Attest             gensbomPkg.AttestConfig `yaml:"attest,omitempty" json:"attest,omitempty" mapstructure:"attest"`
-	Git                gensbomPkg.GitConfig    `yaml:"git,omitempty" json:"git,omitempty" mapstructure:"git"`
-	Verify             gensbomPkg.VerifyConfig `yaml:"verify,omitempty" json:"verify,omitempty" mapstructure:"verify"`
+	Provider           ProviderConfig        `yaml:"provider,omitempty" json:"provider,omitempty" mapstructure:"provider"`
+	version            string                `yaml:"-" json:"-" mapstructure:"-"`
+	Valint             valintPkg.Application `yaml:"valint,omitempty" json:"valint,omitempty" mapstructure:"valint"`
 }
 
 // Implement ApplicationConfig interface
 func (a Application) GetConfigPath() string {
 	return a.BaseConfig.GetConfigPath()
-}
-
-func (a Application) GetGensbomConfig() gensbomPkg.Application {
-	app := gensbomPkg.Application{
-		BaseConfig: a.BaseConfig,
-		Bom:        a.Bom,
-		SLSA:       a.SLSA,
-		Verify:     a.Verify,
-		Attest:     a.Attest,
-		Git:        a.Git,
-	}
-
-	app.SetVersion(a.Version())
-
-	return app
 }
 
 func (cfg *Application) Version() string {

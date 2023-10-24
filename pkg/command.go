@@ -29,7 +29,7 @@ import (
 
 	"github.com/scribe-security/gatekeeper-valint/internal/config"
 	"github.com/scribe-security/gatekeeper-valint/pkg/utils"
-	gensbomPkg "github.com/scribe-security/gensbom/pkg"
+	valintPkg "github.com/scribe-security/valint/pkg"
 	"github.com/sigstore/cosign/v2/cmd/cosign/cli/options"
 	ociremote "github.com/sigstore/cosign/v2/pkg/oci/remote"
 )
@@ -48,8 +48,7 @@ type ProviderCmd struct {
 }
 
 func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd, error) {
-	gensbomCfg := cfg.GetGensbomConfig()
-	l, err := gensbomPkg.InitCommandLogger("", &gensbomCfg, nil)
+	l, err := valintPkg.InitCommandLogger("", &cfg.Valint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -136,8 +135,8 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		cfg := cmd.cfg.GetGensbomConfig()
-		err = gensbomPkg.VerifyAdmissionImage(ref.String(),
+		cfg := cmd.cfg.Valint
+		err = valintPkg.VerifyAdmissionImage(ref.String(),
 			imageID.String(),
 			&cfg,
 			cmd.logger,
