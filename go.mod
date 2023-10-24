@@ -8,8 +8,8 @@ require (
 	github.com/google/go-containerregistry v0.16.1
 	github.com/magefile/mage v1.14.0
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20231011212908-ad0a9011c2af
-	github.com/scribe-security/basecli v0.0.0-20231003063937-34cb5441c4a6
-	github.com/scribe-security/gensbom v0.0.21-0.20231003064010-c728fd17ea93
+	github.com/scribe-security/basecli v0.0.0-20231017083830-42e97826ff14
+	github.com/scribe-security/valint v0.4.2-0.20231023121136-770ec7c28036
 	github.com/sigstore/cosign/v2 v2.2.0
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
@@ -21,6 +21,7 @@ require (
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20230306123547-8075edf89bb0 // indirect
+	github.com/CycloneDX/cyclonedx-go/old v0.0.0-00010101000000-000000000000 // indirect
 	github.com/containerd/cgroups v1.1.0 // indirect
 	github.com/containerd/continuity v0.4.2 // indirect
 	github.com/containerd/fifo v1.1.0 // indirect
@@ -306,8 +307,8 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sassoftware/go-rpmutils v0.2.0 // indirect
 	github.com/sassoftware/relic v7.2.1+incompatible // indirect
-	github.com/scribe-security/KML v0.0.0-20230731094701-463589363d3e // indirect
-	github.com/scribe-security/cocosign v0.0.0-20231002133640-2198f63167bf
+	github.com/scribe-security/KML v0.0.0-20231004082821-6dfabf3246f4 // indirect
+	github.com/scribe-security/cocosign v0.0.0-20231023055932-9ca11d5c659a
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.7.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
@@ -397,7 +398,7 @@ require (
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	inet.af/netaddr v0.0.0-20220811202034-502d2d690317 // indirect
 	k8s.io/api v0.28.2
@@ -421,3 +422,5 @@ require (
 // replace github.com/scribe-security/gensbom => ../../base/gensbom
 
 replace github.com/anchore/syft => github.com/scribe-security/syft v0.20.1-0.20230704073618-3aac89a3889f
+
+replace github.com/CycloneDX/cyclonedx-go/old => github.com/CycloneDX/cyclonedx-go v0.5.2

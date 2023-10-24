@@ -168,9 +168,9 @@ clean-test:
 	@helm -ngatekeeper-system delete gatekeeper || true
 	@helm -ngatekeeper-valint delete gatekeeper-valint || true
 
-.PHONY: upstream-gensbom
-upstream-gensbom:
-	GOPRIVATE=github.com/scribe-security/* go get github.com/scribe-security/gensbom@master
+.PHONY: upstream-valint
+upstream-valint:
+	GOPRIVATE=github.com/scribe-security/* go get github.com/scribe-security/valint@main
 
 .PHONY: minikube_start
 minikube_start: ## Install admission on minikube
