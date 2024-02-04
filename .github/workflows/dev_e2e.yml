@@ -37,7 +37,7 @@ jobs:
     with:
       RELEASE_ARTIFACTORY_USERNAME: mikey@scribesecurity.com
       GITHUB_USER: houdini91
-      SCRIBE_URL: https://airflow.dev.scribesecurity.com
+      SCRIBE_URL: https://api.dev.scribesecurity.com
       SCRIBE_LOGIN_URL: https://scribe-hub-dev.us.auth0.com
       SCRIBE_AUDIENCE:  api.dev.scribesecurity.com
       ENV: dev

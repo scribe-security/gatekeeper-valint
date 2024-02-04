@@ -26,7 +26,7 @@ on:
       SCRIBE_URL:
         type: string
         required: true
-        default: https://airflow.dev.scribesecurity.com 
+        default: https://api.dev.scribesecurity.com 
       SCRIBE_LOGIN_URL:
         type: string
         required: true
