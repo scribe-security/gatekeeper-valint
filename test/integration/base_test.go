@@ -77,18 +77,18 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 	}{
 		// {
 		// 	name:          "No evidence deployment",
-		// 	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+		// 	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/valint_alpine_input:latest",
 		// 	expectedError: "Err: no evidence found",
 		// },
 		// {
 		// 	name:          "Scribe no evidence deployment",
-		// 	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+		// 	image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/valint_alpine_input:latest",
 		// 	expectedError: "Err: no evidence found",
 		// 	scribeConfig:  MakeScribeConfig(t),
 		// },
 		{
 			name:          "Scribe evidence deployment",
-			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/gensbom_alpine_input:latest",
+			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/valint_alpine_input:latest",
 			expectedError: "",
 			format:        "statement",
 			bomFlags:      PrepareScribeE2E(t, "bom", ConfigPath),
