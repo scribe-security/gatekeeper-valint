@@ -12,3 +12,5 @@ attest:
         enable: true
         cert: testdata/keys/test.cert.pem
         ca: testdata/keys/ca-chain.cert.pem
+context:
+  context-type: local
