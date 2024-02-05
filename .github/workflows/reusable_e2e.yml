@@ -83,7 +83,10 @@ jobs:
           password: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
 
       - name: Set Registry secret
-        run: echo "IMAGE_PULL_SECRET=$(cat ~/.docker/config.json | base64 -w0)" >> $GITHUB_ENV
+        run: |
+          SECRET=$(cat ~/.docker/config.json | base64 -w0)
+          echo "::add-mask::$SECRET"
+          echo "IMAGE_PULL_SECRET=$SECRET" >> $GITHUB_ENV
 
       - name: Configure git for private modules
         env:
@@ -112,3 +115,4 @@ jobs:
           SCRIBE_LOGIN_URL: ${{ inputs.SCRIBE_LOGIN_URL }}
           SCRIBE_AUDIENCE: ${{ inputs.SCRIBE_AUDIENCE }}
           SCRIBE_OCI_REPO: ${{ env.SCRIBE_OCI_REPO }}
+          IMAGE_PULL_SECRET: ${{ env.IMAGE_PULL_SECRET }}
