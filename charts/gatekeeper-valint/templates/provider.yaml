@@ -5,5 +5,5 @@ metadata:
   namespace: '{{ .Release.Namespace }}'
 spec:
   url: https://gatekeeper-valint.{{ .Release.Namespace }}:{{ .Values.port }}/validate
-  timeout: 30
+  timeout: 300
   caBundle: {{ required "certs.caBundle is required" .Values.certs.caBundle | quote }}

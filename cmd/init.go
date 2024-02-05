@@ -17,7 +17,8 @@ import (
 )
 
 var (
-	conf    config.Application
+	conf config.Application
+
 	cli     *basecli.Engine
 	version = "0.0.0"
 )
@@ -79,4 +80,6 @@ func LoadApplication() {
 	if err != nil {
 		er(err)
 	}
+
+	cli.LoadApplication(&conf.Valint)
 }
