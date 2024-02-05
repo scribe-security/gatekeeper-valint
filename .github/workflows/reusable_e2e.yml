@@ -7,7 +7,7 @@ env:
   ARTIFACTORY_URL: "https://scribesecuriy.jfrog.io"
   GOPRIVATE: "github.com/scribe-security/*"
   GO_VERSION: "1.21"
-  SCRIBE_OCI_STORE: scribesecuriy.jfrog.io/scribe-docker-local/attestation/e2e
+  SCRIBE_OCI_REPO: scribesecuriy.jfrog.io/scribe-docker-local/attestation/e2e
 
 on:
   workflow_call:
@@ -111,4 +111,4 @@ jobs:
           SCRIBE_CLIENT_SECRET: ${{ secrets.SCRIBE_CLIENT_SECRET }}
           SCRIBE_LOGIN_URL: ${{ inputs.SCRIBE_LOGIN_URL }}
           SCRIBE_AUDIENCE: ${{ inputs.SCRIBE_AUDIENCE }}
-          IMAGE_PULL_SECRET: ${{ env.IMAGE_PULL_SECRET }}
+          SCRIBE_OCI_REPO: ${{ env.SCRIBE_OCI_REPO }}
