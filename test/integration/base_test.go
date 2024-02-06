@@ -73,7 +73,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 		bomFlags      []string
 		format        string
 		valintConfig  map[string]interface{}
-		scribeConfig  map[string]interface{}
+		valuesConfig  map[string]interface{}
 	}{
 		// {
 		// 	name:          "No evidence deployment",
@@ -92,13 +92,19 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			expectedError: "",
 			format:        "statement",
 			bomFlags:      PrepareScribeE2E(t, "bom", ConfigPath),
-			scribeConfig:  PrepraeScribeConfigE2E(t, "statement"),
-			valintConfig:  MakeValintScribeConfig(t),
+			valuesConfig:  PrepraeScribeConfigE2E(t, "statement"),
+		},
+		{
+			name:          "OCI evidence deployment",
+			image:         "scribesecuriy.jfrog.io/scribe-docker-public-local/test/valint_alpine_input:latest",
+			expectedError: "",
+			format:        "statement",
+			bomFlags:      PrepareOCIE2E(t, "bom", ConfigPath),
+			valuesConfig:  PrepraeOCIConfigE2E(t, "statement"),
 		},
 	}
 
 	// defer DeleteK8sDeployment(t, clientset)
-	// defer UninstallProvider(t)
 	// defer UninstallGatekeeper(t)
 
 	for _, test := range tests {
@@ -109,7 +115,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 
 			t.Log("###### Testing ", test.name, "######")
 			InstallGatekeeper(t)
-			InstallProvider(t, test.scribeConfig, test.format)
+			InstallProvider(t, test.valuesConfig, test.format)
 
 			if bomFlags != nil {
 				t.Log("###### Running ", bomFlags, "######")
@@ -165,6 +171,8 @@ func HelmInstall(t *testing.T, namespace string, repo string, chart string, rele
 	client.ReleaseName = releaseName
 	client.NameTemplate = releaseName
 	client.Namespace = namespace
+	client.Wait = true
+	client.Timeout = 300 * time.Second
 	var chartPath string
 
 	if strings.HasPrefix(repo, "http") {
@@ -191,9 +199,9 @@ func UninstallGatekeeper(t *testing.T) {
 	HelmUninstall(t, gatekeeperNamespace, "gatekeeper")
 }
 
-func InstallProvider(t *testing.T, scribeConfig map[string]interface{}, format string) {
+func InstallProvider(t *testing.T, valuesConfig map[string]interface{}, format string) {
 	HelmInstall(t, providerNamespace, "../../charts/gatekeeper-valint",
-		"gatekeeper-valint", "gatekeeper-valint", MakeProviderValues(t, scribeConfig, format))
+		"gatekeeper-valint", "gatekeeper-valint", MakeProviderValues(t, valuesConfig, format))
 }
 
 func UninstallProvider(t *testing.T) {
@@ -241,6 +249,7 @@ func LoadFormat(t *testing.T, format string, scribeConfig map[string]interface{}
 				configM := configF.(map[string]interface{})
 				configM["verify"] = map[string]interface{}{
 					"input-format": format,
+					"format":       format,
 				}
 
 				res["valint"] = map[string]interface{}{
@@ -347,6 +356,56 @@ func DeleteK8sDeployment(t *testing.T, clientset *kubernetes.Clientset) {
 }
 func int32Ptr(i int32) *int32 { return &i }
 
+func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} {
+	repo, found := os.LookupEnv("SCRIBE_OCI_REPO")
+	require.True(t, found, "OCI REPO not found")
+
+	pullSecret, found := os.LookupEnv("IMAGE_PULL_SECRET")
+	require.True(t, found, "IMAGE PULL SECRET not found")
+
+	return map[string]interface{}{
+		"image": map[string]interface{}{
+			"imagePullSecrets": string(pullSecret),
+		},
+		"scribe": map[string]interface{}{
+			"enable": false,
+		},
+		"cache": map[string]interface{}{
+			"enable": false,
+		},
+		"valint": map[string]interface{}{
+			"config": map[string]interface{}{
+				"scribe": map[string]interface{}{
+					"auth": map[string]interface{}{
+						"enable": false,
+					},
+					"enable": false,
+				},
+				"context": map[string]interface{}{
+					"context-type": "local",
+				},
+				"verify": map[string]interface{}{
+					"input-format": statement,
+					"formats":      statement,
+				},
+				"attest": map[string]interface{}{
+					"report": map[string]interface{}{
+						"disable": true,
+					},
+					"cocosign": map[string]interface{}{
+						"storer": map[string]interface{}{
+							"OCI": map[string]interface{}{
+								"enable": true,
+								"repo":   repo,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface{} {
 	scribeURL, found := os.LookupEnv("SCRIBE_URL")
 	require.True(t, found, "Scribe url not found")
@@ -357,61 +416,31 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
 	require.True(t, found, "Scribe client secret not found")
 
-	scribeCLientLoginURL, found := os.LookupEnv("SCRIBE_LOGIN_URL")
-	require.True(t, found, "Scribe client login url")
-
-	scribeClientAudience, found := os.LookupEnv("SCRIBE_AUDIENCE")
-	require.True(t, found, "Scribe client login audience")
-
 	return map[string]interface{}{
 		"scribe": map[string]interface{}{
 			"enable":        true,
 			"client_id":     scribeClientID,
 			"client_secret": scribeClientSecret,
+			"url":           scribeURL,
+		},
+		"cache": map[string]interface{}{
+			"enable": false,
 		},
 		"valint": map[string]interface{}{
 			"config": map[string]interface{}{
 				"scribe": map[string]interface{}{
 					"auth": map[string]interface{}{
-						"login-url":  scribeCLientLoginURL,
-						"grant-type": "client_credentials",
-						"enable":     true,
-						"audience":   scribeClientAudience,
+						"enable": true,
 					},
 					"url":    scribeURL,
 					"enable": true,
 				},
+				"context": map[string]interface{}{
+					"context-type": "local",
+				},
 				"verify": map[string]interface{}{
 					"input-format": statement,
-				},
-			},
-		},
-		// "verify": map[string]interface{}{
-		// 	"input-format": format,
-		// },
-	}
-}
-
-func MakeValintScribeConfig(t *testing.T) map[string]interface{} {
-	return map[string]interface{}{
-		"config": map[string]interface{}{
-			"logger": map[string]interface{}{
-				"level": "debug",
-			},
-			"verify": map[string]interface{}{
-				"input-format": "statement",
-			},
-			"attest": map[string]interface{}{
-				"default": "x509-env",
-			},
-			"cocosign": map[string]interface{}{
-				"storer": map[string]interface{}{
-					"OCI": map[string]interface{}{
-						"enable": false,
-					},
-					"scribe": map[string]interface{}{
-						"enable": true,
-					},
+					"formats":      statement,
 				},
 			},
 		},
@@ -444,6 +473,7 @@ func BaseFlags(command string, cacheConfig *baseCache.Config, scribeService *api
 			"--scribe.auth.audience", scribeService.Auth.Audience,
 			"--timeout", "240s", // "--final-artifact",
 			"--backoff", "30s",
+			"--components", "metadata",
 		}
 		base = append(base, scribe...)
 	}
@@ -479,18 +509,10 @@ func PrepareScribeE2E(t *testing.T, command, baseConfig string) []string {
 	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
 	require.True(t, found, "Scribe client secret not found")
 
-	scribeCLientLoginURL, found := os.LookupEnv("SCRIBE_LOGIN_URL")
-	require.True(t, found, "Scribe client login url")
-
-	scribeClientAudience, found := os.LookupEnv("SCRIBE_AUDIENCE")
-	require.True(t, found, "Scribe client login audience")
-
 	config := api.Config{
 		Auth: api.Auth{
-			LoginURL:     scribeCLientLoginURL,
 			ClientID:     scribeClientID,
 			ClientSecret: scribeClientSecret,
-			Audience:     scribeClientAudience,
 			Enable:       true,
 		},
 		ServiceCfg: api.ServiceCfg{

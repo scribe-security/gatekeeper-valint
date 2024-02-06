@@ -62,7 +62,7 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 
 func (cmd *ProviderCmd) Run() error {
 
-	fmt.Println("starting HTTPS server...")
+	fmt.Printf("starting HTTPS server on port %d...\n", cmd.cfg.Provider.Port)
 
 	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeout))
 

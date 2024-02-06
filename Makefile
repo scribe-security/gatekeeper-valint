@@ -14,6 +14,7 @@ TEMPDIR = ./.tmp
 DISTDIR=./dist
 SNAPSHOTDIR=./snapshot
 
+
 ifeq "$(strip $(VERSION))" ""
  override VERSION = $(shell git describe --always --tags --dirty)
 endif
@@ -39,7 +40,6 @@ endif
 define title
     @printf '$(TITLE)$(1)$(RESET)\n'
 endef
-
 
 ## Tasks
 .PHONY: help
@@ -150,7 +150,7 @@ mod-goreleaser:
 
 .PHONY: test
 test:
-	go test -test.v ./...
+	go test -count=1 -test.v ./...
 
 .PHONY: clean
 clean: clean-dist clean-snapshot ## Remove previous builds, result reports, and test cache

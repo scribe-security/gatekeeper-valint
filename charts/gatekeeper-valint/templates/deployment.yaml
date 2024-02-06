@@ -29,17 +29,17 @@ spec:
           value: {{ quote .Values.gatekeeperValint.debug }}
         - name: DOCKER_CONFIG
           value: "/docker"
-        - name: VALINT_SCRIBE_AUTH_CLIENT_ID
+        - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_ID
           valueFrom:
             secretKeyRef:
               key: scribe_client_id
               name: scribe-cred-secret
-        - name: VALINT_SCRIBE_AUTH_CLIENT_SECRET
+        - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               key: scribe_client_secret
               name: scribe-cred-secret
-        - name: VALINT_SCRIBE_ENABLE
+        - name: GATEKEEPER_VALINT_SCRIBE_ENABLE
           valueFrom:
             secretKeyRef:
               key: scribe_enable
@@ -62,9 +62,11 @@ spec:
           protocol: TCP
         resources: {}
         volumeMounts:
+        {{- if .Values.image.imagePullSecrets }}
         - mountPath: /docker/
           name: valint-pull-secret
           readOnly: true
+        {{- end }}
         - mountPath: /valint
           name: valint-config
           readOnly: true
@@ -79,6 +81,7 @@ spec:
       - configMap:
           name: gatekeeper-valint-config
         name: valint-config
+      {{- if .Values.image.imagePullSecrets }}
       - name: valint-pull-secret
         secret:
           secretName: gatekeeper-valint-pull-secret
@@ -86,6 +89,7 @@ spec:
           items:
             - key: .dockerconfigjson
               path: config.json
+      {{- end }}
       - name: valint-certs
         secret:
           secretName: gatekeeper-valint-certs

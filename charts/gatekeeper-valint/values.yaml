@@ -2,7 +2,6 @@ image:
   repository: scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint
   tag: dev
   imagePullPolicy: Always
-
 certs:
   caBundle: ""
   tlsCrt: ""
@@ -37,16 +36,23 @@ valint:
   config:
     logger:
       level: debug
+    cache:
+      enable: false
     verify:
       # -- Evidence format
       input-format: attest
+      # -- Policy result format
+      formats: attest
     attest:
       # -- Signature verification type (sigstore, x509-env)
       default: x509-env
-    cocosign:
-      storer:
-        OCI:
-          # -- OCI evidence enable
-          enable: false
-          # -- OCI evidence repo location 
-          repo: ""
+    context:
+      context-type: local
+    attest:
+      cocosign:
+        storer:
+          OCI:
+            # -- OCI evidence enable
+            enable: false
+            # -- OCI evidence repo location 
+            repo: ""
