@@ -66,25 +66,25 @@ bootstrap: bootstrap-tools ## Download and install all go dependencies (+ prep t
 
 .PHONY: install_local_scribe
 install_local_scribe:  ## Install admission with scribe
-	@if helm status $(NAME) -n $(NAMESPACE) > /dev/null 2>&1; then \
-		helm upgrade --debug --reset-values --force \
-			--set scribe.enable=true \
-			--set scribe.client_id=$(SCRIBE_CLIENT_ID) \
-			--set scribe.client_secret=$(SCRIBE_CLIENT_SECRET) \
-			--set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
-			--set certs.tlsCrt="$(cat certs/tls.crt)" \
-			--set certs.tlsKey="$(cat certs/tls.key)" \
-			$(NAME) -n $(NAMESPACE) ./charts/gatekeeper-valint --devel; \
-	else \
-		helm install --debug  \
-			--set scribe.enable=true \
-			--set scribe.client_id=$(SCRIBE_CLIENT_ID) \
-			--set scribe.client_secret=$(SCRIBE_CLIENT_SECRET) \
-			--set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
-			--set certs.tlsCrt="$(cat certs/tls.crt)" \
-			--set certs.tlsKey="$(cat certs/tls.key)" \
-			$(NAME) -n $(NAMESPACE) ./charts/gatekeeper-valint --devel; \
-	fi
+	SCRIBE_CLIENT_ID=$(SCRIBE_CLIENT_ID) SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) 
+
+.PHONY: install_local_scribe_x509
+install_local_scribe_x509:  ## Install admission with scribe
+	SCRIBE_CLIENT_ID=$(SCRIBE_CLIENT_ID) SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) x509
+
+.PHONY: install_local_scribe_sigstore
+install_local_scribe_sigstore:  ## Install admission with scribe
+	SCRIBE_CLIENT_ID=$(SCRIBE_CLIENT_ID) SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) sigstore
+
+
+.PHONY: install_gatekeeper
+install_gatekeeper:
+	helm install gatekeeper/gatekeeper  \
+    --name-template=gatekeeper \
+    --namespace gatekeeper-system --create-namespace \
+    --set enableExternalData=true \
+    --set controllerManager.dnsPolicy=ClusterFirst,audit.dnsPolicy=ClusterFirst \
+    --set validatingWebhookTimeoutSeconds=30
 
 .PHONY: install_local_oci
 install_local_oci: ## Install admission with oci from local dir
@@ -166,6 +166,10 @@ clean-dist:
 .PHONY: clean-test
 clean-test:
 	@helm -ngatekeeper-system delete gatekeeper || true
+	@helm -ngatekeeper-valint delete gatekeeper-valint || true
+
+.PHONY: clean-provider
+clean-provider:
 	@helm -ngatekeeper-valint delete gatekeeper-valint || true
 
 .PHONY: upstream-valint

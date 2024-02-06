@@ -32,7 +32,7 @@ func (cfg *Application) SetVersion(version string) {
 }
 
 func (cfg *Application) PostInit() error {
-	return nil
+	return cfg.Valint.PostInit()
 }
 
 type ProviderConfig struct {

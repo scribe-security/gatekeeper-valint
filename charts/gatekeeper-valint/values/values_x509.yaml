@@ -1,0 +1,11 @@
+valint:
+  verify:
+    # -- Evidence format
+    input-format: attest # In order to verify signatures must provide x509.ca value field
+    # -- Policy result format
+    formats: statement  # In order to sign policy results must provide x509.key value field
+  attest:
+    # -- Signature verification type (sigstore, x509-env)
+    default: x509-env
+  context:
+    context-type: local

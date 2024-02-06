@@ -23,6 +23,8 @@ spec:
         env:
         - name: POLICIES_TMP_ROOT
           value: "/policies"
+        - name: TMPDIR
+          value: "/policies"
         - name: SIGSTORE_NO_CACHE
           value: {{ quote .Values.gatekeeperValint.sigstoreNoCache }}
         - name: DEBUG
@@ -34,10 +36,17 @@ spec:
             secretKeyRef:
               key: scribe_client_id
               name: scribe-cred-secret
+        {{- if .Values.scribe.url }}
         - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               key: scribe_client_secret
+              name: scribe-cred-secret
+        {{- end }}
+        - name: GATEKEEPER_VALINT_SCRIBE_URL
+          valueFrom:
+            secretKeyRef:
+              key: scribe_url
               name: scribe-cred-secret
         - name: GATEKEEPER_VALINT_SCRIBE_ENABLE
           valueFrom:
@@ -49,11 +58,20 @@ spec:
             secretKeyRef:
               key: ATTEST_CA
               name: scribe-x509-secret
+        {{- if .Values.x509.cert }}
         - name: ATTEST_CERT
           valueFrom:
             secretKeyRef:
               key: ATTEST_CERT
               name: scribe-x509-secret
+        {{- end }}
+        {{- if .Values.x509.key }}
+        - name: ATTEST_KEY
+          valueFrom:
+            secretKeyRef:
+              key: ATTEST_KEY
+              name: scribe-x509-secret
+        {{- end }}
         image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}
         name: gatekeeper-valint

@@ -1,0 +1,11 @@
+valint:
+  verify:
+    # -- Evidence format
+    input-format: attest
+    # -- Policy result format
+    formats: statement  # In order to sign with sigstore the policy results you need to map a OIDC identity.
+  attest:
+    # -- Signature verification type (sigstore, x509-env)
+    default: sigstore
+  context:
+    context-type: local

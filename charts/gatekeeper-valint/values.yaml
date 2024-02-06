@@ -33,26 +33,17 @@ x509:
   ca: ""
 
 valint:
-  config:
-    logger:
-      level: debug
-    cache:
-      enable: false
-    verify:
-      # -- Evidence format
-      input-format: attest
-      # -- Policy result format
-      formats: attest
-    attest:
-      # -- Signature verification type (sigstore, x509-env)
-      default: x509-env
-    context:
-      context-type: local
-    attest:
-      cocosign:
-        storer:
-          OCI:
-            # -- OCI evidence enable
-            enable: false
-            # -- OCI evidence repo location 
-            repo: ""
+  logger:
+    level: debug
+  cache:
+    enable: false
+  verify:
+    # -- Evidence format
+    input-format: statement
+    # -- Policy result format
+    formats: statement
+  context:
+    context-type: local
+  attest:
+    bundle: https://github.com/scribe-public/sample-policies
+
