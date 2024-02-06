@@ -36,18 +36,18 @@ spec:
             secretKeyRef:
               key: scribe_client_id
               name: scribe-cred-secret
-        {{- if .Values.scribe.url }}
         - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               key: scribe_client_secret
               name: scribe-cred-secret
-        {{- end }}
+        {{- if .Values.scribe.url }}
         - name: GATEKEEPER_VALINT_SCRIBE_URL
           valueFrom:
             secretKeyRef:
               key: scribe_url
               name: scribe-cred-secret
+        {{- end }}
         - name: GATEKEEPER_VALINT_SCRIBE_ENABLE
           valueFrom:
             secretKeyRef:
