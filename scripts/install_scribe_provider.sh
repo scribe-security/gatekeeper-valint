@@ -50,6 +50,14 @@ case "$SIGNTYPE" in
       --values ./charts/"$NAME"/values/"$VALUES_FILE"
     ;;
   *)
-    echo "Unknown option. Defaulting to unsigned."
+    echo "Using default"
+    VALUES_FILE="values_default.yaml"
+    helm upgrade "$NAME" ./charts/"$NAME" \
+      --debug --reuse-values --force \
+      --namespace "$NAMESPACE" \
+      --set "x509.cert=$(cat $CERTS_PATH/tls.crt)" \
+      --set "x509.key=$(cat $CERTS_PATH/tls.key)" \
+      --set "x509.ca=$(cat $CERTS_PATH/ca.crt)" \
+      --values ./charts/"$NAME"/values/"$VALUES_FILE"
     ;;
 esac
