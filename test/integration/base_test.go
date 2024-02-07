@@ -116,7 +116,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			t.Log("###### Testing ", test.name, "######")
 			InstallGatekeeper(t)
 			InstallProvider(t, test.valuesConfig, test.format)
-
+			t.Fail()
 			if bomFlags != nil {
 				t.Log("###### Running ", bomFlags, "######")
 				_, out, err := runCmd(t, bomFlags...)
@@ -374,30 +374,28 @@ func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} 
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
-			"config": map[string]interface{}{
-				"scribe": map[string]interface{}{
-					"auth": map[string]interface{}{
-						"enable": false,
-					},
+			"scribe": map[string]interface{}{
+				"auth": map[string]interface{}{
 					"enable": false,
 				},
-				"context": map[string]interface{}{
-					"context-type": "local",
+				"enable": false,
+			},
+			"context": map[string]interface{}{
+				"context-type": "local",
+			},
+			"verify": map[string]interface{}{
+				"input-format": statement,
+				"formats":      statement,
+			},
+			"attest": map[string]interface{}{
+				"report": map[string]interface{}{
+					"disable": true,
 				},
-				"verify": map[string]interface{}{
-					"input-format": statement,
-					"formats":      statement,
-				},
-				"attest": map[string]interface{}{
-					"report": map[string]interface{}{
-						"disable": true,
-					},
-					"cocosign": map[string]interface{}{
-						"storer": map[string]interface{}{
-							"OCI": map[string]interface{}{
-								"enable": true,
-								"repo":   repo,
-							},
+				"cocosign": map[string]interface{}{
+					"storer": map[string]interface{}{
+						"OCI": map[string]interface{}{
+							"enable": true,
+							"repo":   repo,
 						},
 					},
 				},
@@ -427,21 +425,19 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
-			"config": map[string]interface{}{
-				"scribe": map[string]interface{}{
-					"auth": map[string]interface{}{
-						"enable": true,
-					},
-					"url":    scribeURL,
-					"enable": true,
-				},
-				"context": map[string]interface{}{
-					"context-type": "local",
-				},
-				"verify": map[string]interface{}{
-					"input-format": statement,
-					"formats":      statement,
-				},
+			// "scribe": map[string]interface{}{
+			// 	"auth": map[string]interface{}{
+			// 		"enable": true,
+			// 	},
+			// 	"url":    scribeURL,
+			// 	"enable": true,
+			// },
+			"context": map[string]interface{}{
+				"context-type": "local",
+			},
+			"verify": map[string]interface{}{
+				"input-format": statement,
+				"formats":      statement,
 			},
 		},
 	}

@@ -2,6 +2,11 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8sexternaldatavalint
+  annotations:
+    metadata.gatekeeper.sh/title: "Enforce Supply Chain Policies with Valint"
+    description: >-
+      Ensures that container images adhere to specified supply chain policies by integrating with Valint for verification. 
+      Violations will be reported if images do not comply with the defined policies.
 spec:
   crd:
     spec:
