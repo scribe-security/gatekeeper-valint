@@ -32,6 +32,15 @@ x509:
   cert: "" 
   ca: ""
 
+policies:
+  - glob: "**"
+    policies:
+     - name: application-policy
+       rules:
+       - name: fresh-image
+         uses: policies/images/fresh-image.yaml
+         with:
+          max_days: 400
 valint:
   logger:
     level: debug

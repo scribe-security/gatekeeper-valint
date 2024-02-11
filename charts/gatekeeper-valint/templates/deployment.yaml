@@ -20,11 +20,14 @@ spec:
       containers:
       - args:
         - "--config=/valint/config.yaml"
+        - "--policy-map=/policies/map.yaml"
         env:
         - name: POLICIES_TMP_ROOT
-          value: "/policies"
+          value: "/tmpdir"
+        - name: PULL_BUNDLE
+          value: "true"
         - name: TMPDIR
-          value: "/policies"
+          value: "/tmpdir"
         - name: SIGSTORE_NO_CACHE
           value: {{ quote .Values.gatekeeperValint.sigstoreNoCache }}
         - name: DEBUG
@@ -88,17 +91,27 @@ spec:
         - mountPath: /valint
           name: valint-config
           readOnly: true
+        {{- if .Values.policies }}
+        - mountPath: /policies
+          name: valint-policies
+          readOnly: true
+        {{- end }}
         - mountPath: /valint-certs
           name: valint-certs
           readOnly: true
-        - mountPath: /policies
-          name: policies
+        - mountPath: /tmpdir
+          name: tmpdir
       nodeSelector: {{- toYaml .Values.gatekeeperValint.nodeSelector | nindent 8 }}
       restartPolicy: Always
       volumes:
       - configMap:
           name: gatekeeper-valint-config
         name: valint-config
+      {{- if .Values.policies }}
+      - configMap:
+          name: gatekeeper-valint-policies
+        name: valint-policies
+      {{- end }}
       {{- if .Values.image.imagePullSecrets }}
       - name: valint-pull-secret
         secret:
@@ -113,4 +126,4 @@ spec:
           secretName: gatekeeper-valint-certs
       - emptyDir:
           sizeLimit: 100Mi
-        name: policies
+        name: tmpdir

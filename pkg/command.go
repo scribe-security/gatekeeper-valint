@@ -20,14 +20,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/scribe-security/basecli/logger"
+	"gopkg.in/yaml.v2"
 
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/externaldata"
 
 	"github.com/scribe-security/gatekeeper-valint/internal/config"
+	"github.com/scribe-security/gatekeeper-valint/pkg/glob"
 	"github.com/scribe-security/gatekeeper-valint/pkg/utils"
 	valintPkg "github.com/scribe-security/valint/pkg"
 	"github.com/sigstore/cosign/v2/cmd/cosign/cli/options"
@@ -42,9 +45,10 @@ const (
 )
 
 type ProviderCmd struct {
-	cfg    *config.Application
-	ctx    context.Context
-	logger logger.Logger
+	cfg              *config.Application
+	ctx              context.Context
+	logger           logger.Logger
+	policySelectList config.PolicySelectList
 }
 
 func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd, error) {
@@ -53,10 +57,20 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 		return nil, err
 	}
 
+	var policySelectList config.PolicySelectList
+	if _, err := os.Stat(cfg.Provider.PolicyMap); err == nil {
+		policySelectList, err = ReadPolicySelectList(cfg.Provider.PolicyMap)
+		if err != nil {
+			l.Warnf("issue reading policy select list, Err: %s", err)
+			return nil, err
+		}
+	}
+
 	return &ProviderCmd{
-		cfg:    cfg,
-		ctx:    ctx,
-		logger: l,
+		cfg:              cfg,
+		ctx:              ctx,
+		policySelectList: policySelectList,
+		logger:           l,
 	}, nil
 }
 
@@ -78,6 +92,22 @@ func (cmd *ProviderCmd) Run() error {
 	}
 
 	return nil
+}
+
+func ReadPolicySelectList(file string) (config.PolicySelectList, error) {
+	var policyMap config.PolicySelectList
+	yamlFile, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(yamlFile, &policyMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return policyMap, nil
+
 }
 
 func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
@@ -114,41 +144,72 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// iterate over all keys
-	for _, key := range providerRequest.Request.Keys {
-		fmt.Println("valint verify signature for:", key)
-		ref, err := name.ParseReference(key)
-		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (ParseReference(%q)): %v", key, err), w)
-			return
+	os.Setenv("PULL_BUNDLE", "true")
+
+	if len(cmd.policySelectList) == 0 {
+		// Run Default policy
+		for _, key := range providerRequest.Request.Keys {
+			runPolicy(w, key, co, cmd.cfg.Valint, cmd.logger)
 		}
-
-		img, err := ociremote.SignedImage(ref, co...)
-		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (Image(%q)): %v", key, err), w)
-			return
-		}
-
-		imageID, err := img.ConfigName()
-		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (ConfigName(%q)): %v", key, err), w)
-			return
-		}
-
-		cfg := cmd.cfg.Valint
-		err = valintPkg.VerifyAdmissionImage(ref.String(),
-			imageID.String(),
-			&cfg,
-			cmd.logger,
-			co...,
-		)
-
-		if err != nil {
-			utils.SendResponse(nil, fmt.Sprintf("ERROR (VerifyAdmissionImage(%q)): %v", key, err), w)
-			return
+	} else {
+		var matchErrs []error
+		for _, key := range providerRequest.Request.Keys {
+			found := false
+			for _, selectPolicy := range cmd.policySelectList {
+				if selectPolicy.Glob != "" {
+					fmt.Printf("glob match, Glob: %s, Key %s\n", selectPolicy.Glob, key)
+					if matched, err := glob.Match(selectPolicy.Glob, key); err != nil {
+						fmt.Println("glob not found", err)
+						matchErrs = append(matchErrs, err)
+					} else if matched {
+						found = true
+						fmt.Println("glob match found")
+						cmd.cfg.Valint.Attest.Config.Policies = selectPolicy.Config.Policies
+						runPolicy(w, key, co, cmd.cfg.Valint, cmd.logger)
+					}
+				}
+			}
+			if !found {
+				fmt.Println("no policy found for image", key)
+			}
 		}
 	}
+
 	utils.SendResponse(&results, "", w)
+}
+
+func runPolicy(w http.ResponseWriter, key string, co []ociremote.Option, cfg valintPkg.Application, l logger.Logger) {
+	fmt.Println("valint verify signature for:", key)
+
+	ref, err := name.ParseReference(key)
+	if err != nil {
+		utils.SendResponse(nil, fmt.Sprintf("ERROR (ParseReference(%q)): %v", key, err), w)
+		return
+	}
+
+	img, err := ociremote.SignedImage(ref, co...)
+	if err != nil {
+		utils.SendResponse(nil, fmt.Sprintf("ERROR (Image(%q)): %v", key, err), w)
+		return
+	}
+
+	imageID, err := img.ConfigName()
+	if err != nil {
+		utils.SendResponse(nil, fmt.Sprintf("ERROR (ConfigName(%q)): %v", key, err), w)
+		return
+	}
+
+	err = valintPkg.VerifyAdmissionImage(ref.String(),
+		imageID.String(),
+		&cfg,
+		l,
+		co...,
+	)
+
+	if err != nil {
+		utils.SendResponse(nil, fmt.Sprintf("ERROR (VerifyAdmissionImage(%q)): %v", key, err), w)
+		return
+	}
 }
 
 func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc {
