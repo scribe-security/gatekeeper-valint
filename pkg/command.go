@@ -41,7 +41,7 @@ const (
 	apiVersion = "externaldata.gatekeeper.sh/v1beta1"
 	tlsCert    = "/valint-certs/tls.crt"
 	tlsKey     = "/valint-certs/tls.key"
-	timeout    = 30 * time.Second
+	timeout    = 300 * time.Second
 )
 
 type ProviderCmd struct {
@@ -83,7 +83,7 @@ func (cmd *ProviderCmd) Run() error {
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
 		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      10 * time.Second,
+		WriteTimeout:      300 * time.Second,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
@@ -165,7 +165,11 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 						found = true
 						fmt.Println("glob match found")
 						cmd.cfg.Valint.Attest.Config.Policies = selectPolicy.Config.Policies
-						runPolicy(w, key, co, cmd.cfg.Valint, cmd.logger)
+						err := runPolicyWithError(w, key, co, cmd.cfg.Valint, cmd.logger)
+						if err != nil {
+							utils.SendResponse(nil, fmt.Sprintf("ERROR (VerifyAdmissionImage(%q)): %v", key, err), w)
+							return
+						}
 					}
 				}
 			}
@@ -173,9 +177,40 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 				fmt.Println("no policy found for image", key)
 			}
 		}
+
 	}
 
 	utils.SendResponse(&results, "", w)
+}
+
+func runPolicyWithError(w http.ResponseWriter, key string, co []ociremote.Option, cfg valintPkg.Application, l logger.Logger) error {
+	ref, err := name.ParseReference(key)
+	if err != nil {
+		return err
+	}
+
+	img, err := ociremote.SignedImage(ref, co...)
+	if err != nil {
+		return err
+	}
+
+	imageID, err := img.ConfigName()
+	if err != nil {
+		return err
+	}
+
+	err = valintPkg.VerifyAdmissionImage(ref.String(),
+		imageID.String(),
+		&cfg,
+		l,
+		co...,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func runPolicy(w http.ResponseWriter, key string, co []ociremote.Option, cfg valintPkg.Application, l logger.Logger) {

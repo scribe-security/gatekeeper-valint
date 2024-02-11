@@ -33,7 +33,7 @@ x509:
   ca: ""
 
 policies:
-  - glob: "**"
+  - glob: "**alpine**"
     policies:
      - name: application-policy
        rules:
@@ -41,6 +41,14 @@ policies:
          uses: policies/images/fresh-image.yaml
          with:
           max_days: 400
+  - glob: "busybox*"
+    policies:
+     - name: framework-policy
+       rules:
+       - name: fresh-image
+         uses: policies/images/fresh-image.yaml
+         with:
+          max_days: 500
 valint:
   logger:
     level: debug
