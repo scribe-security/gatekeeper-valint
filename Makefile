@@ -192,8 +192,12 @@ logs: ## Read admission logs
 clean_namespace: clean ## Delete admission namespace
 	@kubectl delete namespace $(NAMESPACE)  || true
 
-
 .PHONY: accept_test
 accept_test: ## Accept test 
 	kubectl delete -f policy/examples/valid.yaml || true
 	kubectl apply -f policy/examples/valid.yaml
+
+.PHONY: multi_test
+multi_test: ## Multi test 
+	kubectl delete -f policy/examples/multi.yaml || true
+	kubectl apply -f policy/examples/multi.yaml

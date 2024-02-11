@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-deployment
+  labels:
+    app: multi-deployment
+spec:
+  replicas: 0 # testing purposes only
+  selector:
+    matchLabels:
+      app: multi-deployment
+  template:
+    metadata:
+      labels:
+        app: multi-deployment
+    spec:
+      containers:
+      - name: custom-alpine
+        image: scribesecuriy.jfrog.io/scribe-docker-public-local/test/valint_alpine_input:latest
+      - name: busybox
+        image: busybox:latest
