@@ -1,5 +1,5 @@
 
-name: dev_e2e
+name: staging_e2e
 
 on:
   # push:
@@ -9,7 +9,7 @@ on:
     #   - "pre-release/**"
     #   - "release/**"
     #   - "feature/policy-flow-readyness-pass1"
-  # pull_request:
+  pull_request:
   workflow_dispatch:
     inputs:
       SCRIBE_CLIENT_ID:
@@ -22,7 +22,7 @@ on:
         default: ''
 
 concurrency: 
-  group: e2e-dev-${{ github.ref }}
+  group: e2e-staging-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -31,12 +31,12 @@ jobs:
     secrets:
       RELEASE_GITHUB_TOKEN: ${{ secrets.READ_PRIVATE_GO_REPOS }} ## needed to pull our private go libraries
       RELEASE_ARTIFACTORY_TOKEN: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
-      SCRIBE_CLIENT_ID: ${{ github.event.inputs.SCRIBE_CLIENT_ID || secrets.SCRIBE_DEV_M2M_CLIENT_ID }}
-      SCRIBE_CLIENT_SECRET: ${{ github.event.inputs.SCRIBE_CLIENT_SECRET || secrets.SCRIBE_DEV_M2M_CLIENT_SECRET }}
+      SCRIBE_CLIENT_ID: ${{ github.event.inputs.SCRIBE_CLIENT_ID || secrets.SCRIBE_STAGING_M2M_CLIENT_ID }}
+      SCRIBE_CLIENT_SECRET: ${{ github.event.inputs.SCRIBE_CLIENT_SECRET || secrets.SCRIBE_STAGING_M2M_CLIENT_SECRET }}
       SLACK_WEBHOOK_URL: ${{ secrets.VALINT_SLACK_WEBHOOK_URL }}
     with:
       RELEASE_ARTIFACTORY_USERNAME: mikey@scribesecurity.com
       GITHUB_USER: houdini91
-      SCRIBE_URL: https://api.dev.scribesecurity.com
+      SCRIBE_URL: https://api.staging.scribesecurity.com
       ENV: dev
       # reusable_e2e default is dev
