@@ -32,23 +32,29 @@ x509:
   cert: "" 
   ca: ""
 
-policies:
-  - glob: "**alpine**"
-    policies:
-     - name: application-policy
-       rules:
-       - name: fresh-image
-         uses: policies/images/fresh-image.yaml
-         with:
-          max_days: 400
-  - glob: "busybox*"
-    policies:
-     - name: framework-policy
-       rules:
-       - name: fresh-image
-         uses: policies/images/fresh-image.yaml
-         with:
-          max_days: 500
+select:
+- glob: 
+  - "**alpine**"
+  - "**alpine2**"
+  policies:
+  - name: application-policy
+    rules:
+    - name: fresh-image
+      uses: policies/images/fresh-image.yaml
+      with:
+        max_days: 400
+  
+- glob: 
+  - "**busybox**"
+  policies:
+  - name: framework-policy
+    rules:
+    - name: fresh-image
+      uses: policies/images/fresh-image.yaml
+      with:
+        max_days: 500
+    
+
 valint:
   logger:
     level: debug
@@ -63,4 +69,5 @@ valint:
     context-type: local
   attest:
     bundle: https://github.com/scribe-public/sample-policies
-
+    report:
+      add-passed: true

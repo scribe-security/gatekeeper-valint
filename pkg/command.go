@@ -38,10 +38,10 @@ import (
 )
 
 const (
-	apiVersion = "externaldata.gatekeeper.sh/v1beta1"
-	tlsCert    = "/valint-certs/tls.crt"
-	tlsKey     = "/valint-certs/tls.key"
-	timeout    = 300 * time.Second
+	apiVersion     = "externaldata.gatekeeper.sh/v1beta1"
+	tlsCert        = "/valint-certs/tls.crt"
+	tlsKey         = "/valint-certs/tls.key"
+	defaultTimeout = 300 * time.Second
 )
 
 type ProviderCmd struct {
@@ -49,12 +49,21 @@ type ProviderCmd struct {
 	ctx              context.Context
 	logger           logger.Logger
 	policySelectList config.PolicySelectList
+	timeout          time.Duration
 }
 
 func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd, error) {
 	l, err := valintPkg.InitCommandLogger("", &cfg.Valint, nil)
 	if err != nil {
 		return nil, err
+	}
+
+	var timeout time.Duration
+	newTimeout, err := time.ParseDuration(cfg.Provider.Timeout)
+	if err == nil {
+		timeout = newTimeout
+	} else {
+		timeout = defaultTimeout
 	}
 
 	var policySelectList config.PolicySelectList
@@ -71,6 +80,7 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 		ctx:              ctx,
 		policySelectList: policySelectList,
 		logger:           l,
+		timeout:          timeout,
 	}, nil
 }
 
@@ -78,12 +88,12 @@ func (cmd *ProviderCmd) Run() error {
 
 	fmt.Printf("starting HTTPS server on port %d...\n", cmd.cfg.Provider.Port)
 
-	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeout))
+	http.HandleFunc("/validate", processTimeout(cmd.Validate, cmd.timeout))
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
 		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      300 * time.Second,
+		WriteTimeout:      cmd.timeout,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
@@ -134,7 +144,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 	results := make([]externaldata.Item, 0)
 
-	ctx, cancel := context.WithTimeout(req.Context(), timeout)
+	ctx, cancel := context.WithTimeout(req.Context(), cmd.timeout)
 	defer cancel()
 
 	ro := options.RegistryOptions{}
@@ -152,35 +162,52 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			runPolicy(w, key, co, cmd.cfg.Valint, cmd.logger)
 		}
 	} else {
-		var matchErrs []error
 		for _, key := range providerRequest.Request.Keys {
-			found := false
-			for _, selectPolicy := range cmd.policySelectList {
-				if selectPolicy.Glob != "" {
-					fmt.Printf("glob match, Glob: %s, Key %s\n", selectPolicy.Glob, key)
-					if matched, err := glob.Match(selectPolicy.Glob, key); err != nil {
-						fmt.Println("glob not found", err)
-						matchErrs = append(matchErrs, err)
-					} else if matched {
-						found = true
-						fmt.Println("glob match found")
-						cmd.cfg.Valint.Attest.Config.Policies = selectPolicy.Config.Policies
-						err := runPolicyWithError(w, key, co, cmd.cfg.Valint, cmd.logger)
-						if err != nil {
-							utils.SendResponse(nil, fmt.Sprintf("ERROR (VerifyAdmissionImage(%q)): %v", key, err), w)
-							return
-						}
-					}
-				}
-			}
-			if !found {
-				fmt.Println("no policy found for image", key)
+			err := runPolicySelectWithError(w, key, co, cmd.policySelectList, cmd.cfg.Valint, cmd.logger)
+			if err != nil {
+				utils.SendResponse(nil, fmt.Sprintf("ERROR (VerifyAdmissionImage(%q)): %v", key, err), w)
+				return
 			}
 		}
 
 	}
 
 	utils.SendResponse(&results, "", w)
+}
+
+func runPolicySelectWithError(w http.ResponseWriter, key string, co []ociremote.Option, selectCfg config.PolicySelectList, cfg valintPkg.Application, l logger.Logger) error {
+	found := false
+	var matchErrs []error
+	for _, selectPolicy := range selectCfg {
+		if len(selectPolicy.Glob) > 0 {
+			for _, selectGlob := range selectPolicy.Glob {
+				l.Infof("matching %s on select regex %s", key, selectGlob)
+				if matched, err := glob.Match(selectGlob, key); err != nil {
+					l.Debugf("match failed skipping, err: %s", key, err)
+					matchErrs = append(matchErrs, err)
+				} else if matched {
+					found = true
+					for _, policy := range selectPolicy.Config.Policies {
+						l.Infof("policy %s evaluating for %s", policy.NameField, key)
+					}
+
+					cfg.Attest.Config.Policies = append(cfg.Attest.Config.Policies, selectPolicy.Config.Policies...)
+					err := runPolicyWithError(w, key, co, cfg, l)
+					if err != nil {
+						return err
+					}
+					break
+				}
+			}
+		}
+	}
+	if !found {
+		l.Infof("no policy found for image %s, skipping", key)
+	} else {
+		l.Infof("policies evaluated successfuly for %s", key)
+	}
+
+	return nil
 }
 
 func runPolicyWithError(w http.ResponseWriter, key string, co []ociremote.Option, cfg valintPkg.Application, l logger.Logger) error {

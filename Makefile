@@ -167,6 +167,7 @@ clean-dist:
 clean-test:
 	@helm -ngatekeeper-system delete gatekeeper || true
 	@helm -ngatekeeper-valint delete gatekeeper-valint || true
+	@kubectl delete -n default deployment test-deployment || true
 
 .PHONY: clean-provider
 clean-provider:

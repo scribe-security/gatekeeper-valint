@@ -11,7 +11,7 @@ require (
 	github.com/magefile/mage v1.14.0
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20231011212908-ad0a9011c2af
 	github.com/scribe-security/basecli v0.0.0-20240211081544-ea2e990b4493
-	github.com/scribe-security/valint v1.1.1-10.0.20240211121816-d9051327f548
+	github.com/scribe-security/valint v1.1.1-10.0.20240212073119-43701d02d614
 	github.com/sigstore/cosign/v2 v2.2.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4

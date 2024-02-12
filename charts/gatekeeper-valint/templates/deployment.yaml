@@ -91,7 +91,7 @@ spec:
         - mountPath: /valint
           name: valint-config
           readOnly: true
-        {{- if .Values.policies }}
+        {{- if .Values.select }}
         - mountPath: /policies
           name: valint-policies
           readOnly: true
@@ -107,7 +107,7 @@ spec:
       - configMap:
           name: gatekeeper-valint-config
         name: valint-config
-      {{- if .Values.policies }}
+      {{- if .Values.select }}
       - configMap:
           name: gatekeeper-valint-policies
         name: valint-policies
