@@ -81,6 +81,13 @@ spec:
               key: ATTEST_KEY
               name: scribe-x509-secret
         {{- end }}
+        {{- if .Values.image.bundlePullSecrets }}
+        - name: GATEKEEPER_VALINT_GIT_AUTH
+          valueFrom:
+            secretKeyRef:
+              key: auth
+              name: gatekeeper-valint-bundle-pull-secret
+        {{- end }}
         image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}
         name: gatekeeper-valint

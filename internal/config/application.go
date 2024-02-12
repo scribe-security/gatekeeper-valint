@@ -14,6 +14,7 @@ const (
 
 type Application struct {
 	basecli.BaseConfig `yaml:",omitempty,inline" json:",omitempty,inline" mapstructure:",squash"`
+	Git                valintPkg.GitConfig   `yaml:"git,omitempty" json:"git,omitempty" mapstructure:"git"`
 	Provider           ProviderConfig        `yaml:"provider,omitempty" json:"provider,omitempty" mapstructure:"provider"`
 	version            string                `yaml:"-" json:"-" mapstructure:"-"`
 	Valint             valintPkg.Application `yaml:"valint,omitempty" json:"valint,omitempty" mapstructure:"valint"`
@@ -55,4 +56,12 @@ var ProviderCommandArguments = basecli.Arguments{
 	{ConfigID: "provider.port", LongName: "port", ShortName: "", Message: "Port for the server to listen on", Default: defaultPort},
 	{ConfigID: "provider.policy_map", LongName: "policy-map", ShortName: "", Message: "Path to policy select configuration", Default: "/policies/map.yaml"},
 	{ConfigID: "provider.timeout", LongName: "timeout", ShortName: "", Message: "Evaluation timeout", Default: "300s"},
+}
+
+var GitCommandArguments = basecli.Arguments{
+	{ConfigID: "git.auth", LongName: "git-auth", ShortName: "", Message: "Git repository authentication info, [format: 'username:password']", Default: "", IsHidden: false},
+	{ConfigID: "git.tag", LongName: "git-tag", ShortName: "", Message: "Git tag in the repository", Default: ""},
+	{ConfigID: "git.branch", LongName: "git-branch", ShortName: "", Message: "Git branch in the repository", Default: ""},
+	{ConfigID: "git.commit", LongName: "git-commit", ShortName: "", Message: "Git commit hash in the repository", Default: ""},
+	{ConfigID: "git.depth", LongName: "depth", ShortName: "", Message: "Git clone depth", Default: 0},
 }

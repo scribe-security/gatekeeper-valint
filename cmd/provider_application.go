@@ -18,6 +18,11 @@ func NewCliInit() *basecli.Engine {
 		panic(err)
 	}
 
+	err = cli.AddArguments(rootCmd, config.GitCommandArguments)
+	if err != nil {
+		panic(err)
+	}
+
 	// err = cli.AddCommandAndArguments(providerCmd, config.ProviderCommandArguments)
 	// if err != nil {
 	// 	panic(err)
