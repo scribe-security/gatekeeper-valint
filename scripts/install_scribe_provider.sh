@@ -24,7 +24,8 @@ else
       --set "scribe.enable=true" \
       --set "scribe.client_id=$SCRIBE_CLIENT_ID" \
       --set "scribe.client_secret=$SCRIBE_CLIENT_SECRET" \
-      --set "scribe.url=$SCRIBE_URL"
+      --set "scribe.url=$SCRIBE_URL" \
+      --set "image.imagePullSecrets=$(cat ~/.docker/config.json | base64 -w0)"
 fi
 
 # Upgrade Helm release

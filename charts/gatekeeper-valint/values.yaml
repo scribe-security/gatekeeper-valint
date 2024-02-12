@@ -7,7 +7,9 @@ certs:
   tlsCrt: ""
   tlsKey: ""
 
-port: 8090
+provider:
+  port: 8090
+  timeout: 300s
 
 replicas: 1
 
@@ -32,28 +34,26 @@ x509:
   cert: "" 
   ca: ""
 
-select:
-- glob: 
-  - "**alpine**"
-  - "**alpine2**"
-  policies:
-  - name: application-policy
-    rules:
-    - name: fresh-image
-      uses: policies/images/fresh-image.yaml
-      with:
-        max_days: 400
+# select:
+# - glob: 
+#   - "**myuser/**"
+#   policies:
+#   - name: application-policy
+#     rules:
+#     - name: fresh-image
+#       uses: policies/images/fresh-image.yaml
+#       with:
+#         max_days: 400
   
-- glob: 
-  - "**busybox**"
-  policies:
-  - name: framework-policy
-    rules:
-    - name: fresh-image
-      uses: policies/images/fresh-image.yaml
-      with:
-        max_days: 500
-    
+# - glob: 
+#   - "nginx"
+#   policies:
+#   - name: framework-policy
+#     rules:
+#     - name: fresh-image
+#       uses: policies/images/fresh-image.yaml
+#       with:
+#         max_days: 500 
 
 valint:
   logger:

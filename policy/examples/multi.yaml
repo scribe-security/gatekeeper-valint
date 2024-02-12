@@ -17,5 +17,5 @@ spec:
       containers:
       - name: custom-alpine
         image: scribesecuriy.jfrog.io/scribe-docker-public-local/test/valint_alpine_input:latest
-      - name: busybox
-        image: busybox:latest
+      - name: nginx
+        image: nginx:latest

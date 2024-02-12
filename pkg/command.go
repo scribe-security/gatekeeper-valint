@@ -42,6 +42,7 @@ const (
 	tlsCert        = "/valint-certs/tls.crt"
 	tlsKey         = "/valint-certs/tls.key"
 	defaultTimeout = 300 * time.Second
+	overhead       = 2 * time.Second
 )
 
 type ProviderCmd struct {
@@ -86,9 +87,16 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 
 func (cmd *ProviderCmd) Run() error {
 
-	fmt.Printf("starting HTTPS server on port %d...\n", cmd.cfg.Provider.Port)
+	cmd.logger.Infof("starting HTTPS server on port %d...\n", cmd.cfg.Provider.Port)
 
-	http.HandleFunc("/validate", processTimeout(cmd.Validate, cmd.timeout))
+	timeoutWithOverhead := cmd.timeout
+	if cmd.timeout > 1*time.Second {
+		timeoutWithOverhead = timeoutWithOverhead - overhead
+	}
+
+	cmd.logger.Infof("timeouts, webhook:%s, process:%s...\n", cmd.timeout, timeoutWithOverhead)
+
+	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeoutWithOverhead))
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
@@ -278,7 +286,6 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), duration)
 		defer cancel()
-
 		r = r.WithContext(ctx)
 
 		processDone := make(chan bool)
