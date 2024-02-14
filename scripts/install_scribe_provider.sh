@@ -37,8 +37,8 @@ case "$SIGNTYPE" in
    helm upgrade "$NAME" ./charts/"$NAME" \
       --debug --reuse-values --force \
       --namespace "$NAMESPACE" \
-      --set "x509.cert=$(cat $CERTS_PATH/tls.crt)" \
-      --set "x509.key=$(cat $CERTS_PATH/tls.key)" \
+      --set "x509.cert=$(cat $CERTS_PATH/evidence.crt)" \
+      --set "x509.key=$(cat $CERTS_PATH/evidence.key)" \
       --set "x509.ca=$(cat $CERTS_PATH/ca.crt)" \
       --values ./charts/"$NAME"/values/"$VALUES_FILE"
     ;;
@@ -47,9 +47,6 @@ case "$SIGNTYPE" in
     helm upgrade "$NAME" ./charts/"$NAME" \
       --debug --reuse-values --force \
       --namespace "$NAMESPACE" \
-      --set "x509.cert=$(cat $CERTS_PATH/tls.crt)" \
-      --set "x509.key=$(cat $CERTS_PATH/tls.key)" \
-      --set "x509.ca=$(cat $CERTS_PATH/ca.crt)" \
       --values ./charts/"$NAME"/values/"$VALUES_FILE"
     ;;
   *)
@@ -58,9 +55,6 @@ case "$SIGNTYPE" in
     helm upgrade "$NAME" ./charts/"$NAME" \
       --debug --reuse-values --force \
       --namespace "$NAMESPACE" \
-      --set "x509.cert=$(cat $CERTS_PATH/tls.crt)" \
-      --set "x509.key=$(cat $CERTS_PATH/tls.key)" \
-      --set "x509.ca=$(cat $CERTS_PATH/ca.crt)" \
       --values ./charts/"$NAME"/values/"$VALUES_FILE"
     ;;
 esac

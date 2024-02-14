@@ -18,7 +18,12 @@ generate() {
     echo "Generating server key and certificate for gatekeeper-valint..."
     openssl genrsa -out tls.key 2048
     openssl req -newkey rsa:2048 -nodes -keyout tls.key -subj "/CN=gatekeeper-valint.${NAMESPACE}" -out server.csr
-    openssl x509 -req -extfile <(printf "subjectAltName=DNS:gatekeeper-valint.%s" "${NAMESPACE}") -days 1 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out tls.crt
+    openssl x509 -req -extfile <(printf "subjectAltName=DNS:gatekeeper-valint.%s" "${NAMESPACE}") -days 30 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out tls.crt
+
+    echo "Generating signing key and certificate for signed evidence..."
+    openssl genrsa -out evidence.key 2048
+    openssl req -newkey rsa:2048 -nodes -keyout evidence.key -subj "/CN=gatekeeper-valint.${NAMESPACE}" -out evidence.csr
+    openssl x509 -req -extfile <(printf "subjectAltName=DNS:gatekeeper-valint.%s" "${NAMESPACE}") -days 356 -in evidence.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out evidence.crt
 }
 
 mkdir -p "${REPO_ROOT}/certs"
