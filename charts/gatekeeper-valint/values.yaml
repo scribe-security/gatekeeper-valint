@@ -7,9 +7,13 @@ certs:
   tlsCrt: ""
   tlsKey: ""
 
+serviceAccount:
+  create: true
+
 provider:
   port: 8090
-  timeout: 300s
+  timeout: 300s #In seconds
+
 
 replicas: 1
 
@@ -35,25 +39,27 @@ x509:
   ca: ""
 
 # select:
-# - glob: 
-#   - "**myuser/**"
-#   policies:
-#   - name: application-policy
-#     rules:
-#     - name: fresh-image
-#       uses: policies/images/fresh-image.yaml
-#       with:
-#         max_days: 400
-  
-# - glob: 
-#   - "nginx"
-#   policies:
-#   - name: framework-policy
-#     rules:
-#     - name: fresh-image
-#       uses: policies/images/fresh-image.yaml
-#       with:
-#         max_days: 500 
+#   gate: some_gate
+#   apply:
+#   - glob: 
+#     - "**alpine**"
+#     policies:
+#     - name: application-policy
+#       rules:
+#       - name: fresh-image
+#         uses: images/fresh-image@v1
+#         with:
+#           max_days: 400
+    
+#   - glob: 
+#     - "nginx"
+#     policies:
+#     - name: framework-policy
+#       rules:
+#       - name: fresh-image
+#         uses: images/fresh-image@v1
+#         with:
+#           max_days: 500 
 
 valint:
   logger:
@@ -66,7 +72,7 @@ valint:
     # -- Policy result format
     formats: statement
   context:
-    context-type: local
+    context-type: admission
   attest:
     bundle: https://github.com/scribe-public/sample-policies
     report:

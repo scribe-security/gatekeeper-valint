@@ -7,5 +7,3 @@ valint:
   attest:
     # -- Signature verification type (sigstore, x509-env)
     default: x509-env
-  context:
-    context-type: local

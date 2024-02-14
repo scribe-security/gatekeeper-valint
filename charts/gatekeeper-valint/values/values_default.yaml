@@ -9,6 +9,6 @@ valint:
     # -- Policy result format
     formats: statement
   context:
-    context-type: local
+    context-type: admission
   attest:
     bundle: https://github.com/scribe-public/sample-policies

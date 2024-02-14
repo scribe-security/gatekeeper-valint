@@ -20,7 +20,11 @@ spec:
         violation[{"msg": msg}] {
           # build a list of keys containing images
           images := [img | img = input.review.object.spec.template.spec.containers[_].image]
-
+          
+          # namespaces := [ns | ns = input.review.namespace]
+          # namespace_keys := [ "ns:" + ns | ns := namespaces]
+          # keys := array.concat(namespace_keys, images)
+                    
           # send external data request
           response := external_data({"provider": "gatekeeper-valint", "keys": images})
 

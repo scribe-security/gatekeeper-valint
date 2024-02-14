@@ -115,6 +115,7 @@ spec:
         - mountPath: /tmpdir
           name: tmpdir
       nodeSelector: {{- toYaml .Values.gatekeeperValint.nodeSelector | nindent 8 }}
+      serviceAccountName: {{ include "gatekeeper-valint.serviceAccountName" . }}
       restartPolicy: Always
       volumes:
       - configMap:

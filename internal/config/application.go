@@ -20,7 +20,12 @@ type Application struct {
 	Valint             valintPkg.Application `yaml:"valint,omitempty" json:"valint,omitempty" mapstructure:"valint"`
 }
 
-type PolicySelectList []PolicySelect
+// type PolicySelectList []PolicySelect
+
+type PolicySelectStruct struct {
+	Apply []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
+	Gate  string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
+}
 
 type PolicySelect struct {
 	Glob                   []string `yaml:"glob,omitempty" json:"glob,omitempty" mapstructure:"glob"`
@@ -47,7 +52,7 @@ func (cfg *Application) PostInit() error {
 type ProviderConfig struct {
 	ImagePullSecrets []string `yaml:"image-pull-secrets,omitempty" json:"image-pull-secrets,omitempty" mapstructure:"image-pull-secrets"`
 	Port             int      `yaml:"port,omitempty" json:"port,omitempty" mapstructure:"port"`
-	PolicyMap        string   `yaml:"policy_map,omitempty" json:"policy_map,omitempty" mapstructure:"policy_map"`
+	PolicySelect     string   `yaml:"policy_map,omitempty" json:"policy_map,omitempty" mapstructure:"policy_map"`
 	Timeout          string   `yaml:"timeout,omitempty" json:"timeout,omitempty" mapstructure:"timeout"`
 }
 

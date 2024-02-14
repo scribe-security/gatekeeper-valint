@@ -46,11 +46,11 @@ const (
 )
 
 type ProviderCmd struct {
-	cfg              *config.Application
-	ctx              context.Context
-	logger           logger.Logger
-	policySelectList config.PolicySelectList
-	timeout          time.Duration
+	cfg          *config.Application
+	ctx          context.Context
+	logger       logger.Logger
+	policySelect *config.PolicySelectStruct
+	timeout      time.Duration
 }
 
 func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd, error) {
@@ -67,22 +67,26 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 		timeout = defaultTimeout
 	}
 
-	var policySelectList config.PolicySelectList
-	if _, err := os.Stat(cfg.Provider.PolicyMap); err == nil {
-		policySelectList, err = ReadPolicySelectList(cfg.Provider.PolicyMap)
+	provider := &ProviderCmd{
+		cfg:     cfg,
+		ctx:     ctx,
+		logger:  l,
+		timeout: timeout,
+	}
+
+	var policySelect *config.PolicySelectStruct
+	if _, err := os.Stat(cfg.Provider.PolicySelect); err == nil {
+		policySelect, err = ReadPolicySelectStruct(cfg.Provider.PolicySelect)
 		if err != nil {
 			l.Warnf("issue reading policy select list, Err: %s", err)
 			return nil, err
 		}
+		fmt.Println("############### ReadPolicySelectStruct", policySelect.Gate, len(policySelect.Apply))
+
+		provider.policySelect = policySelect
 	}
 
-	return &ProviderCmd{
-		cfg:              cfg,
-		ctx:              ctx,
-		policySelectList: policySelectList,
-		logger:           l,
-		timeout:          timeout,
-	}, nil
+	return provider, nil
 }
 
 func (cmd *ProviderCmd) Run() error {
@@ -112,19 +116,19 @@ func (cmd *ProviderCmd) Run() error {
 	return nil
 }
 
-func ReadPolicySelectList(file string) (config.PolicySelectList, error) {
-	var policyMap config.PolicySelectList
+func ReadPolicySelectStruct(file string) (*config.PolicySelectStruct, error) {
+	var policySelect config.PolicySelectStruct
 	yamlFile, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
-	err = yaml.Unmarshal(yamlFile, &policyMap)
+	err = yaml.Unmarshal(yamlFile, &policySelect)
 	if err != nil {
 		return nil, err
 	}
 
-	return policyMap, nil
+	return &policySelect, nil
 
 }
 
@@ -164,42 +168,53 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 	os.Setenv("PULL_BUNDLE", "true")
 
-	if len(cmd.policySelectList) == 0 {
+	if cmd.policySelect == nil ||
+		(cmd.policySelect != nil && len(cmd.policySelect.Apply) == 0) {
 		// Run Default policy
 		for _, key := range providerRequest.Request.Keys {
 			runPolicy(w, key, co, cmd.cfg.Valint, cmd.logger)
 		}
-	} else {
+	} else if cmd.policySelect != nil {
+		fmt.Println("###################### GATE ", cmd.policySelect.Gate, cmd.cfg.Valint.Context.Gate)
+		if cmd.policySelect.Gate != "" && cmd.cfg.Valint.Context.Gate == "" {
+			cmd.cfg.Valint.Context.Gate = cmd.policySelect.Gate
+		}
+
+		if cmd.cfg.Valint.Context.Gate != "" {
+			cmd.logger.Infof("evaluating gate %s", cmd.cfg.Valint.Context.Gate)
+		}
+
 		for _, key := range providerRequest.Request.Keys {
-			err := runPolicySelectWithError(w, key, co, cmd.policySelectList, cmd.cfg.Valint, cmd.logger)
+			err := runPolicySelectWithError(w, key, co, cmd.policySelect.Apply, cmd.cfg.Valint, cmd.logger)
 			if err != nil {
 				utils.SendResponse(nil, fmt.Sprintf("ERROR (VerifyAdmissionImage(%q)): %v", key, err), w)
 				return
 			}
 		}
-
+	} else {
+		cmd.logger.Warnf("no policy run on request")
 	}
 
 	utils.SendResponse(&results, "", w)
 }
 
-func runPolicySelectWithError(w http.ResponseWriter, key string, co []ociremote.Option, selectCfg config.PolicySelectList, cfg valintPkg.Application, l logger.Logger) error {
+func runPolicySelectWithError(w http.ResponseWriter, key string, co []ociremote.Option, applyCfg []config.PolicySelect, cfg valintPkg.Application, l logger.Logger) error {
 	found := false
 	var matchErrs []error
-	for _, selectPolicy := range selectCfg {
-		if len(selectPolicy.Glob) > 0 {
-			for _, selectGlob := range selectPolicy.Glob {
+	for _, applyPolicy := range applyCfg {
+		if len(applyPolicy.Glob) > 0 {
+			for _, selectGlob := range applyPolicy.Glob {
 				l.Infof("matching %s on select regex %s", key, selectGlob)
 				if matched, err := glob.Match(selectGlob, key); err != nil {
 					l.Debugf("match failed skipping, err: %s", key, err)
 					matchErrs = append(matchErrs, err)
 				} else if matched {
 					found = true
-					for _, policy := range selectPolicy.Config.Policies {
+					for _, policy := range applyPolicy.Config.Policies {
 						l.Infof("policy %s evaluating for %s", policy.NameField, key)
 					}
 
-					cfg.Attest.Config.Policies = append(cfg.Attest.Config.Policies, selectPolicy.Config.Policies...)
+					cfg.Attest.Config.Policies = append(cfg.Attest.Config.Policies, applyPolicy.Config.Policies...)
 					err := runPolicyWithError(w, key, co, cfg, l)
 					if err != nil {
 						return err
