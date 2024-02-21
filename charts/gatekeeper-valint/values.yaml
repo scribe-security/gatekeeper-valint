@@ -40,6 +40,8 @@ x509:
 
 select:
   gate: my_gate
+  warning: false
+  dry-run: false
   apply:
     - namespace: "" # Any
       glob: 
@@ -82,7 +84,7 @@ valint:
     enable: false
   verify:
     # -- Evidence format
-    input-format: statement
+    # input-format: statement
     # -- Policy result format
     formats: statement
   context:

@@ -97,6 +97,7 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 			return nil, err
 		}
 		provider.policySelect = policySelect
+		utils.SetDryRun(provider.policySelect.DryRun)
 	}
 
 	return provider, nil
@@ -234,7 +235,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		var policyErrs []error
 		var errMsg string
 		for _, image := range images {
-			errs := runPolicySelectWithError(w, image, labels, namespace, name, kind, co, cmd.policySelect.Apply, cmd.cfg.Valint, cmd.logger)
+			errs := runPolicySelectWithError(w, image, labels, namespace, name, kind, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
 			if len(errs) > 0 {
 				policyErrs = append(policyErrs, errs...)
 				for _, err := range errs {
@@ -256,7 +257,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	utils.SendResponse(&results, "", w)
 }
 
-func runPolicySelectWithError(w http.ResponseWriter, image string, labels map[string]string, namespace, name, kind string, co []ociremote.Option, applyCfg []config.PolicySelect, cfg valintPkg.Application, l logger.Logger) []error {
+func runPolicySelectWithError(w http.ResponseWriter, image string, labels map[string]string, namespace, name, kind string, co []ociremote.Option, applyCfg []config.PolicySelect, dryRun bool, cfg valintPkg.Application, l logger.Logger) []error {
 	found := false
 	var matchErrs []error
 	var policyErrs []error
@@ -293,6 +294,18 @@ func runPolicySelectWithError(w http.ResponseWriter, image string, labels map[st
 		cfg.Attest.Config.Policies = policies
 		for _, policy := range policies {
 			l.Infof("policy '%s' evaluating for '%s' deployed to '%s' namespace ", policy.NameField, image, namespace)
+			for i, rule := range policy.Rules {
+				if dryRun {
+					if policy.Rules[i].Level != "note" && policy.Rules[i].Level != "warning" {
+						if policy.Rules[i].Level == "" {
+							l.Infof("Setting '%s' to warning level", rule.NameField)
+						} else {
+							l.Infof("Downgrade '%s' from '%s' to warning level", rule.NameField, rule.Level)
+						}
+						policy.Rules[i].Level = "warning"
+					}
+				}
+			}
 		}
 		err := runPolicyWithError(w, image, labels, namespace, name, kind, co, cfg, l)
 		if err != nil {
@@ -321,7 +334,7 @@ func runPolicyWithError(w http.ResponseWriter, image string, labels map[string]s
 		return err
 	}
 
-	err = valintPkg.VerifyAdmissionImage(ref.String(),
+	err = valintPkg.VerifyAdmissionCommand(ref.String(),
 		imageID.String(),
 		labels, namespace, targetName, kind,
 		&cfg,
@@ -357,7 +370,7 @@ func runPolicy(w http.ResponseWriter, image string, labels map[string]string, na
 		return
 	}
 
-	err = valintPkg.VerifyAdmissionImage(ref.String(),
+	err = valintPkg.VerifyAdmissionCommand(ref.String(),
 		imageID.String(),
 		labels, namespace, targetName, kind,
 		&cfg,

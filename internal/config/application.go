@@ -23,8 +23,10 @@ type Application struct {
 // type PolicySelectList []PolicySelect
 
 type PolicySelectStruct struct {
-	Apply []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
-	Gate  string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
+	Apply   []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
+	Warning bool           `yaml:"warning,omitempty" json:"warning,omitempty" mapstructure:"warning"`
+	DryRun  bool           `yaml:"dry-run,omitempty" json:"dry-run,omitempty" mapstructure:"dry-run"`
+	Gate    string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
 }
 
 type PolicySelect struct {

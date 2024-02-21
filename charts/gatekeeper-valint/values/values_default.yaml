@@ -5,7 +5,7 @@ valint:
     enable: false
   verify:
     # -- Evidence format
-    input-format: statement
+    # input-format: statement
     # -- Policy result format
     formats: statement
   context:
