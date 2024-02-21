@@ -44,49 +44,49 @@ spec:
           valueFrom:
             secretKeyRef:
               key: scribe_client_id
-              name: scribe-cred-secret
+              name: valint-scribe-cred-secret
         - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               key: scribe_client_secret
-              name: scribe-cred-secret
+              name: valint-scribe-cred-secret
         {{- if .Values.scribe.url }}
         - name: GATEKEEPER_VALINT_SCRIBE_URL
           valueFrom:
             secretKeyRef:
               key: scribe_url
-              name: scribe-cred-secret
+              name: valint-scribe-cred-secret
         {{- end }}
         - name: GATEKEEPER_VALINT_SCRIBE_ENABLE
           valueFrom:
             secretKeyRef:
               key: scribe_enable
-              name: scribe-cred-secret
+              name: valint-scribe-cred-secret
         - name: ATTEST_CA
           valueFrom:
             secretKeyRef:
               key: ATTEST_CA
-              name: scribe-x509-secret
+              name: valint-x509-secret
         {{- if .Values.x509.cert }}
         - name: ATTEST_CERT
           valueFrom:
             secretKeyRef:
               key: ATTEST_CERT
-              name: scribe-x509-secret
+              name: valint-x509-secret
         {{- end }}
         {{- if .Values.x509.key }}
         - name: ATTEST_KEY
           valueFrom:
             secretKeyRef:
               key: ATTEST_KEY
-              name: scribe-x509-secret
+              name: valint-x509-secret
         {{- end }}
         {{- if .Values.image.bundlePullSecrets }}
         - name: GATEKEEPER_VALINT_GIT_AUTH
           valueFrom:
             secretKeyRef:
               key: auth
-              name: gatekeeper-valint-bundle-pull-secret
+              name: valint-bundle-pull-secret
         {{- end }}
         image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}
@@ -129,7 +129,7 @@ spec:
       {{- if .Values.image.imagePullSecrets }}
       - name: valint-pull-secret
         secret:
-          secretName: gatekeeper-valint-pull-secret
+          secretName: valint-image-pull-secret
           optional: true
           items:
             - key: .dockerconfigjson

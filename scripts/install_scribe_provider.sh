@@ -16,6 +16,7 @@ if helm status "$NAME" -n "$NAMESPACE" > /dev/null 2>&1; then
    echo "Already installed. Skipping installation."
 else
    # Install Helm release
+   kubectl apply -f charts/gatekeeper-valint/crds/template.yaml
    helm install ./charts/gatekeeper-valint --name-template="$NAME" \
       --namespace "$NAMESPACE" --create-namespace \
       --set "certs.caBundle=$(cat $CERTS_PATH/ca.crt | base64 | tr -d '\n')" \

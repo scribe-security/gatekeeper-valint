@@ -18,7 +18,7 @@ provider:
 replicas: 1
 
 gatekeeperValint:
-  debug: "true"
+  debug: "false"
   sigstoreNoCache: "true"
   nodeSelector:
     kubernetes.io/os: linux
@@ -38,32 +38,46 @@ x509:
   cert: "" 
   ca: ""
 
-# select:
-#   gate: some_gate
-#   apply:
-#   - glob: 
-#     - "**alpine**"
-#     policies:
-#     - name: application-policy
-#       rules:
-#       - name: fresh-image
-#         uses: images/fresh-image@v1
-#         with:
-#           max_days: 400
-    
-#   - glob: 
-#     - "nginx"
-#     policies:
-#     - name: framework-policy
-#       rules:
-#       - name: fresh-image
-#         uses: images/fresh-image@v1
-#         with:
-#           max_days: 500 
+select:
+  gate: my_gate
+  apply:
+    - namespace: "" # Any
+      glob: 
+      - "**"  # Any
+      policies:
+      - name: cluster-policy
+        rules:
+        - name: fresh-image
+          uses: images/fresh-image@v1
+          with:
+            max_days: 1
+
+    - namespace: ""
+      glob: 
+      - "**alpine**"
+      policies:
+      - name: cluster-policy2
+        rules:
+        - name: fresh-image
+          uses: images/fresh-image@v1
+          with:
+            max_days: 4
+
+    - namespace: default
+      glob: 
+      - "my_app/**"
+      policies:
+      - name: application-policy
+        rules:
+        - name: fresh-image
+          uses: images/fresh-image@v1
+          with:
+            signed: true
+            max_days: 100 
 
 valint:
   logger:
-    level: debug
+    level: info
   cache:
     enable: false
   verify:

@@ -29,6 +29,7 @@ type PolicySelectStruct struct {
 
 type PolicySelect struct {
 	Glob                   []string `yaml:"glob,omitempty" json:"glob,omitempty" mapstructure:"glob"`
+	Namespace              string   `yaml:"namespace,omitempty" json:"namespace,omitempty" mapstructure:"namespace"`
 	cocosign_config.Config `yaml:",inline" json:",inline" mapstructure:",squash"`
 }
 

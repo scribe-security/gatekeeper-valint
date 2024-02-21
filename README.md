@@ -78,7 +78,7 @@ Enable Scribe client and add related `Client ID` and `Client Secret`.
    --set scribe.client_id=$SCRIBE_CLIENT_ID \
    --set scribe.client_secret=$SCRIBE_CLIENT_SECRET
   ```
-> Credentials will be stored as a secret named `scribe-cred-secret`.
+> Credentials will be stored as a secret named `valint-scribe-cred-secret`.
 
 ## OCI Evidence store
 Valint supports both storage and verification flows for `attestations` and `statement` objects using an OCI registry as an evidence store. <br />
@@ -89,13 +89,13 @@ Related configmap flags:
 >* `config.attest.cocosign.storer.OCI.repo` - Evidence store location.
 
 ## Private registries
-To verify images from registries that require authentication, create a Kubernetes image pull secret named `gatekeeper-valint-pull-secret`.
+To verify images from registries that require authentication, create a Kubernetes image pull secret named `valint-image-pull-secret`.
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: gatekeeper-valint-pull-secret
+  name: valint-image-pull-secret
   namespace: gatekeeper-valint
 data:
   .dockerconfigjson: ewoJImF1...g==
