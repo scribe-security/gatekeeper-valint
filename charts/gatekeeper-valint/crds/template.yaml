@@ -2,6 +2,11 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8sexternaldatavalint
+  annotations:
+    metadata.gatekeeper.sh/title: "Enforce Supply Chain Policies with Valint"
+    description: >-
+      Ensures that container images adhere to specified supply chain policies by integrating with Valint for verification. 
+      Violations will be reported if images do not comply with the defined policies.
 spec:
   crd:
     spec:
@@ -13,11 +18,16 @@ spec:
         package k8sexternaldata
 
         violation[{"msg": msg}] {
-          # build a list of keys containing images
+          # build a list of keys containing images 
           images := [img | img = input.review.object.spec.template.spec.containers[_].image]
+          
+          request_encoded := base64.encode(json.marshal(input.review.object))
+          request_encoded_prefixed := concat("", ["request:", request_encoded])
+          keys := array.concat(images,[request_encoded_prefixed])
 
+                    
           # send external data request
-          response := external_data({"provider": "gatekeeper-valint", "keys": images})
+          response := external_data({"provider": "gatekeeper-valint", "keys": keys})
 
           response_with_error(response)
 

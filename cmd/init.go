@@ -67,7 +67,9 @@ func Execute() {
 
 func init() {
 	cli = NewCliInit()
-	cobra.OnInitialize(LoadApplication)
+	cobra.OnInitialize(
+		LoadApplication,
+		initConfig)
 }
 
 func er(msg interface{}) {
@@ -82,4 +84,8 @@ func LoadApplication() {
 	}
 
 	cli.LoadApplication(&conf.Valint)
+}
+
+func initConfig() {
+	conf.PostInit()
 }

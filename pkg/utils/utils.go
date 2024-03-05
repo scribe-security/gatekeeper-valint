@@ -14,8 +14,27 @@ const (
 	kind       = "ProviderResponse"
 )
 
+var (
+	DryRunGlobal = false
+)
+
+func SetDryRun(dryRun bool) {
+	if dryRun {
+		klog.InfoS("Running in dry run mode")
+	}
+	DryRunGlobal = dryRun
+}
+
 // sendResponse sends back the response to Gatekeeper.
 func SendResponse(results *[]externaldata.Item, systemErr string, w http.ResponseWriter) {
+	emptyResults := make([]externaldata.Item, 0)
+	if DryRunGlobal && results == nil && systemErr != "" {
+		klog.InfoS("dry run mocking success, Failed with", systemErr)
+		if results == nil {
+			results = &emptyResults
+		}
+	}
+
 	response := externaldata.ProviderResponse{
 		APIVersion: apiVersion,
 		Kind:       kind,

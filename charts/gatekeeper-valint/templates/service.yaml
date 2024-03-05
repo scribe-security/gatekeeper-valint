@@ -11,6 +11,6 @@ spec:
     run: gatekeeper-valint
   {{- include "gatekeeper-valint.selectorLabels" . | nindent 4 }}
   ports:
-    - port: {{ .Values.port }}
+    - port: {{ .Values.provider.port }}
       protocol: TCP
-      targetPort: {{ .Values.port }}
+      targetPort: {{ .Values.provider.port }}

@@ -132,7 +132,7 @@ func HelmInstallTable(t *testing.T, clientset *kubernetes.Clientset) {
 			t.Logf("%v", logs)
 
 			if test.expectedError == "" {
-				require.NoError(t, err)
+				require.NoError(t, err, "apply test")
 			} else {
 				require.True(t, strings.Contains(err.Error(), test.expectedError))
 			}
@@ -152,11 +152,11 @@ func HelmUninstall(t *testing.T, namespace string, releaseName string) {
 
 	actionConfig := new(action.Configuration)
 	err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), t.Logf)
-	require.NoError(t, err)
+	require.NoError(t, err, "helm init")
 
 	client := action.NewUninstall(actionConfig)
 	_, err = client.Run(releaseName)
-	require.NoError(t, err)
+	require.NoError(t, err, "helm uninstall")
 }
 
 func HelmInstall(t *testing.T, namespace string, repo string, chart string, releaseName string, vals map[string]interface{}) {
@@ -296,18 +296,18 @@ func WaitForProviderPod(t *testing.T, clientset *kubernetes.Clientset) {
 
 func GetProviderLogs(t *testing.T, clientset *kubernetes.Clientset) string {
 	pods, err := clientset.CoreV1().Pods(providerNamespace).List(context.Background(), metav1.ListOptions{})
-	require.NoError(t, err)
-	require.Equal(t, len(pods.Items), 1)
+	require.NoError(t, err, "client init")
+	require.Equal(t, len(pods.Items), 1, "no items")
 
 	request := clientset.CoreV1().Pods(providerNamespace).GetLogs(pods.Items[0].Name, &corev1.PodLogOptions{})
 
 	logs, err := request.Stream(context.Background())
-	require.NoError(t, err)
+	require.NoError(t, err, "stream request")
 	defer logs.Close()
 
 	buf := new(bytes.Buffer)
 	_, err = io.Copy(buf, logs)
-	require.NoError(t, err)
+	require.NoError(t, err, "copy logs")
 
 	return buf.String()
 }
@@ -374,30 +374,28 @@ func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} 
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
-			"config": map[string]interface{}{
-				"scribe": map[string]interface{}{
-					"auth": map[string]interface{}{
-						"enable": false,
-					},
+			"scribe": map[string]interface{}{
+				"auth": map[string]interface{}{
 					"enable": false,
 				},
-				"context": map[string]interface{}{
-					"context-type": "local",
+				"enable": false,
+			},
+			"context": map[string]interface{}{
+				"context-type": "local",
+			},
+			"verify": map[string]interface{}{
+				"input-format": statement,
+				"formats":      statement,
+			},
+			"attest": map[string]interface{}{
+				"report": map[string]interface{}{
+					"disable": true,
 				},
-				"verify": map[string]interface{}{
-					"input-format": statement,
-					"formats":      statement,
-				},
-				"attest": map[string]interface{}{
-					"report": map[string]interface{}{
-						"disable": true,
-					},
-					"cocosign": map[string]interface{}{
-						"storer": map[string]interface{}{
-							"OCI": map[string]interface{}{
-								"enable": true,
-								"repo":   repo,
-							},
+				"cocosign": map[string]interface{}{
+					"storer": map[string]interface{}{
+						"OCI": map[string]interface{}{
+							"enable": true,
+							"repo":   repo,
 						},
 					},
 				},
@@ -427,21 +425,19 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
-			"config": map[string]interface{}{
-				"scribe": map[string]interface{}{
-					"auth": map[string]interface{}{
-						"enable": true,
-					},
-					"url":    scribeURL,
-					"enable": true,
-				},
-				"context": map[string]interface{}{
-					"context-type": "local",
-				},
-				"verify": map[string]interface{}{
-					"input-format": statement,
-					"formats":      statement,
-				},
+			// "scribe": map[string]interface{}{
+			// 	"auth": map[string]interface{}{
+			// 		"enable": true,
+			// 	},
+			// 	"url":    scribeURL,
+			// 	"enable": true,
+			// },
+			"context": map[string]interface{}{
+				"context-type": "local",
+			},
+			"verify": map[string]interface{}{
+				"input-format": statement,
+				"formats":      statement,
 			},
 		},
 	}

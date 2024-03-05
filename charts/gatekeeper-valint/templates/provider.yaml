@@ -4,6 +4,10 @@ metadata:
   name: gatekeeper-valint
   namespace: '{{ .Release.Namespace }}'
 spec:
-  url: https://gatekeeper-valint.{{ .Release.Namespace }}:{{ .Values.port }}/validate
+  url: https://gatekeeper-valint.{{ .Release.Namespace }}:{{  required "provider.port is required" .Values.provider.port }}/validate
+  {{- if .Values.provider.timeout }}
+  timeout: {{ regexReplaceAll "(.*)([a-zA-Z])$" .Values.provider.timeout "$1" }}
+  {{- else }}
   timeout: 300
+  {{- end }}
   caBundle: {{ required "certs.caBundle is required" .Values.certs.caBundle | quote }}

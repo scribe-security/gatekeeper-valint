@@ -14,7 +14,7 @@ helm install gatekeeper/gatekeeper  \
     --namespace gatekeeper-system --create-namespace \
     --set enableExternalData=true \
     --set controllerManager.dnsPolicy=ClusterFirst,audit.dnsPolicy=ClusterFirst \
-    --set validatingWebhookTimeoutSeconds=30 \
+    --set validatingWebhookTimeoutSeconds=30
 ```
 
 ### Generate TLS certificate and key for the provider
@@ -43,8 +43,8 @@ If Valint verification is to be performed with x509 certificate, provide additio
    --set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
    --set certs.tlsCrt="$(cat certs/tls.crt)" \
    --set certs.tlsKey="$(cat certs/tls.key)" \
-   --set x509.cert="$(cat valint/tls.crt)" \
-   --set x509.ca="$(cat valint/ca.crt)"
+   --set x509.cert="$(cat certs/tls.crt)" \
+   --set x509.ca="$(cat certs/ca.crt)"
   ```
 
 ### Evidence Stores
@@ -78,7 +78,7 @@ Enable Scribe client and add related `Client ID` and `Client Secret`.
    --set scribe.client_id=$SCRIBE_CLIENT_ID \
    --set scribe.client_secret=$SCRIBE_CLIENT_SECRET
   ```
-> Credentials will be stored as a secret named `scribe-cred-secret`.
+> Credentials will be stored as a secret named `valint-scribe-cred-secret`.
 
 ## OCI Evidence store
 Valint supports both storage and verification flows for `attestations` and `statement` objects using an OCI registry as an evidence store. <br />
@@ -89,13 +89,13 @@ Related configmap flags:
 >* `config.attest.cocosign.storer.OCI.repo` - Evidence store location.
 
 ## Private registries
-To verify images from registries that require authentication, create a Kubernetes image pull secret named `gatekeeper-valint-pull-secret`.
+To verify images from registries that require authentication, create a Kubernetes image pull secret named `valint-image-pull-secret`.
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: gatekeeper-valint-pull-secret
+  name: valint-image-pull-secret
   namespace: gatekeeper-valint
 data:
   .dockerconfigjson: ewoJImF1...g==
@@ -169,4 +169,4 @@ valint [bom, slsa] my_image -o attest [--oci OR --scribe.enable]
 ## Adding custom policies
 The configuration of the Valint provider is done via a ConfigMap.
 The same parameters and flags as in Valint can be set.
-See `charts/gatekeeper-valint/values.yaml`, valint.config section and Valint documentation for more details.
+See `charts/gatekeeper-valint/values.yaml`, `valint` section and Valint documentation for more details.

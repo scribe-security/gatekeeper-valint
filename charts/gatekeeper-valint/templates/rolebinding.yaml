@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-reader-binding
+  namespace: '{{ .Release.Namespace }}'
+  labels:
+  {{- include "gatekeeper-valint.labels" . | nindent 4 }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "gatekeeper-valint.serviceAccountName" . }}
+  namespace: '{{ .Release.Namespace }}'
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+

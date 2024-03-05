@@ -1,0 +1,14 @@
+valint:
+  logger:
+    level: info
+  cache:
+    enable: false
+  verify:
+    # -- Evidence format
+    # input-format: statement
+    # -- Policy result format
+    formats: statement
+  context:
+    context-type: admission
+  attest:
+    bundle: https://github.com/scribe-public/sample-policies

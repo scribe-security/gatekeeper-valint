@@ -6,6 +6,6 @@ metadata:
   labels:
   {{- include "gatekeeper-valint.labels" . | nindent 4 }}
 stringData:
-  tls.crt: {{ required "certs.tlsCrt is required" .Values.certs.tlsCrt | quote }}
-  tls.key: {{ required "certs.tlsKey is required" .Values.certs.tlsKey | quote }}
+  tls.crt: {{ .Values.certs.tlsCrt | quote }}
+  tls.key: {{ .Values.certs.tlsKey | quote }}
 type: kubernetes.io/tls

@@ -7,12 +7,18 @@ certs:
   tlsCrt: ""
   tlsKey: ""
 
-port: 8090
+serviceAccount:
+  create: true
+
+provider:
+  port: 8090
+  timeout: 300s #In seconds
+
 
 replicas: 1
 
 gatekeeperValint:
-  debug: "true"
+  debug: "false"
   sigstoreNoCache: "true"
   nodeSelector:
     kubernetes.io/os: linux
@@ -32,27 +38,58 @@ x509:
   cert: "" 
   ca: ""
 
+select:
+  gate: my_gate
+  warning: false
+  dry-run: false
+  apply:
+    - namespace: "" # Any
+      glob: 
+      - "**"  # Any
+      policies:
+      - name: cluster-policy
+        rules:
+        - name: fresh-image
+          uses: images/fresh-image@v1
+          with:
+            max_days: 1
+
+    - namespace: ""
+      glob: 
+      - "**alpine**"
+      policies:
+      - name: cluster-policy2
+        rules:
+        - name: fresh-image
+          uses: images/fresh-image@v1
+          with:
+            max_days: 4
+
+    - namespace: default
+      glob: 
+      - "my_app/**"
+      policies:
+      - name: application-policy
+        rules:
+        - name: fresh-image
+          uses: images/fresh-image@v1
+          with:
+            signed: true
+            max_days: 100 
+
 valint:
-  config:
-    logger:
-      level: debug
-    cache:
-      enable: false
-    verify:
-      # -- Evidence format
-      input-format: attest
-      # -- Policy result format
-      formats: attest
-    attest:
-      # -- Signature verification type (sigstore, x509-env)
-      default: x509-env
-    context:
-      context-type: local
-    attest:
-      cocosign:
-        storer:
-          OCI:
-            # -- OCI evidence enable
-            enable: false
-            # -- OCI evidence repo location 
-            repo: ""
+  logger:
+    level: info
+  cache:
+    enable: false
+  verify:
+    # -- Evidence format
+    # input-format: statement
+    # -- Policy result format
+    formats: statement
+  context:
+    context-type: admission
+  attest:
+    bundle: https://github.com/scribe-public/sample-policies
+    report:
+      add-passed: true

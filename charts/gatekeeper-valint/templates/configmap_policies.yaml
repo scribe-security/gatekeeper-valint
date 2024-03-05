@@ -1,10 +1,12 @@
+{{- if .Values.select }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gatekeeper-valint-config
+  name: gatekeeper-valint-policies
   namespace: '{{ .Release.Namespace }}'
   labels:
   {{- include "gatekeeper-valint.labels" . | nindent 4 }}
 data:
-  config.yaml: |
-{{ .Values.valint | toYaml | indent 4 }}
+  map.yaml: |
+{{ .Values.select | toYaml | indent 4 }}
+{{- end }}

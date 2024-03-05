@@ -20,9 +20,20 @@ spec:
       containers:
       - args:
         - "--config=/valint/config.yaml"
+        - "--policy-map=/policies/map.yaml"
+        {{- if .Values.provider.port }}
+        - "--port={{ .Values.provider.port }}"
+        {{- end }}
+        {{- if .Values.provider.timeout }}
+        - "--timeout={{ .Values.provider.timeout }}"
+        {{- end }}
         env:
         - name: POLICIES_TMP_ROOT
-          value: "/policies"
+          value: "/tmpdir"
+        - name: PULL_BUNDLE
+          value: "true"
+        - name: TMPDIR
+          value: "/tmpdir"
         - name: SIGSTORE_NO_CACHE
           value: {{ quote .Values.gatekeeperValint.sigstoreNoCache }}
         - name: DEBUG
@@ -33,32 +44,55 @@ spec:
           valueFrom:
             secretKeyRef:
               key: scribe_client_id
-              name: scribe-cred-secret
+              name: valint-scribe-cred-secret
         - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               key: scribe_client_secret
-              name: scribe-cred-secret
+              name: valint-scribe-cred-secret
+        {{- if .Values.scribe.url }}
+        - name: GATEKEEPER_VALINT_SCRIBE_URL
+          valueFrom:
+            secretKeyRef:
+              key: scribe_url
+              name: valint-scribe-cred-secret
+        {{- end }}
         - name: GATEKEEPER_VALINT_SCRIBE_ENABLE
           valueFrom:
             secretKeyRef:
               key: scribe_enable
-              name: scribe-cred-secret
+              name: valint-scribe-cred-secret
         - name: ATTEST_CA
           valueFrom:
             secretKeyRef:
               key: ATTEST_CA
-              name: scribe-x509-secret
+              name: valint-x509-secret
+        {{- if .Values.x509.cert }}
         - name: ATTEST_CERT
           valueFrom:
             secretKeyRef:
               key: ATTEST_CERT
-              name: scribe-x509-secret
+              name: valint-x509-secret
+        {{- end }}
+        {{- if .Values.x509.key }}
+        - name: ATTEST_KEY
+          valueFrom:
+            secretKeyRef:
+              key: ATTEST_KEY
+              name: valint-x509-secret
+        {{- end }}
+        {{- if .Values.image.bundlePullSecrets }}
+        - name: GATEKEEPER_VALINT_GIT_AUTH
+          valueFrom:
+            secretKeyRef:
+              key: auth
+              name: valint-bundle-pull-secret
+        {{- end }}
         image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}
         name: gatekeeper-valint
         ports:
-        - containerPort: 8090
+        - containerPort: {{ .Values.provider.port }}
           protocol: TCP
         resources: {}
         volumeMounts:
@@ -70,21 +104,32 @@ spec:
         - mountPath: /valint
           name: valint-config
           readOnly: true
+        {{- if .Values.select }}
+        - mountPath: /policies
+          name: valint-policies
+          readOnly: true
+        {{- end }}
         - mountPath: /valint-certs
           name: valint-certs
           readOnly: true
-        - mountPath: /policies
-          name: policies
+        - mountPath: /tmpdir
+          name: tmpdir
       nodeSelector: {{- toYaml .Values.gatekeeperValint.nodeSelector | nindent 8 }}
+      serviceAccountName: {{ include "gatekeeper-valint.serviceAccountName" . }}
       restartPolicy: Always
       volumes:
       - configMap:
           name: gatekeeper-valint-config
         name: valint-config
+      {{- if .Values.select }}
+      - configMap:
+          name: gatekeeper-valint-policies
+        name: valint-policies
+      {{- end }}
       {{- if .Values.image.imagePullSecrets }}
       - name: valint-pull-secret
         secret:
-          secretName: gatekeeper-valint-pull-secret
+          secretName: valint-image-pull-secret
           optional: true
           items:
             - key: .dockerconfigjson
@@ -95,4 +140,4 @@ spec:
           secretName: gatekeeper-valint-certs
       - emptyDir:
           sizeLimit: 100Mi
-        name: policies
+        name: tmpdir
