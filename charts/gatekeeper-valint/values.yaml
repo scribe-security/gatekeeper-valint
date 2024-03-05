@@ -38,44 +38,46 @@ x509:
   cert: "" 
   ca: ""
 
-select:
-  gate: my_gate
-  warning: false
-  dry-run: false
-  apply:
-    - namespace: "" # Any
-      glob: 
-      - "**"  # Any
-      policies:
-      - name: cluster-policy
-        rules:
-        - name: fresh-image
-          uses: images/fresh-image@v1
-          with:
-            max_days: 1
+# Example of issuing Supply Chain Policies for specific resources.
+# By Default the Signature Policy is Run on all images.
+# select:
+#   gate: my_gate
+#   warning: false
+#   dry-run: false
+#   apply:
+#     - namespace: "" # Any
+#       glob: 
+#       - "**"  # Any
+#       policies:
+#       - name: cluster-policy
+#         rules:
+#         - name: fresh-image
+#           uses: images/fresh-image@v1
+#           with:
+#             max_days: 1
 
-    - namespace: ""
-      glob: 
-      - "**alpine**"
-      policies:
-      - name: cluster-policy2
-        rules:
-        - name: fresh-image
-          uses: images/fresh-image@v1
-          with:
-            max_days: 4
+#     - namespace: ""
+#       glob: 
+#       - "**alpine**"
+#       policies:
+#       - name: cluster-policy2
+#         rules:
+#         - name: fresh-image
+#           uses: images/fresh-image@v1
+#           with:
+#             max_days: 4
 
-    - namespace: default
-      glob: 
-      - "my_app/**"
-      policies:
-      - name: application-policy
-        rules:
-        - name: fresh-image
-          uses: images/fresh-image@v1
-          with:
-            signed: true
-            max_days: 100 
+#     - namespace: default
+#       glob: 
+#       - "my_app/**"
+#       policies:
+#       - name: application-policy
+#         rules:
+#         - name: fresh-image
+#           uses: images/fresh-image@v1
+#           with:
+#             signed: true
+#             max_days: 100 
 
 valint:
   logger:
