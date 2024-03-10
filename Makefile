@@ -22,6 +22,7 @@ endif
 # used to generate the changelog from the second to last tag to the current tag (used in the release pipeline when the release tag is in place)
 LAST_TAG := $(shell git describe --always --abbrev=0 --tags $(shell git rev-list --tags --max-count=1))
 SECOND_TO_LAST_TAG := $(shell git describe --always --abbrev=0 --tags $(shell git rev-list --tags --skip=1 --max-count=1))
+pod :=  $(shell kubectl get pods -n $(NAMESPACE) | grep $(NAME) | head -1 | awk '{print $$1}')
 
 ## Variable assertions
 
@@ -166,12 +167,12 @@ clean-dist:
 .PHONY: clean-test
 clean-test:
 	@helm -ngatekeeper-system delete gatekeeper || true
-	@helm -ngatekeeper-valint delete gatekeeper-valint || true
+	@helm -n$(NAMESPACE) delete $(NAME) || true
 	@kubectl delete -n default deployment test-deployment || true
 
 .PHONY: clean-provider
 clean-provider:
-	@helm -ngatekeeper-valint delete gatekeeper-valint || true
+	@helm -n$(NAMESPACE) delete $(NAME) || true
 
 .PHONY: upstream-valint
 upstream-valint:
@@ -187,7 +188,9 @@ minikube_dashboard: ## Minikube dashboard
 
 .PHONY: logs
 logs: ## Read admission logs
-	@kubectl logs --all-containers=true --tail=-1 -l gatekeeper-valint -n  $(NAMESPACE)  | grep '^{' | jq -C -r '.' | sed 's/\\n/\n/g; s/\\t/\t/g'
+	pod=$(shell kubectl get pods -n $(NAMESPACE) | grep $(NAME) | head -1 | awk '{print $$1}')
+	kubectl logs -n $(NAMESPACE) $(pod) | sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\r//g" | grep -v "Counting objects:" | grep -v "Compressing objects:"
+
 
 .PHONY: clean_namespace
 clean_namespace: clean ## Delete admission namespace
@@ -195,10 +198,12 @@ clean_namespace: clean ## Delete admission namespace
 
 .PHONY: accept_test
 accept_test: ## Accept test 
+	kubectl delete -f policy/examples/multi.yaml || true
 	kubectl delete -f policy/examples/valid.yaml || true
 	kubectl apply -f policy/examples/valid.yaml
 
 .PHONY: multi_test
 multi_test: ## Multi test 
+	kubectl delete -f policy/examples/valid.yaml || true
 	kubectl delete -f policy/examples/multi.yaml || true
 	kubectl apply -f policy/examples/multi.yaml

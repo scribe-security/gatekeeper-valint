@@ -40,44 +40,92 @@ x509:
 
 # Example of issuing Supply Chain Policies for specific resources.
 # By Default the Signature Policy is Run on all images.
-# select:
-#   gate: my_gate
-#   warning: false
-#   dry-run: false
-#   apply:
-#     - namespace: "" # Any
-#       glob: 
-#       - "**"  # Any
-#       policies:
-#       - name: cluster-policy
-#         rules:
-#         - name: fresh-image
-#           uses: images/fresh-image@v1
-#           with:
-#             max_days: 1
+select:
+  gate: my_gate
+  warning: false
+  dry-run: false
+  apply:
+  - namespace: "" # Any
+    glob: 
+    - "**"  # Any
+    product-key: "prometheus-community/prometheus"
+    filter-by: 
+    - product
+    policy:
+      name: product-fullkit
+      rules:
+      - name: trivy-report-in-product
+        uses: sarif/verify-tool-evidence@v1
+        evidence:
+          tool: "Trivy Vulnerability Scanner"
 
-#     - namespace: ""
-#       glob: 
-#       - "**alpine**"
-#       policies:
-#       - name: cluster-policy2
-#         rules:
-#         - name: fresh-image
-#           uses: images/fresh-image@v1
-#           with:
-#             max_days: 4
+  - namespace: "" # Any
+    glob: 
+    - "**"  # Any
+    product-key: "prometheus-community/prometheus"
+    filter-by: 
+    - product
+    - target
+    policy:
+      name: target-policy
+      rules:
+        - name: evidence-exists-pipeline
+          uses: sboms/evidence-exists@v1
 
-#     - namespace: default
-#       glob: 
-#       - "my_app/**"
-#       policies:
-#       - name: application-policy
-#         rules:
-#         - name: fresh-image
-#           uses: images/fresh-image@v1
-#           with:
-#             signed: true
-#             max_days: 100 
+        - name: fresh-image
+          uses: images/fresh-image@v1
+          level: warn
+          with:
+            max_days: 356
+
+    #################### TYPES OF POLICIES #########################
+    # - namespace: "" # Any
+    #   glob: 
+    #   - "**"  # Any
+    #   product-key: "my_product"
+    #   # workflow: "my_workflow"
+    #   filter-by: 
+    #   - product
+    #   policy:
+    #     name: product-fullkit
+    #     rules:
+    #     - name: trivy-report-in-product
+    #       uses: sarif/verify-tool-evidence@v1
+    #       evidence:
+    #         tool: "Trivy Vulnerability Scanner"
+
+    # - namespace: "" # Any
+    #   glob: 
+    #   - "**"  # Any
+        # workflow: "my_workflow"
+
+    #   filter-by: 
+    #   - pipeline
+    #   policy:
+    #     name: pipeline-fullkit
+    #     rules:
+
+    #     - name: trivy-report-in-pipeline
+    #       uses: sarif/verify-tool-evidence@v1
+    #       evidence:
+    #         tool: "Trivy Vulnerability Scanner"
+
+    # - namespace: "" # Any
+    #   glob: 
+    #   - "**"  # Any
+    #   filter-by: 
+    #   - target
+    #   policy:
+    #     name: target-policy
+    #     rules:
+    #     - name: evidence-exists-pipeline
+    #       uses: sboms/evidence-exists@v1
+
+    #     - name: fresh-image
+    #       uses: images/fresh-image@v1
+    #       level: warn
+    #       with:
+    #         max_days: 356
 
 valint:
   logger:
@@ -95,3 +143,5 @@ valint:
     bundle: https://github.com/scribe-public/sample-policies
     report:
       add-passed: true
+  git:
+    branch: dev

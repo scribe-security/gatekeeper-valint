@@ -23,16 +23,20 @@ type Application struct {
 // type PolicySelectList []PolicySelect
 
 type PolicySelectStruct struct {
-	Apply   []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
-	Warning bool           `yaml:"warning,omitempty" json:"warning,omitempty" mapstructure:"warning"`
-	DryRun  bool           `yaml:"dry-run,omitempty" json:"dry-run,omitempty" mapstructure:"dry-run"`
-	Gate    string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
+	Apply         []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
+	Warning       bool           `yaml:"warning,omitempty" json:"warning,omitempty" mapstructure:"warning"`
+	DryRun        bool           `yaml:"dry-run,omitempty" json:"dry-run,omitempty" mapstructure:"dry-run"`
+	UseTag        bool           `yaml:"use-tag,omitempty" json:"use-tag,omitempty" mapstructure:"use-tag"`
+	IgnoreImageID bool           `yaml:"ignore-imageID,omitempty" json:"ignore-imageID,omitempty" mapstructure:"ignore-imageID"`
+	Gate          string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
 }
 
 type PolicySelect struct {
-	Glob                   []string `yaml:"glob,omitempty" json:"glob,omitempty" mapstructure:"glob"`
-	Namespace              string   `yaml:"namespace,omitempty" json:"namespace,omitempty" mapstructure:"namespace"`
-	cocosign_config.Config `yaml:",inline" json:",inline" mapstructure:",squash"`
+	Glob       []string                   `yaml:"glob,omitempty" json:"glob,omitempty" mapstructure:"glob"`
+	Namespace  string                     `yaml:"namespace,omitempty" json:"namespace,omitempty" mapstructure:"namespace"`
+	ProductKey string                     `yaml:"product-key,omitempty" json:"product-key,omitempty" mapstructure:"product-key"`
+	FilterBy   []string                   `yaml:"filter-by,omitempty" json:"filter-by,omitempty" mapstructure:"filter-by"`
+	Policy     cocosign_config.PolicyFile `yaml:"policy,omitempty" json:"policy,omitempty" mapstructure:"policy"`
 }
 
 // Implement ApplicationConfig interface

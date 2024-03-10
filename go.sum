@@ -1389,14 +1389,8 @@ github.com/sassoftware/relic/v7 v7.5.5 h1:2ZUM6ovo3STCAp0hZnO9nQY9lOB8OyfneeYIi4
 github.com/sassoftware/relic/v7 v7.5.5/go.mod h1:NxwtWxWxlUa9as2qZi635Ye6bBT/tGnMALLq7dSfOOU=
 github.com/scribe-security/KML v0.0.0-20231004082821-6dfabf3246f4 h1:Z17enW4Ni05IzhWNUfISRIHDDe5gUPyxo62dASR35Jw=
 github.com/scribe-security/KML v0.0.0-20231004082821-6dfabf3246f4/go.mod h1:Ns2ZaiHYB2vNl77w032dcaIl1sA7BmkfJRQo4Qhd5F0=
-github.com/scribe-security/basecli v0.0.0-20240304110121-824c1aecb1ac h1:mdvHXu71xrhCDvsCO7dA2IiO1tW37ieH7j82xhf32Qs=
-github.com/scribe-security/basecli v0.0.0-20240304110121-824c1aecb1ac/go.mod h1:6dB3lbFzPtZTq1Z9QYTt7Kk/om9FidHCeeDw8NVbLT0=
-github.com/scribe-security/cocosign v0.0.0-20240304075544-66f242ec75f3 h1:pjgCyBJCkopySi3ND3IWKEihOR3GCTbk3bVrAB7GQSI=
-github.com/scribe-security/cocosign v0.0.0-20240304075544-66f242ec75f3/go.mod h1:KRYaQ4rMWK5l1Q5Sg8C0MIv13ZbjAJ71rb9LUpxDZpg=
 github.com/scribe-security/syft v0.20.1-0.20240218103903-71f43211b082 h1:Fq1Wic1k7SVcmg4GKcB3ZoArntuYJBi382qeeJetvWA=
 github.com/scribe-security/syft v0.20.1-0.20240218103903-71f43211b082/go.mod h1:vYpOuUwqVRTDnnSPWxFwnsmF8YywTwcq0zJpmAjVLZo=
-github.com/scribe-security/valint v1.2.1-0.20240305150214-1bee225e10f6 h1:3lYZmJ40qwMQyaaDd28tkQVlHOyEqN9Dx4+AqbbFmkQ=
-github.com/scribe-security/valint v1.2.1-0.20240305150214-1bee225e10f6/go.mod h1:4PivrTRGBBPOBeX+TR2r1KXNWIr4nLUaMiGK3FeqCeo=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e h1:7q6NSFZDeGfvvtIRwBrU/aegEYJYmvev0cHAwo17zZQ=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e/go.mod h1:DkpGd78rljTxKAnTDPFqXSGxvETQnJyuSOQwsHycqfs=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=

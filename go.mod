@@ -452,11 +452,11 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-// replace github.com/scribe-security/valint => ../valint
+replace github.com/scribe-security/valint => ../valint
 
-// replace github.com/scribe-security/cocosign => ../cocosign
+replace github.com/scribe-security/cocosign => ../cocosign
 
-// replace github.com/scribe-security/basecli => ../basecli
+replace github.com/scribe-security/basecli => ../basecli
 
 replace github.com/anchore/syft => github.com/scribe-security/syft v0.20.1-0.20240218103903-71f43211b082
 
