@@ -18,7 +18,7 @@ provider:
 replicas: 1
 
 gatekeeperValint:
-  debug: "false"
+  debug: "true"
   sigstoreNoCache: "true"
   nodeSelector:
     kubernetes.io/os: linux
@@ -129,7 +129,7 @@ select:
 
 valint:
   logger:
-    level: info
+    level: debug
   cache:
     enable: false
   verify:

@@ -1,6 +1,6 @@
 valint:
   logger:
-    level: info
+    level: debug
   cache:
     enable: false
   verify:
