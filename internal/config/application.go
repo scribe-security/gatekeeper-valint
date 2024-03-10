@@ -2,7 +2,6 @@ package config
 
 import (
 	basecli "github.com/scribe-security/basecli"
-	cocosign_config "github.com/scribe-security/cocosign/signing/config"
 	valintPkg "github.com/scribe-security/valint/pkg"
 )
 
@@ -22,22 +21,22 @@ type Application struct {
 
 // type PolicySelectList []PolicySelect
 
-type PolicySelectStruct struct {
-	Apply         []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
-	Warning       bool           `yaml:"warning,omitempty" json:"warning,omitempty" mapstructure:"warning"`
-	DryRun        bool           `yaml:"dry-run,omitempty" json:"dry-run,omitempty" mapstructure:"dry-run"`
-	UseTag        bool           `yaml:"use-tag,omitempty" json:"use-tag,omitempty" mapstructure:"use-tag"`
-	IgnoreImageID bool           `yaml:"ignore-imageID,omitempty" json:"ignore-imageID,omitempty" mapstructure:"ignore-imageID"`
-	Gate          string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
-}
+// type PolicySelectStruct struct {
+// 	Apply         []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
+// 	Warning       bool           `yaml:"warning,omitempty" json:"warning,omitempty" mapstructure:"warning"`
+// 	DryRun        bool           `yaml:"dry-run,omitempty" json:"dry-run,omitempty" mapstructure:"dry-run"`
+// 	UseTag        bool           `yaml:"use-tag,omitempty" json:"use-tag,omitempty" mapstructure:"use-tag"`
+// 	IgnoreImageID bool           `yaml:"ignore-imageID,omitempty" json:"ignore-imageID,omitempty" mapstructure:"ignore-imageID"`
+// 	Gate          string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
+// }
 
-type PolicySelect struct {
-	Glob       []string                   `yaml:"glob,omitempty" json:"glob,omitempty" mapstructure:"glob"`
-	Namespace  string                     `yaml:"namespace,omitempty" json:"namespace,omitempty" mapstructure:"namespace"`
-	ProductKey string                     `yaml:"product-key,omitempty" json:"product-key,omitempty" mapstructure:"product-key"`
-	FilterBy   []string                   `yaml:"filter-by,omitempty" json:"filter-by,omitempty" mapstructure:"filter-by"`
-	Policy     cocosign_config.PolicyFile `yaml:"policy,omitempty" json:"policy,omitempty" mapstructure:"policy"`
-}
+// type PolicySelect struct {
+// 	Glob       []string                   `yaml:"glob,omitempty" json:"glob,omitempty" mapstructure:"glob"`
+// 	Namespace  string                     `yaml:"namespace,omitempty" json:"namespace,omitempty" mapstructure:"namespace"`
+// 	ProductKey string                     `yaml:"product-key,omitempty" json:"product-key,omitempty" mapstructure:"product-key"`
+// 	FilterBy   []string                   `yaml:"filter-by,omitempty" json:"filter-by,omitempty" mapstructure:"filter-by"`
+// 	Policy     cocosign_config.PolicyFile `yaml:"policy,omitempty" json:"policy,omitempty" mapstructure:"policy"`
+// }
 
 // Implement ApplicationConfig interface
 func (a Application) GetConfigPath() string {
