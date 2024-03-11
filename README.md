@@ -110,7 +110,6 @@ For example, to perform an upgrade with sigstore-based verification:
    --set valint.attest.default=sigstore
 ```
 
-
 # Demo: Enforcing Image Signing Policies with Gatekeeper Valint
 To showcase the enforcement of image signing policies using Gatekeeper Valint, we'll apply a simplistic unsigned image error policy and upgrade our gate accordingly.
 
@@ -223,7 +222,6 @@ Upon successful deployment, you'll see a detailed evaluation summary in the admi
 └─────────────────────────┴────────┴────────────────────────┴───────────────────┴────────────────────────────────────────────┘
 ```
 
-
 # Policy Gate
 The Gate Policies in Valint Gatekeeper Provider allow for fine-grained control over policy evaluation for images admitted into the system. 
 
@@ -335,7 +333,6 @@ The policy named pipeline-scanners is applied, which requires that images admitt
 
 For CI integrations see [CI integration](https://scribe-security.netlify.app/docs/integrating-scribe/ci-integrations/)
 
-
 <details>
   <summary> Collecting evidence in pipeline </summary>
 
@@ -354,7 +351,6 @@ trivy image --format sarif -o report.sarif busybox:latest
 RUN_ID=44 WORKFLOW=my_workflow.yaml valint evidence report.sarif [FLAGS]
 ```
 </details>
-
 
 ### Product Evaluation
 > Option only available when using `scribe` store.
