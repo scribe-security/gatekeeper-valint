@@ -85,5 +85,7 @@ valint:
     bundle: https://github.com/scribe-public/sample-policies
     report:
       add-passed: true
+    # -- Default verify with sigstore
+    default: sigstore
   git:
     branch: dev
