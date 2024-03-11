@@ -197,7 +197,6 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), w)
 		return
 	}
-
 	os.Setenv("PULL_BUNDLE", "true")
 
 	if cmd.policySelect == nil ||
@@ -225,10 +224,12 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
 			if len(errs) > 0 {
 				policyErrs = append(policyErrs, errs...)
-				for _, err := range errs {
-					cmd.logger.Warnf("Scribe Admission refused '%s' deploy to '%s' with Errors %s", image, namespace, err)
+				policyErrMsg := []string{}
+				for _, e := range errs {
+					cmd.logger.Warnf("Scribe Admission refused '%s' deploy to '%s' namespace.%s", image, namespace, e)
+					policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
 				}
-				errMsg = errMsg + fmt.Sprintf(">>>>> Scribe Admission refused '%s' deploy to '%s' with Errors %s<<<<<", image, namespace, errs)
+				errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deploy to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
 			}
 		}
 

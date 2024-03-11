@@ -16,6 +16,8 @@ spec:
       labels:
         run: gatekeeper-valint
         {{- include "gatekeeper-valint.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap_policies.yaml") . | sha256sum }}
     spec:
       containers:
       - args:
@@ -40,6 +42,8 @@ spec:
           value: {{ quote .Values.gatekeeperValint.debug }}
         - name: DOCKER_CONFIG
           value: "/docker"
+        - name: GATEKEEPER_VALINT_SCRIBE_RETRY_TIMEOUT
+          value: 180s
         - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_ID
           valueFrom:
             secretKeyRef:

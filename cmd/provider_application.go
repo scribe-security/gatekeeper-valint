@@ -7,7 +7,7 @@ import (
 
 func NewCliInit() *basecli.Engine {
 	cli := basecli.New(nil, config.ApplicationName, rootCmd)
-	// Adding basic command line argument - configuration must include the BaseConfig structure to map values to.
+
 	err := cli.AddBasicCommandsAndArguments(basecli.ARG_ALL)
 	if err != nil {
 		panic(err)
@@ -22,11 +22,6 @@ func NewCliInit() *basecli.Engine {
 	if err != nil {
 		panic(err)
 	}
-
-	// err = cli.AddCommandAndArguments(providerCmd, config.ProviderCommandArguments)
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	return cli
 }

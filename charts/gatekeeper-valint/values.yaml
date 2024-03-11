@@ -39,93 +39,35 @@ x509:
   ca: ""
 
 # Example of issuing Supply Chain Policies for specific resources.
-# By Default the Signature Policy is Run on all images.
+# By Default the Signature Policy is Run on all images set to warning.
 select:
-  gate: my_gate
+  # -- Gate name
+  gate: default_gate
+  # -- Set all rules as warning
   warning: false
+  # -- Run policy dry run mode
   dry-run: false
+
+  # -- Policy Select List
   apply:
+  # -- Select Namespace that should comply to policy
   - namespace: "" # Any
+    # -- Select Image Regular expression should comply to policy
     glob: 
     - "**"  # Any
-    product-key: "prometheus-community/prometheus"
-    filter-by: 
-    - product
-    policy:
-      name: product-fullkit
-      rules:
-      - name: trivy-report-in-product
-        uses: sarif/verify-tool-evidence@v1
-        evidence:
-          tool: "Trivy Vulnerability Scanner"
-
-  - namespace: "" # Any
-    glob: 
-    - "**"  # Any
-    product-key: "prometheus-community/prometheus"
-    filter-by: 
-    - product
+    # -- filter evidence by scope, options<product, pipeline, target>
+    filter-by:
     - target
+    # -- Select policy rules and arguments to evaluate
     policy:
-      name: target-policy
+      # -- Policy name
+      name: default-provider-policy
       rules:
-        - name: evidence-exists-pipeline
-          uses: sboms/evidence-exists@v1
-
-        - name: fresh-image
-          uses: images/fresh-image@v1
-          level: warn
-          with:
-            max_days: 356
-
-    #################### TYPES OF POLICIES #########################
-    # - namespace: "" # Any
-    #   glob: 
-    #   - "**"  # Any
-    #   product-key: "my_product"
-    #   # workflow: "my_workflow"
-    #   filter-by: 
-    #   - product
-    #   policy:
-    #     name: product-fullkit
-    #     rules:
-    #     - name: trivy-report-in-product
-    #       uses: sarif/verify-tool-evidence@v1
-    #       evidence:
-    #         tool: "Trivy Vulnerability Scanner"
-
-    # - namespace: "" # Any
-    #   glob: 
-    #   - "**"  # Any
-        # workflow: "my_workflow"
-
-    #   filter-by: 
-    #   - pipeline
-    #   policy:
-    #     name: pipeline-fullkit
-    #     rules:
-
-    #     - name: trivy-report-in-pipeline
-    #       uses: sarif/verify-tool-evidence@v1
-    #       evidence:
-    #         tool: "Trivy Vulnerability Scanner"
-
-    # - namespace: "" # Any
-    #   glob: 
-    #   - "**"  # Any
-    #   filter-by: 
-    #   - target
-    #   policy:
-    #     name: target-policy
-    #     rules:
-    #     - name: evidence-exists-pipeline
-    #       uses: sboms/evidence-exists@v1
-
-    #     - name: fresh-image
-    #       uses: images/fresh-image@v1
-    #       level: warn
-    #       with:
-    #         max_days: 356
+      - name: warn_on_unsigned_image
+        uses: sboms/artifact-signed@v1
+        level: "warning"
+        evidence:
+          signed: true
 
 valint:
   logger:
