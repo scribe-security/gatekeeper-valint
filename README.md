@@ -1,7 +1,27 @@
 # Valint Gatekeeper Provider
-To integrate [OPA Gatekeeper's new ExternalData feature](https://open-policy-agent.github.io/gatekeeper/website/docs/externaldata) with Valint to verify policies on your supply chain.
+Valint Gatekeeper Provider seamlessly integrates with OPA Gatekeeper's [ExternalData](https://open-policy-agent.github.io/gatekeeper/website/docs/externaldata) feature to facilitate policy verification within your supply chain. 
+This integration enables you to enforce a variety of supply chain policies, including signed image verification and various SDLC (Software Development Life Cycle) policies.
 
-> This repo is meant for testing Gatekeeper external data feature. Do not use for production.
+These policies are highly customizable and can be expressed as code. For more detailed explore the default [policy bundle](https://github.com/scribe-public/sample-policies).
+
+## Use Cases Examples
+
+| Use Case                                       | Description                                                                                                   |
+|------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| Enforcing Image Signing                        | Ensure that all images deployed to the production environment are signed and have a matching CycloneDX SBOM.  |
+| Enforcing Build pipeline vulnerability scanner | Verify that the image build pipeline executes a vulnerability scanner with no critical CVEs.                  |
+| Enforcing image built by CI                    | Verify that images are built using continuous integration (CI) processes.                                     |
+| Enforcing SLSA Level 2                         | Verify that images are built using CI and produce signed SLSA provenance.                                     |
+| Restricted Builder Dependency Management       | Restrict the use of banned builder dependencies during the build process.                                     |
+| Continuous Compliance Monitoring               | Monitor compliance with branch protection rules and push rules in Git repositories.                           |
+| Vulnerability Assessment for Infrastructure    | Detect misconfigurations or vulnerabilities in Kubernetes clusters or Docker images.                          |
+| License Compliance Enforcement                 | Ensure that software artifacts comply with licensing policies and do not include banned licenses.             |
+| Deployment Environment Validation              | Validate that deployment environments meet specified security and configuration standards.                    |
+| Rollout Verification                           | Verify that deployments adhere to rollout strategies and policies, such as canary or blue-green deployments.  |
+| Dependency Version Control                     | Control the versioning and usage of dependencies in deployed applications to prevent security risks.          |
+| Configuration Consistency                      | Ensure consistency in configuration settings across deployed instances to prevent misconfigurations.          |
+| Resource Utilization Management                | Monitor and manage resource usage during deployment to optimize performance and cost-effectiveness.           |
+
 
 ## Installation
 
@@ -336,7 +356,7 @@ RUN_ID=44 WORKFLOW=my_workflow.yaml valint evidence report.sarif [FLAGS]
 </details>
 
 
-### Product
+### Product Evaluation
 > Option only available when using `scribe` store.
 
 The product option evaluates policies based on the product, allowing you to verify critical aspects of the product evidence associated with the image.
@@ -362,9 +382,8 @@ select:
           rule_level:
             - critical
 ```
-In this example, the verify-critical-vulnerabilities policy is applied to evaluate images associated with the `my-product`. 
+In this example, the `pipeline-scanners` policy is applied to evaluate images associated with the `my-product`. 
 Specifically checking for vulnerabilities using the Trivy Vulnerability Scanner. This ensures that product undergo thorough vulnerability assessment.
-
 
 <details>
   <summary> Collecting evidence in product </summary>
