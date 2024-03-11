@@ -381,7 +381,7 @@ func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} 
 				"enable": false,
 			},
 			"context": map[string]interface{}{
-				"context-type": "local",
+				"context-type": "admission",
 			},
 			"verify": map[string]interface{}{
 				"input-format": statement,
@@ -391,6 +391,7 @@ func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} 
 				"report": map[string]interface{}{
 					"disable": true,
 				},
+				"default": "sigstore",
 				"cocosign": map[string]interface{}{
 					"storer": map[string]interface{}{
 						"OCI": map[string]interface{}{
@@ -433,11 +434,14 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 			// 	"enable": true,
 			// },
 			"context": map[string]interface{}{
-				"context-type": "local",
+				"context-type": "admission",
 			},
 			"verify": map[string]interface{}{
 				"input-format": statement,
 				"formats":      statement,
+			},
+			"attest": map[string]interface{}{
+				"default": "sigstore",
 			},
 		},
 	}
