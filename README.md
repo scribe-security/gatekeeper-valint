@@ -22,7 +22,6 @@ These policies are highly customizable and can be expressed as code. For more de
 | Configuration Consistency                      | Ensure consistency in configuration settings across deployed instances to prevent misconfigurations.          |
 | Resource Utilization Management                | Monitor and manage resource usage during deployment to optimize performance and cost-effectiveness.           |
 
-
 ## Installation
 
 ### Installing Gatekeeper
