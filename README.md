@@ -219,19 +219,18 @@ select:
     policy: <object> # Reuquired
 ```
 * `gate`: Specifies the gate name.
-* `namespace`: Specifies the namespace to which the policy applies.
-* `glob`: Defines the image reference pattern to which the policy is applied, for more details see glob section..
+* `apply`: list of policies to apply
+* `namespace`: Specifies the namespace to which the policy should apply to.
+* `glob`: Defines the image reference pattern to which the policy is applied to.
 * `filter-by`: Determines the scope of the policy evaluation. Supported options include:
-* `target`: Evaluate policies scoped by the imageID for admission.
-* `pipeline`: Evaluate policies scoped by the image build runID and workflow.
-* `product-key`: Evaluate policies scoped by a specific product.
+  * `target`: Evaluate policies scoped by the admission imageID.
+  * `pipeline`: Evaluate policies scoped by the image build pipeline.
+  * `product-key`: Evaluate policies scoped by a specific product.
 * `policy`: Set policy to evalute, for more details see [policy details](https://scribe-security.netlify.app/docs/guides/enforcing-sdlc-policy).
 
 > policy gate configuration are mapped to a configmap named `gatekeeper-valint-policies`.
 
-## Filter-By Options 
-The filter-by field allows you to specify the scope of the policy evaluation. Below are the available options:
-
+#### Usage example
 For example, to perform an upgrade to your policy gate:
 ```bash
    helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
@@ -250,8 +249,18 @@ select:
     - "**"
     filter-by:
     - target
-    policy: <object>
+    policy:
+      name: cluster-policy
+      rules:
+      - name: fresh-image
+        uses: images/fresh-image@v1
+        level: warning
+        with:
+          max_days: 356
 ```
+
+## Filter-By Options 
+The filter-by field allows you to specify the scope of the policy evaluation. Below are the available options:
 
 ### Target Evaluation
 > Option available for both `scribe` and `OCI` stores.
