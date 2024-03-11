@@ -226,10 +226,10 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 				policyErrs = append(policyErrs, errs...)
 				policyErrMsg := []string{}
 				for _, e := range errs {
-					cmd.logger.Warnf("Scribe Admission refused '%s' deploy to '%s' namespace.%s", image, namespace, e)
+					cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
 					policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
 				}
-				errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deploy to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
+				errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
 			}
 		}
 
