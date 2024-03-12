@@ -29,6 +29,8 @@ const (
 	defaultTimeout   = 300 * time.Second
 	overhead         = 2 * time.Second
 	requestKeyPrefix = "request:"
+	objectKeyPrefix  = "object:"
+	reviewKeyPrefix  = "review:"
 )
 
 type Metadata struct {
@@ -37,9 +39,14 @@ type Metadata struct {
 	Name      string            `yaml:"name,omitempty" json:"name,omitempty" mapstructure:"name"`
 }
 
-type AdmissionReview struct {
+type AdmissionReviewObject struct {
 	Kind     string   `yaml:"kind,omitempty" json:"kind,omitempty" mapstructure:"kind"`
 	Metadata Metadata `yaml:"metadata,omitempty" json:"metadata,omitempty" mapstructure:"metadata"`
+}
+
+type AdmissionReview struct {
+	Object    AdmissionReviewObject `yaml:"object,omitempty" json:"object,omitempty" mapstructure:"object"`
+	Operation string                `yaml:"operation,omitempty" json:"operation,omitempty" mapstructure:"operation"`
 }
 
 type ProviderCmd struct {
@@ -100,9 +107,9 @@ func (cmd *ProviderCmd) Run() error {
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
-		ReadTimeout:       10 * time.Second,
+		ReadTimeout:       100 * time.Second,
 		WriteTimeout:      cmd.timeout,
-		ReadHeaderTimeout: 10 * time.Second,
+		ReadHeaderTimeout: 100 * time.Second,
 	}
 
 	if err := srv.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
@@ -128,22 +135,24 @@ func ReadPolicySelectStruct(file string) (*valintPkg.PolicySelectStruct, error) 
 
 }
 
-func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]string, map[string]string, string, string, string, error) {
+func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]string, map[string]string, string, string, string, string, error) {
 	var images []string
 	var labels map[string]string
-	var namespace, name, kind string
+	var namespace, name, kind, operation string
 	var admissionRequest AdmissionReview
 	for _, key := range providerReq.Request.Keys {
-		if strings.HasPrefix(key, requestKeyPrefix) {
-			base := strings.TrimPrefix(key, requestKeyPrefix)
+		if strings.HasPrefix(key, reviewKeyPrefix) {
+			base := strings.TrimPrefix(key, reviewKeyPrefix)
 			data, err := base64.StdEncoding.DecodeString(base)
 			if err == nil {
 				err := json.Unmarshal(data, &admissionRequest)
 				if err == nil {
-					labels = admissionRequest.Metadata.Labels
-					name = admissionRequest.Metadata.Name
-					namespace = admissionRequest.Metadata.Namespace
-					kind = admissionRequest.Kind
+					object := admissionRequest.Object
+					labels = object.Metadata.Labels
+					name = object.Metadata.Name
+					namespace = object.Metadata.Namespace
+					kind = object.Kind
+					operation = admissionRequest.Operation
 				}
 			}
 		} else {
@@ -151,7 +160,7 @@ func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]
 		}
 	}
 
-	return images, labels, namespace, name, kind, nil
+	return images, labels, namespace, name, kind, operation, nil
 }
 
 func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
@@ -179,12 +188,18 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	}
 	useTag := cmd.policySelect.UseTag
 	ignoreImageID := cmd.policySelect.IgnoreImageID
-	images, labels, namespace, name, kind, err := cmd.decodeKeys(providerRequest)
+	images, labels, namespace, name, kind, operation, err := cmd.decodeKeys(providerRequest)
 	if err != nil {
 		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), w)
 		return
 	}
-	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s", len(images), images, labels, namespace, name, kind)
+	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
+	if operation != "CREATE" {
+		cmd.logger.Info("Skipping API Call, only operation CREATE is supported")
+		emptyResults := make([]externaldata.Item, 0)
+		utils.SendResponse(&emptyResults, "", w)
+		return
+	}
 
 	results := make([]externaldata.Item, 0)
 
@@ -259,7 +274,7 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 
 		select {
 		case <-ctx.Done():
-			utils.SendResponse(nil, "operation timed out", w)
+			utils.SendResponse(nil, "ERROR: operation timed out", w)
 		case <-processDone:
 		}
 	}

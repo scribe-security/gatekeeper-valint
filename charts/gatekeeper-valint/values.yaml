@@ -71,7 +71,7 @@ select:
 
 valint:
   logger:
-    level: debug
+    level: info
   cache:
     enable: false
   verify:
