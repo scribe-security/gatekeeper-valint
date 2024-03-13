@@ -429,13 +429,6 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
-			// "scribe": map[string]interface{}{
-			// 	"auth": map[string]interface{}{
-			// 		"enable": true,
-			// 	},
-			// 	"url":    scribeURL,
-			// 	"enable": true,
-			// },
 			"logger": map[string]interface{}{
 				"level": "debug",
 			},
