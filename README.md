@@ -256,6 +256,7 @@ In the output, you should see a rejected admission error due to the unsigned ima
 
 To resolve this, sign your image using the Valint tool:
 
+
 ```bash
 valint bom mycompany/signed:latest -o attest [FLAGS]
 ```
