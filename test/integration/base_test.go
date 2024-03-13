@@ -374,6 +374,9 @@ func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} 
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
+			"logger": map[string]interface{}{
+				"level": "debug",
+			},
 			"scribe": map[string]interface{}{
 				"auth": map[string]interface{}{
 					"enable": false,
@@ -433,6 +436,9 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 			// 	"url":    scribeURL,
 			// 	"enable": true,
 			// },
+			"logger": map[string]interface{}{
+				"level": "debug",
+			},
 			"context": map[string]interface{}{
 				"context-type": "admission",
 			},
