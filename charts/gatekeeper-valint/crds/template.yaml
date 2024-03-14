@@ -21,10 +21,9 @@ spec:
           # build a list of keys containing images 
           images := [img | img = input.review.object.spec.template.spec.containers[_].image]
           
-          request_encoded := base64.encode(json.marshal(input.review.object))
-          request_encoded_prefixed := concat("", ["request:", request_encoded])
-          keys := array.concat(images,[request_encoded_prefixed])
-
+          review_encoded := base64.encode(json.marshal(input.review))
+          review_encoded_prefixed := concat("", ["review:", review_encoded])
+          keys := array.concat(images,[review_encoded_prefixed])
                     
           # send external data request
           response := external_data({"provider": "gatekeeper-valint", "keys": keys})

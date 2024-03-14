@@ -1,0 +1,20 @@
+select:
+  gate: signed_images_gate
+  apply:
+  - namespace: "" # Any
+    glob:
+    - "scribesecurity/**"
+    filter-by:
+    - target
+    policy:
+      name: require_signed_images
+      rules:
+      - name: error_on_unsigned_image
+        uses: sboms/artifact-signed@v1
+        level: error
+        evidence:
+          signed: true
+
+valint:
+  attest:
+    default: sigstore

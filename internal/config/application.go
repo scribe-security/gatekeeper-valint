@@ -2,7 +2,6 @@ package config
 
 import (
 	basecli "github.com/scribe-security/basecli"
-	cocosign_config "github.com/scribe-security/cocosign/signing/config"
 	valintPkg "github.com/scribe-security/valint/pkg"
 )
 
@@ -18,21 +17,6 @@ type Application struct {
 	Provider           ProviderConfig        `yaml:"provider,omitempty" json:"provider,omitempty" mapstructure:"provider"`
 	version            string                `yaml:"-" json:"-" mapstructure:"-"`
 	Valint             valintPkg.Application `yaml:"valint,omitempty" json:"valint,omitempty" mapstructure:"valint"`
-}
-
-// type PolicySelectList []PolicySelect
-
-type PolicySelectStruct struct {
-	Apply   []PolicySelect `yaml:"apply,omitempty" json:"apply,omitempty" mapstructure:"apply"`
-	Warning bool           `yaml:"warning,omitempty" json:"warning,omitempty" mapstructure:"warning"`
-	DryRun  bool           `yaml:"dry-run,omitempty" json:"dry-run,omitempty" mapstructure:"dry-run"`
-	Gate    string         `yaml:"gate,omitempty" json:"gate,omitempty" mapstructure:"gate"`
-}
-
-type PolicySelect struct {
-	Glob                   []string `yaml:"glob,omitempty" json:"glob,omitempty" mapstructure:"glob"`
-	Namespace              string   `yaml:"namespace,omitempty" json:"namespace,omitempty" mapstructure:"namespace"`
-	cocosign_config.Config `yaml:",inline" json:",inline" mapstructure:",squash"`
 }
 
 // Implement ApplicationConfig interface

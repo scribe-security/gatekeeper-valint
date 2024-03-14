@@ -374,6 +374,9 @@ func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} 
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
+			"logger": map[string]interface{}{
+				"level": "debug",
+			},
 			"scribe": map[string]interface{}{
 				"auth": map[string]interface{}{
 					"enable": false,
@@ -381,13 +384,14 @@ func PrepraeOCIConfigE2E(t *testing.T, statement string) map[string]interface{} 
 				"enable": false,
 			},
 			"context": map[string]interface{}{
-				"context-type": "local",
+				"context-type": "admission",
 			},
 			"verify": map[string]interface{}{
-				"input-format": statement,
+				"input-format": "",
 				"formats":      statement,
 			},
 			"attest": map[string]interface{}{
+				"default": "sigstore",
 				"report": map[string]interface{}{
 					"disable": true,
 				},
@@ -425,19 +429,18 @@ func PrepraeScribeConfigE2E(t *testing.T, statement string) map[string]interface
 			"enable": false,
 		},
 		"valint": map[string]interface{}{
-			// "scribe": map[string]interface{}{
-			// 	"auth": map[string]interface{}{
-			// 		"enable": true,
-			// 	},
-			// 	"url":    scribeURL,
-			// 	"enable": true,
-			// },
+			"logger": map[string]interface{}{
+				"level": "debug",
+			},
 			"context": map[string]interface{}{
-				"context-type": "local",
+				"context-type": "admission",
 			},
 			"verify": map[string]interface{}{
-				"input-format": statement,
-				"formats":      statement,
+				"input-format": "",
+				"formats":      "statement",
+			},
+			"attest": map[string]interface{}{
+				"default": "sigstore",
 			},
 		},
 	}

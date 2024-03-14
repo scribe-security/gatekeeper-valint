@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signed-deployment
+  labels:
+    app: signed-deployment
+spec:
+  replicas: 0 # testing purposes only
+  selector:
+    matchLabels:
+      app: signed-deployment
+  template:
+    metadata:
+      labels:
+        app: signed-deployment
+    spec:
+      containers:
+      - name: valid
+        image: scribesecurity/signed:latest

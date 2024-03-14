@@ -12,3 +12,4 @@ valint:
     context-type: admission
   attest:
     bundle: https://github.com/scribe-public/sample-policies
+    default: sigstore
