@@ -114,11 +114,11 @@ To enable the provider to verify X509-based signatures, follow these steps:
 
 For example, to perform an upgrade with X509-based verification:
 ```bash
-   helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
-   --namespace gatekeeper-valint \
-   --reuse-values --force \
-   --set valint.attest.default=x509-env \
-   --set x509.ca="$(cat certs/evidence.crt)"
+helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+  --namespace gatekeeper-valint \
+  --reuse-values --force \
+  --set valint.attest.default=x509-env \
+  --set x509.ca="$(cat certs/evidence.crt)"
 ```
 
 > Certificate is mapped to `valint-x509-secret` secret.
@@ -156,10 +156,10 @@ To enable the provider to verify Sigstore Keyless signatures, set the `valint.at
 
 For example, to perform an upgrade with sigstore-based verification:
 ```bash
-   helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
-   --namespace gatekeeper-valint \
-   --reuse-values --force \
-   --set valint.attest.default=sigstore
+helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+  --namespace gatekeeper-valint \
+  --reuse-values --force \
+  --set valint.attest.default=sigstore
 ```
 
 <details>
@@ -326,10 +326,10 @@ select:
 #### Updating Your Policy Gate
 For example, to perform an upgrade to your policy gate:
 ```bash
-   helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
-   --values my_gate.yaml \
-   --namespace gatekeeper-valint \
-   --reuse-values --force
+helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+  --values my_gate.yaml \
+  --namespace gatekeeper-valint \
+  --reuse-values --force
 ```
 
 In the `my_gate.yaml` file, you can specify policy rules like this:
@@ -487,13 +487,13 @@ Currently, signing policy results are only supported when using X509 keys. To se
   
 For example, to perform an upgrade with X509-based signing:
 ```bash
-   helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
-   --namespace gatekeeper-valint \
-   --reuse-values --force \
-   --set valint.attest.default=x509-env \
-   --set valint.verify.formats=attest \
-   --set x509.ca="$(cat certs/evidence.crt)"
-   --set x509.key="$(cat certs/evidence.key)"
+helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+  --namespace gatekeeper-valint \
+  --reuse-values --force \
+  --set valint.attest.default=x509-env \
+  --set valint.verify.formats=attest \
+  --set x509.ca="$(cat certs/evidence.crt)"
+  --set x509.key="$(cat certs/evidence.key)"
 ```
 > Secret is stored under a secret named `valint-x509-secret`.
 
@@ -535,9 +535,9 @@ To verify images from registries that require authentication, follow these steps
 For example, to perform an upgrade with your local docker config:
 ```bash
 helm upgrade charts/gatekeeper-valint \
-   --namespace gatekeeper-valint \
-   --reuse-values --force \
-   --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 -w0)"
+  --namespace gatekeeper-valint \
+  --reuse-values --force \
+  --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 -w0)"
 ```
 
 Secret createcd should follow the following pattern
@@ -562,10 +562,10 @@ To use private bundles from your preferred Git platform, follow these steps:
 For example, to perform an upgrade with your local docker config:
 ```bash
 helm upgrade charts/gatekeeper-valint \
-   --namespace gatekeeper-valint \
-   --reuse-values --force \
-   --set valint.attest.bundle=https://github.com/my_company/policies.git
-   --set image.bundlePullSecrets="ghp_****"
+  --namespace gatekeeper-valint \
+  --reuse-values --force \
+  --set valint.attest.bundle=https://github.com/my_company/policies.git
+  --set image.bundlePullSecrets="ghp_****"
 ```
 > Secret is stored under a secret named `valint-bundle-pull-secret`.
 
