@@ -22,6 +22,8 @@ on:
         required: true
       SLACK_WEBHOOK_URL:
         required: true
+      RELEASE_DOCKERHUB_TOKEN:
+        required: true   
     inputs:
       SCRIBE_URL:
         type: string
@@ -31,6 +33,9 @@ on:
         type: string
         required: true
       RELEASE_ARTIFACTORY_USERNAME:
+        type: string
+        required: true
+      RELEASE_DOCKERHUB_USERNAME:
         type: string
         required: true
       ENV:
@@ -73,6 +78,12 @@ jobs:
           registry: ${{ env.ARTIFACTORY_URL }}
           username: ${{ inputs.RELEASE_ARTIFACTORY_USERNAME }}
           password: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ inputs.RELEASE_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.RELEASE_DOCKERHUB_TOKEN }}
 
       - name: Set Registry secret
         run: |
