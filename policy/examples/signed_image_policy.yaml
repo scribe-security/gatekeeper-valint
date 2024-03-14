@@ -12,9 +12,3 @@ select:
       - name: error_on_unsigned_image
         uses: sboms/artifact-signed@v1
         level: error
-        evidence:
-          signed: true
-
-valint:
-  attest:
-    default: sigstore

@@ -193,13 +193,14 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), w)
 		return
 	}
-	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 	if operation != "CREATE" {
-		cmd.logger.Info("Skipping API Call, only operation CREATE is supported")
+		cmd.logger.Debugf("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
+		cmd.logger.Debug("Skipping API Call, only operation CREATE is supported")
 		emptyResults := make([]externaldata.Item, 0)
 		utils.SendResponse(&emptyResults, "", w)
 		return
 	}
+	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 
 	results := make([]externaldata.Item, 0)
 

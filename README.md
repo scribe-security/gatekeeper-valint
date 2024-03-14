@@ -49,7 +49,7 @@ helm install gatekeeper/gatekeeper  \
 ### Step 2: Pull Valint Gatekeeper helm Repo
 Pull valint gatekeeper Helm chart
 ```bash
-helm repo add gatekeeper-valint https://scribe-security.github.io/gatekeeper-valint/charts
+helm repo add scribe https://scribe-security.github.io/gatekeeper-valint
 helm repo update
 ```
 
@@ -79,15 +79,14 @@ Integrating Scribe Hub with admission controller requires the following credenti
 Enable Scribe client and add related `Client ID` and `Client Secret`.
 
 ```bash
-helm install charts/gatekeeper-valint --name-template=gatekeeper-valint \
+helm install scribe/gatekeeper-valint --name-template=gatekeeper-valint \
   --namespace gatekeeper-valint --create-namespace \
   --set certs.caBundle=$(cat certs/ca.crt | base64 | tr -d '\n') \
   --set certs.tlsCrt="$(cat certs/tls.crt)" \
   --set certs.tlsKey="$(cat certs/tls.key)" \
   --set scribe.enable=true \
   --set scribe.client_id=$SCRIBE_CLIENT_ID \
-  # --set scribe.url=$SCRIBE_URL \
-  --set scribe.client_secret=$SCRIBE_CLIENT_SECRET
+  --set scribe.client_secret=$SCRIBE_CLIENT_SECRET --devel
 ```
 > Credentials will be stored as a secret named `valint-scribe-cred-secret`.
 
@@ -114,7 +113,7 @@ To enable the provider to verify X509-based signatures, follow these steps:
 
 For example, to perform an upgrade with X509-based verification:
 ```bash
-helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+helm upgrade gatekeeper-valint scribe/gatekeeper-valint \
   --namespace gatekeeper-valint \
   --reuse-values --force \
   --set valint.attest.default=x509-env \
@@ -156,7 +155,7 @@ To enable the provider to verify Sigstore Keyless signatures, set the `valint.at
 
 For example, to perform an upgrade with sigstore-based verification:
 ```bash
-helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+helm upgrade gatekeeper-valint scribe/gatekeeper-valint \
   --namespace gatekeeper-valint \
   --reuse-values --force \
   --set valint.attest.default=sigstore
@@ -185,7 +184,7 @@ To showcase the enforcement of image signing policies using Gatekeeper Valint, w
 
 Upgrade your gate with the following command,
 ```bash
-helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+helm upgrade gatekeeper-valint scribe/gatekeeper-valint \
   --values signed_image_policy.yaml \
   --namespace gatekeeper-valint \
   --reuse-values --force
@@ -326,7 +325,7 @@ select:
 #### Updating Your Policy Gate
 For example, to perform an upgrade to your policy gate:
 ```bash
-helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+helm upgrade gatekeeper-valint scribe/gatekeeper-valint \
   --values my_gate.yaml \
   --namespace gatekeeper-valint \
   --reuse-values --force
@@ -487,7 +486,7 @@ Currently, signing policy results are only supported when using X509 keys. To se
   
 For example, to perform an upgrade with X509-based signing:
 ```bash
-helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+helm upgrade gatekeeper-valint scribe/gatekeeper-valint \
   --namespace gatekeeper-valint \
   --reuse-values --force \
   --set valint.attest.default=x509-env \
@@ -534,7 +533,7 @@ To verify images from registries that require authentication, follow these steps
 
 For example, to perform an upgrade with your local docker config:
 ```bash
-helm upgrade charts/gatekeeper-valint \
+helm upgrade scribe/gatekeeper-valint \
   --namespace gatekeeper-valint \
   --reuse-values --force \
   --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 -w0)"
@@ -561,7 +560,7 @@ To use private bundles from your preferred Git platform, follow these steps:
 
 For example, to perform an upgrade with your local docker config:
 ```bash
-helm upgrade charts/gatekeeper-valint \
+helm upgrade scribe/gatekeeper-valint \
   --namespace gatekeeper-valint \
   --reuse-values --force \
   --set valint.attest.bundle=https://github.com/my_company/policies.git
@@ -577,7 +576,7 @@ Users who own there own bundle repo can apply the `policy` field directly from t
 
 For example, to perform an upgrade to your policy gate:
 ```bash
-   helm upgrade gatekeeper-valint ./charts/gatekeeper-valint \
+   helm upgrade gatekeeper-valint scribe/gatekeeper-valint \
    --values my_gate.yaml \
    --namespace gatekeeper-valint \
    --reuse-values --force
@@ -623,7 +622,7 @@ Related configmap flags:
 - Read access to download evidence for the provider.
 - Evidence can be stored in any accessible OCI registry.
 
-1. Edit the `charts/gatekeeper-valint/values.yaml` file, enable OCI client and enable a OCI repo.
+1. Edit the `scribe/gatekeeper-valint/values.yaml` file, enable OCI client and enable a OCI repo.
    For example, 
    ```yaml
    attest:
