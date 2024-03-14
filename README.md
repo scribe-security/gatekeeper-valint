@@ -74,7 +74,7 @@ Integrating Scribe Hub with admission controller requires the following credenti
 * **Client ID**
 * **Client Secret**
 
-<img src='../../../../img/ci/integrations-secrets.jpg' alt='Scribe Integration Secrets' width='70%' min-width='400px'/>
+<img src='img/ci/integrations-secrets.jpg' alt='Scribe Integration Secrets' width='70%' min-width='400px'/>
 
 Enable Scribe client and add related `Client ID` and `Client Secret`.
 
@@ -287,12 +287,12 @@ Upon successful deployment, you'll see a detailed evaluation summary in the admi
 
 Finally, if you consult the **management console**, you'll be able to view both the unsuccessful and successful outcomes of the policy.
 
-<img src='../../../../img/cicd/admission_demo_results.png' alt='Policy Results view' width='70%' min-width='400px'/>
+<img src='img/cicd/admission_demo_results.png' alt='Policy Results view' width='70%' min-width='400px'/>
 
 <details>
   <summary> Policy Result Context </summary>
 
-<img src='../../../../img/cicd/admission_result_context.png' alt='Context Details view' width='70%' min-width='400px'/>
+<img src='img/cicd/admission_result_context.png' alt='Context Details view' width='70%' min-width='400px'/>
 
 </details>
 
