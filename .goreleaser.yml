@@ -32,10 +32,9 @@ builds:
 dockers:
   - dockerfile: docker/Dockerfile
     image_templates:
-      - "scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:dev"
-      # - "scribesecuriy.jfrog.io/scribe-docker-public-local/{{ tolower .ProjectName }}:{{ .Env.IMAGE_TAG }}-provider"
-      - "scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:{{ .Tag }}"
-      - "scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:{{ .Env.IMAGE_TAG }}"
+      # - "scribesecuriy.jfrog.io/scribe-docker-public-local/gatekeeper-valint:{{ .Env.IMAGE_TAG }}"
+      - "scribesecurity/{{ tolower .ProjectName }}:{{ .Tag }}"
+      - "scribesecurity/{{ tolower .ProjectName }}:{{ .Env.IMAGE_TAG }}"
     ids:
       - main
     goarch: amd64

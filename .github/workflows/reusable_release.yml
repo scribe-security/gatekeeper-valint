@@ -12,11 +12,16 @@ on:
         required: true
       RELEASE_ARTIFACTORY_TOKEN:
         required: true   
+      RELEASE_DOCKERHUB_TOKEN:
+        required: true   
     inputs:
       GITHUB_USER:
         type: string
         required: true
       RELEASE_ARTIFACTORY_USERNAME:
+        type: string
+        required: true
+      RELEASE_DOCKERHUB_USERNAME:
         type: string
         required: true
       IS_DEV:
@@ -70,7 +75,13 @@ jobs:
           registry: ${{ env.ARTIFACTORY_URL }}
           username: ${{ inputs.RELEASE_ARTIFACTORY_USERNAME }}
           password: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
-      
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ inputs.RELEASE_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.RELEASE_DOCKERHUB_TOKEN }}
+
       - name: Build & publish release artifacts
         run: make release
         env:
