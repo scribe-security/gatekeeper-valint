@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag: v1.2.0-5
+  tag: dev-latest
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -13,7 +13,6 @@ serviceAccount:
 provider:
   port: 8090
   timeout: 300s #In seconds
-
 
 replicas: 1
 
