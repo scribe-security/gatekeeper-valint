@@ -6,3 +6,4 @@ home: https://github.com/scribe-security/gatekeeper-valint
 sources:
   - https://github.com/scribe-security/gatekeeper-valint.git
 appVersion: v1.2.0-6
+
