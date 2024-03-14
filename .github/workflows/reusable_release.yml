@@ -104,6 +104,6 @@ jobs:
         uses: helm/chart-releaser-action@v1.6.0
         with:
           skip_existing: false 
-          charts_dir: charts/gatekeeper-provider
+          charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
