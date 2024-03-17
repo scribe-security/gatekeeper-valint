@@ -4,14 +4,18 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# Determine the REPO_ROOT based on the presence of BASH_SOURCE or $0
-if [ -n "${BASH_SOURCE[0]}" ]; then
-    REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
-elif [ -n "${0}" ]; then
-    REPO_ROOT=$(dirname "${0}")/..
-else
-    REPO_ROOT=$(pwd)
-fi
+determine_repo_root() {
+    if [ -n "${BASH_SOURCE[0]+x}" ]; then
+        REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+    elif [ -n "${0}" ]; then
+        REPO_ROOT=$(dirname "${0}")/..
+    else
+        REPO_ROOT=$(pwd)
+    fi
+}
+
+# Call the function to determine REPO_ROOT
+determine_repo_root
 
 cd "${REPO_ROOT}" || exit 1
 NAMESPACE=${NAMESPACE:-gatekeeper-valint}
