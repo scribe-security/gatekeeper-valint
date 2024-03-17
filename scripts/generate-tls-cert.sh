@@ -37,3 +37,6 @@ mkdir -p "${REPO_ROOT}/certs"
 pushd "${REPO_ROOT}/certs"
 generate
 popd
+
+echo "Certificates pussed to ${REPO_ROOT}/certs"
+echo "Certificates pushed to $(readlink -f "${REPO_ROOT}/certs")"
