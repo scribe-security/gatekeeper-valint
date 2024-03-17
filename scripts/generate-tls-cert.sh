@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-set -o pipefail
+if [ ! -z "$BASH_VERSION" ]; then
+    set -o errexit
+    set -o nounset
+    set -o pipefail
+fi
 
-REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+if [[ -v BASH_SOURCE ]]; then
+    REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+elif [ -n "${0:-}" ]; then
+    REPO_ROOT=$(dirname "${0}")
+else
+    REPO_ROOT=$(pwd)
+fi
+
+echo "#### REPO_ROOT ${REPO_ROOT}"
+
 cd "${REPO_ROOT}" || exit 1
 NAMESPACE=${NAMESPACE:-gatekeeper-valint}
 
@@ -30,3 +41,5 @@ mkdir -p "${REPO_ROOT}/certs"
 pushd "${REPO_ROOT}/certs"
 generate
 popd
+
+echo "Certificates pushed to $(readlink -f "${REPO_ROOT}/certs")"
