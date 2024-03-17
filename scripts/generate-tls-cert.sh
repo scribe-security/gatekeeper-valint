@@ -12,6 +12,8 @@ else
     REPO_ROOT=$(pwd)
 fi
 
+echo "#### REPO_ROOT ${REPO_ROOT}"
+
 cd "${REPO_ROOT}" || exit 1
 NAMESPACE=${NAMESPACE:-gatekeeper-valint}
 
