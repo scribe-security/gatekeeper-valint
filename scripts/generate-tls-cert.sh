@@ -7,7 +7,7 @@ set -o pipefail
 if [[ -v BASH_SOURCE ]]; then
     REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 elif [ -n "${0:-}" ]; then
-    REPO_ROOT=$(dirname "${0}")/..
+    REPO_ROOT=$(dirname "${0}")
 else
     REPO_ROOT=$(pwd)
 fi
