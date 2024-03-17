@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-set -o pipefail
+if [ ! -z "$BASH_VERSION" ]; then
+    set -o errexit
+    set -o nounset
+    set -o pipefail
+fi
 
 if [[ -v BASH_SOURCE ]]; then
     REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
@@ -40,5 +42,4 @@ pushd "${REPO_ROOT}/certs"
 generate
 popd
 
-echo "Certificates pussed to ${REPO_ROOT}/certs"
 echo "Certificates pushed to $(readlink -f "${REPO_ROOT}/certs")"
