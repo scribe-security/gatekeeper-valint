@@ -87,4 +87,4 @@ valint:
     # -- Default verify with sigstore
     default: sigstore
   git:
-    branch: dev
+    branch: dev # NOTICE: April 1, Remove Dev Flag.
