@@ -37,4 +37,16 @@ entries:
     urls:
     - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-7/gatekeeper-valint-v1.2.0-7.tgz
     version: v1.2.0-7
-generated: "2024-03-14T16:18:36.98445116Z"
+  - apiVersion: v2
+    appVersion: v1.2.0-7
+    created: "2024-03-18T08:42:29.481249975Z"
+    description: A Helm chart for a Valint GateKeeper provider
+    digest: 64393a4f3200271846c5568083b369aafb4c91a3ec76e500d39e4adfe6988efd
+    home: https://github.com/scribe-security/gatekeeper-valint
+    name: gatekeeper-valint
+    sources:
+    - https://github.com/scribe-security/gatekeeper-valint.git
+    urls:
+    - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-7/gatekeeper-valint-v1.2.0-7.tgz
+    version: v1.2.0-7
+generated: "2024-03-18T08:42:29.481271355Z"
