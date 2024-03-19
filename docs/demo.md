@@ -60,7 +60,7 @@ helm install scribe/gatekeeper-valint --name-template=gatekeeper-valint \
 > The `--devel` flag is currently used for the Helm provider. By April 1, this flag can be omitted in favor of the release candidate.
 
 ## Step 4: Configure Policy
-Next, let's configure Gatekeeper constraints, scoped by namespace. This step involves installing Intuit policies for signature checks.
+Next, let's configure Gatekeeper constraints, scoped by namespace. This step involves installing policies for signature checks.
 
 ```bash
 helm upgrade gatekeeper-valint scribe/gatekeeper-valint \
