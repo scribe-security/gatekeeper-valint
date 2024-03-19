@@ -5,8 +5,12 @@ metadata:
 spec:
   enforcementAction: deny
   match:
+    {{- if .Values.constraint }}
     namespaces:
+    {{- if .Values.constraint.namespace }}
       - {{ .Values.constraint.namespace }}
+    {{- end }}
+    {{- end }}
     kinds:
       - apiGroups: ["apps"]
         kinds: ["Deployment"]
