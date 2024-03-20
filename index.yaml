@@ -25,6 +25,39 @@ entries:
     urls:
     - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-6d/gatekeeper-valint-v1.2.0-6d.tgz
     version: v1.2.0-6d
+  - annotations:
+      artifacthub.io/category: security
+      artifacthub.io/images: |
+        - name: gatekeeper-valint
+          image: scribesecuriy.jfrog.io/scribe-docker-public-local/valint@
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Homepage
+          url: https://scribesecurity.com
+        - name: Source
+          url: https://github.com/scribe-security/gatekeeper-valint.git
+        - name: Documentation
+          url: https://scribe-security.netlify.app/docs/integrating-scribe/admission-controller/gatekeeper-provider
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/vendor: Scribe security, Inc.
+    apiVersion: v2
+    appVersion: v1.2.0-8
+    created: "2024-03-20T13:30:02.835862482Z"
+    description: 'A Helm chart for Valint GateKeeper provider to enforce enforce a
+      variety of supply chain policies, including signed image verification. '
+    digest: e55152783ea6a15338328cd290ada882177b753cc87d294138ab0b50ec9fa234
+    home: https://scribesecurity.com
+    icon: https://raw.githubusercontent.com/scribe-security/misc/master/assets/logo-white.jpg
+    maintainers:
+    - email: mikey@scribesecurity.com
+      name: Mikey Strauss
+      url: https://scribesecurity.com
+    name: gatekeeper-valint
+    sources:
+    - https://github.com/scribe-security/gatekeeper-valint.git
+    urls:
+    - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-8/gatekeeper-valint-v1.2.0-8.tgz
+    version: v1.2.0-8
   - apiVersion: v2
     appVersion: v1.2.0-7
     created: "2024-03-14T16:18:36.984438767Z"
@@ -146,4 +179,4 @@ entries:
     urls:
     - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-7/gatekeeper-valint-v1.2.0-7.tgz
     version: v1.2.0-7
-generated: "2024-03-20T13:28:28.641262134Z"
+generated: "2024-03-20T13:30:02.835915782Z"
