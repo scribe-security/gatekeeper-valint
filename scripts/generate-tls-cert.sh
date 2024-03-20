@@ -6,7 +6,7 @@ if [ ! -z "$BASH_VERSION" ]; then
     set -o pipefail
 fi
 
-if [[ -v BASH_SOURCE ]]; then
+if [ -v BASH_SOURCE ]; then
     REPO_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 elif [ -n "${0:-}" ]; then
     REPO_ROOT=$(dirname "${0}")

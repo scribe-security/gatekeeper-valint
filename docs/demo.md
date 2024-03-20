@@ -24,7 +24,7 @@ helm install gatekeeper/gatekeeper \
 
 >  Enabling the `enableExternalData` feature is essential for our deployment scenario. We should consider enabling it on the running instance.
 
-## Step 2: Generate TLS and Signing Keys
+## Step 3: Generate TLS and Signing Keys
 Execute the help script to create keys.
 
 * TLS keys facilitate communication with the Provider. (`certs/tls.crt`, `certs/tls.key`)
@@ -35,7 +35,7 @@ Execute the help script to create keys.
 curl -sSfL https://raw.githubusercontent.com/scribe-security/gatekeeper-valint/main/scripts/generate-tls-cert.sh  | bash
 ```
 
-## Step 3: Setup Valint Gatekeeper Provider
+## Step 4: Setup Valint Gatekeeper Provider
 In this step, we'll configure the Valint Gatekeeper Provider. This involves setting up CA-based verification with a demo Root CA and OCI-based signatures against a dedicated OCI registry repository. We'll also disable the default behavior of pushing evaluation reports to OCI to minimize permissions.
 
 ```bash
@@ -59,7 +59,7 @@ helm install scribe/gatekeeper-valint --name-template=gatekeeper-valint \
 
 > The `--devel` flag is currently used for the Helm provider. By April 1, this flag can be omitted in favor of the release candidate.
 
-## Step 4: Configure Policy
+## Step 5: Configure Policy
 Next, let's configure Gatekeeper constraints, scoped by namespace. This step involves installing policies for signature checks.
 
 ```bash
@@ -98,14 +98,14 @@ select:
 In the provided `signed_image_policy.yaml`, we specify a policy to enforce signature verification for images admitted from the my_company Dockerhub account.
 </details>
 
-## Step 5: Create Demo Namespace
+## Step 6: Create Demo Namespace
 We'll create a demo namespace in our Kubernetes cluster where we'll deploy our demo application.
 
 ```bash
 kubectl create namespace demo-valint
 ```
 
-## Step 6: Create Evidence Locally
+## Step 7: Create Evidence Locally
 To resolve the unsigned image error, we'll create evidence locally using the Valint tool. This evidence will be used to validate the image signatures.
 
 ```bash
@@ -170,14 +170,14 @@ pipeline {
 
 </details>
 
-## Step 7: Admit Demo Deployments
+## Step 8: Admit Demo Deployments
 Now, let's admit a deployment into our demo namespace. We'll deploy a sample application, which will be rejected due to unsigned images.
 
 ```bash
 kubectl apply -f signed-deployment.yaml -n demo-valint 2>&1 | echo -e "$(cat -)"
 ```
 
-## Step 8: Reviewing Results
+## Step 9: Reviewing Results
 You can review results by looking at logs.
 ```bash
 kubectl logs -n gatekeeper-valint $(kubectl get pods -n gatekeeper-valint | grep gatekeeper-valint | head -1 | awk '{print $1}') | sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\r//g"
