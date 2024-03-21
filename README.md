@@ -551,7 +551,7 @@ For example, to perform an upgrade with your local docker config:
 helm upgrade scribe/gatekeeper-valint \
   --namespace gatekeeper-valint \
   --reuse-values --force \
-  --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 -w0)"
+  --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 | tr -d '\n')"
 ```
 
 Secret created should follow the following pattern
@@ -650,7 +650,7 @@ helm install scribe/gatekeeper-valint --name-template=gatekeeper-valint \
   --set certs.tlsCrt="$(cat certs/tls.crt)" \
   --set certs.tlsKey="$(cat certs/tls.key)" \
   --set valint.attest.report.disable=true \
-  --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 -w0)" \
+  --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 | tr -d '\n')" \
   --set valint.attest.cocosign.storer.OCI.enable=true \
   --set valint.attest.cocosign.storer.OCI.repo=[oci-repo]"
 ```

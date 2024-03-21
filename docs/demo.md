@@ -51,13 +51,14 @@ helm install scribe/gatekeeper-valint --name-template=gatekeeper-valint \
     --set valint.attest.report.disable=true \
     --set valint.attest.default=x509-env \
     --set x509.ca="$(cat certs/ca.crt)" \
-    --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 -w0)" \
+    --set image.imagePullSecrets="$(cat ~/.docker/config.json | base64 | tr -d '\n')" \
     --set valint.attest.cocosign.storer.OCI.repo="scribesecuriy.jfrog.io/scribe-docker-local/attestation/" \
     --set valint.attest.cocosign.storer.OCI.enable=true \
     --devel
 ```
 
 > The `--devel` flag is currently used for the Helm provider. By April 1, this flag can be omitted in favor of the release candidate.
+
 
 ## Step 5: Configure Policy
 Next, let's configure Gatekeeper constraints, scoped by namespace. This step involves installing policies for signature checks.
