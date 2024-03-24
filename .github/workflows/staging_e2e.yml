@@ -39,4 +39,5 @@ jobs:
       GITHUB_USER: houdini91
       SCRIBE_URL: https://api.staging.scribesecurity.com
       ENV: dev
+      DEBUG: true
       # reusable_e2e default is dev

@@ -151,7 +151,7 @@ func runImageAdmissionTest(t *testing.T, test runImageAdmissionTestStruct, clien
 	} else {
 		t.Log("Apply K8S Error: ", err)
 		if err != nil {
-			require.True(t, strings.Contains(err.Error(), test.expectedError))
+			require.Contains(t, err.Error(), test.expectedError)
 		}
 	}
 
