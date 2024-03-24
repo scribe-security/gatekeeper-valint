@@ -182,7 +182,7 @@ func ProviderFailTestTable(t *testing.T, clientset *kubernetes.Clientset, storeT
 		{
 			name:          "require-artifact-sign",
 			image:         "busybox:latest",
-			expectedError: "no evidence found",
+			expectedError: "denied the request",
 			format:        "statement",
 			store:         storeTest.Type(),
 			bomFlags:      storeTest.BomFlags(t, "bom", ConfigPath),
