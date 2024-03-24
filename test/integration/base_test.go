@@ -314,7 +314,7 @@ func MakeProviderValues(t *testing.T, scribeConfig, policyConfig map[string]inte
 
 func MakeGatekeeperValues() map[string]interface{} {
 	return map[string]interface{}{
-		"validatingWebhookTimeoutSeconds": 30,
+		"validatingWebhookTimeoutSeconds": 180,
 		"enableExternalData":              true,
 		"controllerManager": map[string]interface{}{
 			"dnsPolicy": "ClusterFirst",
