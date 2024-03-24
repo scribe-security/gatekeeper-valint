@@ -7,10 +7,11 @@ toolchain go1.21.5
 // toolchain go1.21.3
 
 require (
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/google/go-containerregistry v0.19.0
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20231011212908-ad0a9011c2af
-	github.com/scribe-security/basecli v0.0.0-20240317160221-40c3fb2fee8b
-	github.com/scribe-security/valint v1.2.1-0.20240318065932-75d493d7777b
+	github.com/scribe-security/basecli v0.0.0-20240320092243-0e6ad36e3293
+	github.com/scribe-security/valint v1.2.1-0.20240321101020-c05f7834e979
 	github.com/sigstore/cosign/v2 v2.2.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
@@ -23,7 +24,6 @@ require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20230306123547-8075edf89bb0 // indirect
 	github.com/CycloneDX/cyclonedx-go/old v0.0.0-00010101000000-000000000000 // indirect
-	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
 	github.com/anchore/bubbly v0.0.0-20231115134915-def0aba654a9 // indirect
 	github.com/anchore/clio v0.0.0-20240209204744-cb94e40a4f65 // indirect
 	github.com/anchore/fangs v0.0.0-20231201140849-5075d28d6d8b // indirect
@@ -138,7 +138,7 @@ require (
 	github.com/anchore/go-version v1.2.2-0.20200701162849-18adb9c92b9b // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20240202171727-877e1747d426 // indirect
 	github.com/anchore/stereoscope v0.0.2-0.20240216182029-6171ee21e1d5 // indirect
-	github.com/anchore/syft v0.93.0 // indirect
+	github.com/anchore/syft v0.93.0
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.20.0 // indirect
@@ -345,7 +345,7 @@ require (
 	github.com/sassoftware/go-rpmutils v0.3.0 // indirect
 	github.com/sassoftware/relic v7.2.1+incompatible // indirect
 	github.com/scribe-security/KML v0.0.0-20231004082821-6dfabf3246f4 // indirect
-	github.com/scribe-security/cocosign v0.0.0-20240317160037-1c5a9b62171d
+	github.com/scribe-security/cocosign v0.0.0-20240320091339-51846df821b7
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.7.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
