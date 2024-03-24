@@ -200,6 +200,8 @@ func HelmInstall(t *testing.T, namespace string, repo string, chart string, rele
 	helmChart, err := loader.Load(chartPath)
 	require.NoError(t, err)
 
+	time.Sleep(3 * time.Second)
+
 	return client.Run(helmChart, vals)
 }
 

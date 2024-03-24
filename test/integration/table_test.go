@@ -292,6 +292,9 @@ func ProviderFailTestTable(t *testing.T, clientset *kubernetes.Clientset, storeT
 
 			runImageAdmissionTest(t, test, clientset, bomFlags)
 
+			//Give the admission a second to push logs
+			time.Sleep(3 * time.Second)
+
 			DeleteK8sDeployment(t, clientset)
 			UninstallProvider(t, false)
 		})
@@ -299,6 +302,10 @@ func ProviderFailTestTable(t *testing.T, clientset *kubernetes.Clientset, storeT
 		elapsed := endTime.Sub(startTime)
 		fmt.Printf("Elapsed: %s\n", elapsed)
 	}
+
+	//Give the admission a second to push logs
+	time.Sleep(3 * time.Second)
+
 	UninstallGatekeeper(t, true)
 
 }
