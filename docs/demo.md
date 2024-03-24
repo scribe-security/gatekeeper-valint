@@ -14,6 +14,8 @@ curl -sSfL https://get.scribesecurity.com/install.sh | sh -s -- -t valint -D
 Now, we'll set up Gatekeeper in our Kubernetes cluster. This step involves installing the Gatekeeper Helm chart with specific configurations.
 
 ```bash
+helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+helm repo update
 helm install gatekeeper/gatekeeper \
     --name-template=gatekeeper \
     --namespace gatekeeper-system --create-namespace \
@@ -23,6 +25,9 @@ helm install gatekeeper/gatekeeper \
 ```
 
 >  Enabling the `enableExternalData` feature is essential for our deployment scenario. We should consider enabling it on the running instance.
+
+> Ensure that the version you have is newer than `3.15.0`.
+
 
 ## Step 3: Generate TLS and Signing Keys
 Execute the help script to create keys.

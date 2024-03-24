@@ -46,6 +46,8 @@ helm install gatekeeper/gatekeeper  \
 
 > Notice `enableExternalData` is set as true.
 
+> Ensure that the version you have is newer than `3.15.0`.
+
 ### Step 2: Pull Valint Gatekeeper helm Repo
 Pull valint gatekeeper Helm chart
 ```bash

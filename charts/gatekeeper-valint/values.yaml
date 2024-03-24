@@ -65,8 +65,6 @@ select:
       - name: warn_on_unsigned_image
         uses: sboms/artifact-signed@v1
         level: "warning"
-        evidence:
-          signed: true
 
 valint:
   logger:

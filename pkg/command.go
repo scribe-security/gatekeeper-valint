@@ -168,14 +168,14 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 	// only accept POST requests
 	if req.Method != http.MethodPost {
-		utils.SendResponse(nil, "only POST is allowed", w)
+		utils.SendResponse(nil, "only POST is allowed", http.StatusOK, false, w)
 		return
 	}
 
 	// read request body
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
-		utils.SendResponse(nil, fmt.Sprintf("unable to read request body: %v", err), w)
+		utils.SendResponse(nil, fmt.Sprintf("unable to read request body: %v", err), http.StatusOK, false, w)
 		return
 	}
 
@@ -183,21 +183,21 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	var providerRequest externaldata.ProviderRequest
 	err = json.Unmarshal(requestBody, &providerRequest)
 	if err != nil {
-		utils.SendResponse(nil, fmt.Sprintf("unable to unmarshal request body: %v", err), w)
+		utils.SendResponse(nil, fmt.Sprintf("unable to unmarshal request body: %v", err), http.StatusOK, false, w)
 		return
 	}
 	useTag := cmd.policySelect.UseTag
 	ignoreImageID := cmd.policySelect.IgnoreImageID
 	images, labels, namespace, name, kind, operation, err := cmd.decodeKeys(providerRequest)
 	if err != nil {
-		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), w)
+		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), http.StatusOK, false, w)
 		return
 	}
 	if operation != "CREATE" {
 		cmd.logger.Debugf("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 		cmd.logger.Debug("Skipping API Call, only operation CREATE is supported")
 		emptyResults := make([]externaldata.Item, 0)
-		utils.SendResponse(&emptyResults, "", w)
+		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
 		return
 	}
 	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
@@ -210,7 +210,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	ro := options.RegistryOptions{}
 	co, err := ro.ClientOpts(ctx)
 	if err != nil {
-		utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), w)
+		utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), http.StatusOK, false, w)
 		return
 	}
 	os.Setenv("PULL_BUNDLE", "true")
@@ -221,7 +221,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		for _, image := range images {
 			err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, co, cmd.cfg.Valint, cmd.logger)
 			if err != nil {
-				utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), w)
+				utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), http.StatusOK, false, w)
 			}
 		}
 	} else if cmd.policySelect != nil {
@@ -250,7 +250,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if len(policyErrs) > 0 {
-			utils.SendResponse(nil, errMsg, w)
+			utils.SendResponse(nil, errMsg, http.StatusOK, false, w)
 			return
 		}
 
@@ -258,8 +258,10 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		cmd.logger.Warnf("no policy run on request")
 	}
 
-	utils.SendResponse(&results, "", w)
+	utils.SendResponse(&results, "", http.StatusOK, false, w)
 }
+
+type ContextHandler func(w http.ResponseWriter, r *http.Request) error
 
 func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -268,6 +270,7 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 		r = r.WithContext(ctx)
 
 		processDone := make(chan bool)
+		var err error
 		go func() {
 			h(w, r)
 			processDone <- true
@@ -275,8 +278,12 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 
 		select {
 		case <-ctx.Done():
-			utils.SendResponse(nil, "ERROR: operation timed out", w)
+			err = fmt.Errorf("operation timed out after duration %v", duration)
 		case <-processDone:
+		}
+
+		if err != nil {
+			utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
 		}
 	}
 }

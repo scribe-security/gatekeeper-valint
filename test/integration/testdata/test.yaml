@@ -3,12 +3,12 @@ attest:
   cocosign:
     signer:
       x509:
-        enable: false
+        enable: true
         private: testdata/keys/test.key.pem
         cert: testdata/keys/test.cert.pem
         ca: testdata/keys/ca-chain.cert.pem
     verifier:
       x509:
-        enable: false
+        enable: true
         cert: testdata/keys/test.cert.pem
         ca: testdata/keys/ca-chain.cert.pem

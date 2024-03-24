@@ -27,7 +27,7 @@ else
       --set "scribe.client_secret=$SCRIBE_CLIENT_SECRET" \
       --set "scribe.url=$SCRIBE_URL" \
       --set "image.bundlePullSecrets=$BUNDLE_PULL_SECRET" \
-      --set "image.imagePullSecrets=$(cat ~/.docker/config.json | base64 -w0)"
+      --set "image.imagePullSecrets=$(cat ~/.docker/config.json | base64 | tr -d '\n')"
       
 fi
 
