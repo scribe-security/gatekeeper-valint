@@ -222,7 +222,7 @@ func ProviderFailTestTable(t *testing.T, clientset *kubernetes.Clientset, storeT
 		{
 			name:          "require-artifact-fresh-sign",
 			image:         "alpine:latest",
-			expectedError: "no evidence found",
+			expectedError: "denied the request",
 			format:        "attest",
 			store:         storeTest.Type(),
 			bomFlags:      storeTest.BomFlags(t, "bom", ConfigPath),

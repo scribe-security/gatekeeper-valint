@@ -26,7 +26,39 @@ func SetDryRun(dryRun bool) {
 }
 
 // sendResponse sends back the response to Gatekeeper.
-func SendResponse(results *[]externaldata.Item, systemErr string, w http.ResponseWriter) {
+func SendResponse(results *[]externaldata.Item, systemErr string, respCode int, isMutation bool, w http.ResponseWriter) {
+	emptyResults := make([]externaldata.Item, 0)
+	if DryRunGlobal && results == nil && systemErr != "" {
+		klog.InfoS("dry run mocking success, Failed with", systemErr)
+		if results == nil {
+			results = &emptyResults
+		}
+	}
+
+	response := externaldata.ProviderResponse{
+		APIVersion: apiVersion,
+		Kind:       kind,
+		Response: externaldata.Response{
+			Idempotent: isMutation, // mutation requires idempotent results
+		},
+	}
+
+	if results != nil {
+		response.Response.Items = *results
+	} else {
+		response.Response.SystemError = systemErr
+	}
+
+	klog.InfoS("sending response", "response", response)
+
+	w.WriteHeader(respCode)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		klog.ErrorS(err, "unable to encode response")
+		os.Exit(1)
+	}
+}
+
+func SendResponseWithError(results *[]externaldata.Item, systemErr string, w http.ResponseWriter) error {
 	emptyResults := make([]externaldata.Item, 0)
 	if DryRunGlobal && results == nil && systemErr != "" {
 		klog.InfoS("dry run mocking success, Failed with", systemErr)
@@ -54,6 +86,8 @@ func SendResponse(results *[]externaldata.Item, systemErr string, w http.Respons
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		klog.ErrorS(err, "unable to encode response")
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
