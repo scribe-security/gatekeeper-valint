@@ -193,13 +193,24 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), http.StatusOK, false, w)
 		return
 	}
-	if operation != "CREATE" {
+
+	onlyCreate, found := os.LookupEnv("ONLY_CREATE")
+	if found && strings.ToLower(onlyCreate) == "true" && operation != "CREATE" {
 		cmd.logger.Debugf("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 		cmd.logger.Debug("Skipping API Call, only operation CREATE is supported")
 		emptyResults := make([]externaldata.Item, 0)
 		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
 		return
 	}
+
+	if operation != "CREATE" && operation != "UPDATE" {
+		cmd.logger.Debugf("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
+		cmd.logger.Debug("Skipping API Call, only operation CREATE or UPDATE is supported")
+		emptyResults := make([]externaldata.Item, 0)
+		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
+		return
+	}
+
 	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 
 	results := make([]externaldata.Item, 0)
