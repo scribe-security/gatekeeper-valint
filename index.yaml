@@ -34,6 +34,39 @@ entries:
     urls:
     - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.3.0/gatekeeper-valint-v1.3.0.tgz
     version: v1.3.0
+  - annotations:
+      artifacthub.io/category: security
+      artifacthub.io/images: |
+        - name: gatekeeper-valint
+          image: scribesecuriy.jfrog.io/scribe-docker-public-local/valint@
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Homepage
+          url: https://scribesecurity.com
+        - name: Source
+          url: https://github.com/scribe-security/gatekeeper-valint.git
+        - name: Documentation
+          url: https://scribe-security.netlify.app/docs/integrating-scribe/admission-controller/gatekeeper-provider
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/vendor: Scribe security, Inc.
+    apiVersion: v2
+    appVersion: v1.3.0-2
+    created: "2024-04-01T13:58:04.533557496Z"
+    description: 'A Helm chart for Valint GateKeeper provider to enforce enforce a
+      variety of supply chain policies, including signed image verification. '
+    digest: 9e66e1189924ac1c4e453c328f95a593a430f434ba4e688fcc8047d7f7b02968
+    home: https://scribesecurity.com
+    icon: https://raw.githubusercontent.com/scribe-security/misc/master/assets/logo-white.jpg
+    maintainers:
+    - email: mikey@scribesecurity.com
+      name: Mikey Strauss
+      url: https://scribesecurity.com
+    name: gatekeeper-valint
+    sources:
+    - https://github.com/scribe-security/gatekeeper-valint.git
+    urls:
+    - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.3.0-2/gatekeeper-valint-v1.3.0-2.tgz
+    version: v1.3.0-2
   - apiVersion: v2
     appVersion: v1.2.0-6
     created: "2024-03-14T15:34:13.806385527Z"
@@ -245,4 +278,4 @@ entries:
     urls:
     - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-7/gatekeeper-valint-v1.2.0-7.tgz
     version: v1.2.0-7
-generated: "2024-03-27T10:56:01.387337953Z"
+generated: "2024-04-01T13:58:04.533613361Z"
