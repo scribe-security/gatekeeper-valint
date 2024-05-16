@@ -10,8 +10,8 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/google/go-containerregistry v0.19.1
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20231011212908-ad0a9011c2af
-	github.com/scribe-security/basecli v0.0.0-20240515132411-170857720730
-	github.com/scribe-security/valint v1.4.1-3
+	github.com/scribe-security/basecli v0.0.0-20240516102033-7158f101e287
+	github.com/scribe-security/valint v1.4.2
 	github.com/sigstore/cosign/v2 v2.2.4
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
@@ -323,7 +323,7 @@ require (
 	github.com/sassoftware/go-rpmutils v0.3.0 // indirect
 	github.com/sassoftware/relic v7.2.1+incompatible // indirect
 	github.com/scribe-security/KML v0.0.0-20240430064413-b5360935e420 // indirect
-	github.com/scribe-security/cocosign v0.0.0-20240508115035-b7b7ffdd781a
+	github.com/scribe-security/cocosign v0.0.0-20240516101701-03110ac3a0b7
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
