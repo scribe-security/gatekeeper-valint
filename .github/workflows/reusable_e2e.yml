@@ -16,8 +16,6 @@ on:
         required: true
       RELEASE_ARTIFACTORY_TOKEN:
         required: true
-      SCRIBE_CLIENT_ID:
-        required: true
       SCRIBE_CLIENT_SECRET:
         required: true
       SLACK_WEBHOOK_URL:
@@ -39,8 +37,7 @@ on:
         default: dev
       DEBUG:
         type: string
-        default: false
-
+        default: "false"
 
 jobs:
   e2e-test:
@@ -104,7 +101,6 @@ jobs:
         run: make e2e_scribe
         env:
           SCRIBE_URL: ${{ inputs.SCRIBE_URL }}
-          SCRIBE_CLIENT_ID: ${{ secrets.SCRIBE_CLIENT_ID }}
           SCRIBE_CLIENT_SECRET: ${{ secrets.SCRIBE_CLIENT_SECRET }}
           IMAGE_PULL_SECRET: ${{ env.IMAGE_PULL_SECRET }}
           DEBUG: ${{ inputs.DEBUG }}

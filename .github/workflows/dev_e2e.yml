@@ -12,10 +12,6 @@ on:
   # pull_request:
   workflow_dispatch:
     inputs:
-      SCRIBE_CLIENT_ID:
-        description: 'Scribe client ID, default secret.SCRIBE_DEV_M2M_CLIENT_ID'
-        required: false
-        default: ''
       SCRIBE_CLIENT_SECRET:
         description: 'Scribe client secret, default secret.SCRIBE_DEV_M2M_CLIENT_SECRET'
         required: false
@@ -31,7 +27,6 @@ jobs:
     secrets:
       RELEASE_GITHUB_TOKEN: ${{ secrets.READ_PRIVATE_GO_REPOS }} ## needed to pull our private go libraries
       RELEASE_ARTIFACTORY_TOKEN: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
-      SCRIBE_CLIENT_ID: ${{ github.event.inputs.SCRIBE_CLIENT_ID || secrets.SCRIBE_DEV_M2M_CLIENT_ID }}
       SCRIBE_CLIENT_SECRET: ${{ github.event.inputs.SCRIBE_CLIENT_SECRET || secrets.SCRIBE_DEV_M2M_CLIENT_SECRET }}
       SLACK_WEBHOOK_URL: ${{ secrets.VALINT_SLACK_WEBHOOK_URL }}
     with:
