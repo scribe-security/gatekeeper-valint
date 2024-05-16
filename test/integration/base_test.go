@@ -68,15 +68,11 @@ func (s *ScribeStoreTest) BomFlags(t *testing.T, command, baseConfig string) []s
 	scribeURL, found := os.LookupEnv("SCRIBE_URL")
 	require.True(t, found, "Scribe url not found")
 
-	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
-	require.True(t, found, "Scribe client id not found")
-
 	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
 	require.True(t, found, "Scribe client secret not found")
 
 	config := api.Config{
 		Auth: api.Auth{
-			ClientID:     scribeClientID,
 			ClientSecret: scribeClientSecret,
 			Enable:       true,
 		},
@@ -461,9 +457,6 @@ func PrepareScribeConfigE2E(t *testing.T, defaultAttest string, caPath string, t
 	scribeURL, found := os.LookupEnv("SCRIBE_URL")
 	require.True(t, found, "Scribe url not found")
 
-	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
-	require.True(t, found, "Scribe client id not found")
-
 	pullSecret, found := os.LookupEnv("IMAGE_PULL_SECRET")
 	require.True(t, found, "IMAGE PULL SECRET not found")
 
@@ -480,7 +473,6 @@ func PrepareScribeConfigE2E(t *testing.T, defaultAttest string, caPath string, t
 		},
 		"scribe": map[string]interface{}{
 			"enable":        true,
-			"client_id":     scribeClientID,
 			"client_secret": scribeClientSecret,
 			"url":           scribeURL,
 		},
@@ -564,15 +556,11 @@ func PrepareScribeE2E(t *testing.T, command, baseConfig string) []string {
 	scribeURL, found := os.LookupEnv("SCRIBE_URL")
 	require.True(t, found, "Scribe url not found")
 
-	scribeClientID, found := os.LookupEnv("SCRIBE_CLIENT_ID")
-	require.True(t, found, "Scribe client id not found")
-
 	scribeClientSecret, found := os.LookupEnv("SCRIBE_CLIENT_SECRET")
 	require.True(t, found, "Scribe client secret not found")
 
 	config := api.Config{
 		Auth: api.Auth{
-			ClientID:     scribeClientID,
 			ClientSecret: scribeClientSecret,
 			Enable:       true,
 		},

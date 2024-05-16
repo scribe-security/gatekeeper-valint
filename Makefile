@@ -67,15 +67,15 @@ bootstrap: bootstrap-tools ## Download and install all go dependencies (+ prep t
 
 .PHONY: install_local_scribe
 install_local_scribe:  ## Install admission with scribe
-	SCRIBE_CLIENT_ID=$(SCRIBE_CLIENT_ID) SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) 
+	SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) 
 
 .PHONY: install_local_scribe_x509
 install_local_scribe_x509:  ## Install admission with scribe
-	SCRIBE_CLIENT_ID=$(SCRIBE_CLIENT_ID) SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) x509
+	SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) x509
 
 .PHONY: install_local_scribe_sigstore
 install_local_scribe_sigstore:  ## Install admission with scribe
-	SCRIBE_CLIENT_ID=$(SCRIBE_CLIENT_ID) SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) sigstore
+	SCRIBE_CLIENT_SECRET=$(SCRIBE_CLIENT_SECRET) bash scripts/install_scribe_provider.sh $(NAME) $(NAMESPACE) sigstore
 
 
 .PHONY: install_gatekeeper
