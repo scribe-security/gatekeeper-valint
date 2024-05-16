@@ -37,8 +37,7 @@ on:
         default: dev
       DEBUG:
         type: string
-        default: false
-
+        default: "false"
 
 jobs:
   e2e-test:
