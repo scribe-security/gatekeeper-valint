@@ -26,8 +26,6 @@ constraint:
   namespace: "default"
 
 scribe:
-  # -- Scribe Client ID
-  client_id: ""
   # -- Scribe Client Secret
   client_secret: ""
     # -- Scribe Client Enable

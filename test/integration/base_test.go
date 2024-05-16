@@ -520,7 +520,6 @@ func BaseFlags(command string, cacheConfig *baseCache.Config, scribeService *api
 		scribe := []string{
 			"-E",
 			"--scribe.url", scribeService.ServiceCfg.URL,
-			"--scribe.client-id", scribeService.Auth.ClientID,
 			"--scribe.client-secret", scribeService.Auth.ClientSecret,
 			"--scribe.login-url", scribeService.Auth.LoginURL,
 			"--scribe.auth.audience", scribeService.Auth.Audience,
