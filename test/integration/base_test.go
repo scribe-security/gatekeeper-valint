@@ -521,8 +521,6 @@ func BaseFlags(command string, cacheConfig *baseCache.Config, scribeService *api
 			"-E",
 			"--scribe.url", scribeService.ServiceCfg.URL,
 			"--scribe.client-secret", scribeService.Auth.ClientSecret,
-			"--scribe.login-url", scribeService.Auth.LoginURL,
-			"--scribe.auth.audience", scribeService.Auth.Audience,
 			"--timeout", "240s", // "--final-artifact",
 			"--backoff", "30s",
 			"--components", "metadata",

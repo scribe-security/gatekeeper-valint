@@ -95,7 +95,7 @@ select:
       name: require_signed_images
       rules:
       - name: error_on_unsigned_image
-        uses: sboms/artifact-signed@v1
+        uses: sbom/artifact-signed@v1
         level: error
         # evidence: Enforce CI origin
         #     context-type: jenkins
