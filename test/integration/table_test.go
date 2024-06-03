@@ -69,7 +69,7 @@ func ProviderSuccessTestTable(t *testing.T, clientset *kubernetes.Clientset, sto
 								"rules": []map[string]interface{}{
 									{
 										"name":  "require-sbom-exists",
-										"uses":  "sboms/evidence-exists@v1",
+										"uses":  "sbom/evidence-exists@v1",
 										"level": "error",
 									},
 								},
@@ -110,7 +110,7 @@ func ProviderSuccessTestTable(t *testing.T, clientset *kubernetes.Clientset, sto
 								"rules": []map[string]interface{}{
 									{
 										"name":  "require-artifact-signed",
-										"uses":  "sboms/artifact-signed@v1",
+										"uses":  "sbom/artifact-signed@v1",
 										"level": "error",
 									},
 									{
@@ -200,7 +200,7 @@ func ProviderFailTestTable(t *testing.T, clientset *kubernetes.Clientset, storeT
 								"rules": []map[string]interface{}{
 									{
 										"name":  "require-artifact-signed",
-										"uses":  "sboms/artifact-signed@v1",
+										"uses":  "sbom/artifact-signed@v1",
 										"level": "error",
 									},
 								},
@@ -240,7 +240,7 @@ func ProviderFailTestTable(t *testing.T, clientset *kubernetes.Clientset, storeT
 								"rules": []map[string]interface{}{
 									{
 										"name":  "require-artifact-signed",
-										"uses":  "sboms/artifact-signed@v1",
+										"uses":  "sbom/artifact-signed@v1",
 										"level": "error",
 									},
 									{
