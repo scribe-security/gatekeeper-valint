@@ -7,9 +7,11 @@ spec:
   match:
     {{- if .Values.constraint }}
     namespaces:
-    {{- if .Values.constraint.namespace }}
-      - {{ .Values.constraint.namespace }}
+    #{{- if .Values.constraint.namespaces }}
+    {{- range .Values.constraint.namespaces }}
+    - {{ . }}
     {{- end }}
+    #{{- end }}
     {{- end }}
     kinds:
       - apiGroups: ["apps"]

@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag: v1.4.7
+  tag: v1.4.8
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -23,7 +23,8 @@ gatekeeperValint:
     kubernetes.io/os: linux
 
 constraint:
-  namespace: "default"
+  namespaces:
+  - "default"
 
 scribe:
   # -- Scribe Client Secret
@@ -82,5 +83,5 @@ valint:
       add-passed: true
     # -- Default verify with sigstore
     default: sigstore
-  git:
-    branch: dev # NOTICE: April 1, Remove Dev Flag.
+  # git:
+  #   branch:
