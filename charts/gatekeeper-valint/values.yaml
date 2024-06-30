@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag: v1.4.7
+  tag: v1.4.8
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -84,4 +84,4 @@ valint:
     # -- Default verify with sigstore
     default: sigstore
   # git:
-  #   branch: dev # NOTICE: April 1, Remove Dev Flag.
+  #   branch:
