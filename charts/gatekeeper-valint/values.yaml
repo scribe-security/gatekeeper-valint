@@ -23,7 +23,8 @@ gatekeeperValint:
     kubernetes.io/os: linux
 
 constraint:
-  namespace: "default"
+  namespaces:
+  - "default"
 
 scribe:
   # -- Scribe Client Secret
