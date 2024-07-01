@@ -6,7 +6,7 @@ version: v1.4.4
 home: https://scribesecurity.com
 sources:
   - https://github.com/scribe-security/gatekeeper-valint.git
-appVersion: v1.4.4
+appVersion: v1.4.2
 icon: https://raw.githubusercontent.com/scribe-security/misc/master/assets/logo-white.jpg
 maintainers:
   - name: Mikey Strauss
