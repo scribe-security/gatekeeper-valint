@@ -12,6 +12,7 @@ spec:
     - {{ . }}
     {{- end }}
     {{- end }}
+    {{- end }}
     kinds:
       - apiGroups: ["apps"]
         kinds: ["Deployment"]
