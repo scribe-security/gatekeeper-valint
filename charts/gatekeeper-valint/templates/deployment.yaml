@@ -81,7 +81,7 @@ spec:
               name: valint-x509-secret
         {{- end }}
         {{- if .Values.image.bundlePullSecrets }}
-        - name: GATEKEEPER_VALINT_GIT_AUTH
+        - name: GATEKEEPER_VALINT_ATTEST_BUNDLE_ARGS_AUTH
           valueFrom:
             secretKeyRef:
               key: auth

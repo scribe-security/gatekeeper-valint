@@ -6,7 +6,7 @@ import (
 )
 
 func NewCliInit() *basecli.Engine {
-	cli := basecli.New(nil, config.ApplicationName, rootCmd)
+	cli := basecli.New(nil, config.ApplicationName, rootCmd, []string{"gatekeeper-valint admission"})
 
 	err := cli.AddBasicCommandsAndArguments(basecli.ARG_ALL)
 	if err != nil {
