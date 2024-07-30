@@ -83,5 +83,5 @@ valint:
       add-passed: true
     # -- Default verify with sigstore
     default: sigstore
-  # git:
-  #   branch:
+    # bundle-args:
+      # branch:
