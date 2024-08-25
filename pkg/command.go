@@ -110,6 +110,7 @@ func (cmd *ProviderCmd) Run() error {
 		ReadTimeout:       100 * time.Second,
 		WriteTimeout:      cmd.timeout,
 		ReadHeaderTimeout: 100 * time.Second,
+		IdleTimeout:       100 * time.Second,
 	}
 
 	if err := srv.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
@@ -294,7 +295,8 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 		}
 
 		if err != nil {
-			utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
+			err = utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
 		}
+
 	}
 }
