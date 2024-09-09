@@ -27,7 +27,7 @@ spec:
         - "--port={{ .Values.provider.port }}"
         {{- end }}
         {{- if .Values.provider.timeout }}
-        - "--timeout={{ .Values.provider.timeout }}"
+        - --timeout={{ printf "%ds" .Values.provider.timeout }}
         {{- end }}
         env:
         - name: POLICIES_TMP_ROOT

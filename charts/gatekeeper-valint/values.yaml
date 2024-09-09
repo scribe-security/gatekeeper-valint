@@ -12,7 +12,7 @@ serviceAccount:
 
 provider:
   port: 8090
-  timeout: 300s #In seconds
+  timeout: 300 #In seconds
 
 replicas: 1
 
