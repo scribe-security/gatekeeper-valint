@@ -110,6 +110,7 @@ func (cmd *ProviderCmd) Run() error {
 		ReadTimeout:       100 * time.Second,
 		WriteTimeout:      cmd.timeout,
 		ReadHeaderTimeout: 100 * time.Second,
+		IdleTimeout:       100 * time.Second,
 	}
 
 	if err := srv.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
@@ -139,9 +140,9 @@ func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]
 	var images []string
 	var labels map[string]string
 	var namespace, name, kind, operation string
-	var admissionRequest AdmissionReview
 	for _, key := range providerReq.Request.Keys {
 		if strings.HasPrefix(key, reviewKeyPrefix) {
+			var admissionRequest AdmissionReview
 			base := strings.TrimPrefix(key, reviewKeyPrefix)
 			data, err := base64.StdEncoding.DecodeString(base)
 			if err == nil {
@@ -153,7 +154,14 @@ func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]
 					namespace = object.Metadata.Namespace
 					kind = object.Kind
 					operation = admissionRequest.Operation
+					v, _ := json.MarshalIndent(admissionRequest, "", "  ")
+					cmd.logger.Debugf("admission request: %s", string(v))
+
+				} else {
+					cmd.logger.Debugf("error unmarshal review: %s", err)
 				}
+			} else {
+				cmd.logger.Debugf("error decoding review: %s", err)
 			}
 		} else {
 			images = append(images, key)
@@ -204,6 +212,14 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if operation != "CREATE" && operation != "UPDATE" {
+		if operation != "" {
+			cmd.logger.Debugf("operation %s is not supported", operation)
+		}
+		// else {
+		// 	v, _ := json.MarshalIndent(providerRequest, "", "  ")
+		// 	cmd.logger.Debugf("operation is empty, request: %s", string(v))
+		// }
+
 		cmd.logger.Debugf("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 		cmd.logger.Debug("Skipping API Call, only operation CREATE or UPDATE is supported")
 		emptyResults := make([]externaldata.Item, 0)
@@ -294,7 +310,8 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 		}
 
 		if err != nil {
-			utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
+			err = utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
 		}
+
 	}
 }
