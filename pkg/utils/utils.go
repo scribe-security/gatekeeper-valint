@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 
 	"github.com/open-policy-agent/frameworks/constraint/pkg/externaldata"
 	"k8s.io/klog/v2"
@@ -25,8 +24,20 @@ func SetDryRun(dryRun bool) {
 	DryRunGlobal = dryRun
 }
 
+func SendResponseWithWarning(results *[]externaldata.Item, systemErr string, respCode int, isMutation bool, w http.ResponseWriter, warning bool) error {
+	if warning {
+		klog.InfoS("Warning Policy - Pre-approve admission")
+		if systemErr != "" {
+			klog.Errorf("Warning Policy - Pre-approve admission: %s", systemErr)
+		}
+		return nil
+	}
+
+	return SendResponse(results, systemErr, respCode, isMutation, w)
+}
+
 // sendResponse sends back the response to Gatekeeper.
-func SendResponse(results *[]externaldata.Item, systemErr string, respCode int, isMutation bool, w http.ResponseWriter) {
+func SendResponse(results *[]externaldata.Item, systemErr string, respCode int, isMutation bool, w http.ResponseWriter) error {
 	emptyResults := make([]externaldata.Item, 0)
 	if DryRunGlobal && results == nil && systemErr != "" {
 		klog.InfoS("dry run mocking success, Failed with", systemErr)
@@ -49,13 +60,14 @@ func SendResponse(results *[]externaldata.Item, systemErr string, respCode int, 
 		response.Response.SystemError = systemErr
 	}
 
-	klog.InfoS("sending response", "response", response)
-
 	w.WriteHeader(respCode)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		klog.ErrorS(err, "unable to encode response")
-		os.Exit(1)
+		klog.Infof("Response %v", response)
+		return err
 	}
+
+	return nil
 }
 
 func SendResponseWithError(results *[]externaldata.Item, systemErr string, w http.ResponseWriter) error {

@@ -13,6 +13,7 @@ import (
 
 	"github.com/scribe-security/basecli/logger"
 	"gopkg.in/yaml.v2"
+	"k8s.io/klog/v2"
 
 	"github.com/open-policy-agent/frameworks/constraint/pkg/externaldata"
 
@@ -146,6 +147,9 @@ func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]
 			data, err := base64.StdEncoding.DecodeString(base)
 			if err == nil {
 				err := json.Unmarshal(data, &admissionRequest)
+				v, _ := json.MarshalIndent(admissionRequest, "", "  ")
+				cmd.logger.Debugf("Admission request: %s", v)
+
 				if err == nil {
 					object := admissionRequest.Object
 					labels = object.Metadata.Labels
@@ -188,6 +192,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	}
 	useTag := cmd.policySelect.UseTag
 	ignoreImageID := cmd.policySelect.IgnoreImageID
+	includeTargetName := cmd.policySelect.IncludeTargetName
 	images, labels, namespace, name, kind, operation, err := cmd.decodeKeys(providerRequest)
 	if err != nil {
 		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), http.StatusOK, false, w)
@@ -213,6 +218,12 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 
+	if cmd.policySelect.Warning {
+		cmd.logger.Infof("warning policy is enabled return response")
+		emptyResults := make([]externaldata.Item, 0)
+		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
+	}
+
 	results := make([]externaldata.Item, 0)
 
 	ctx, cancel := context.WithTimeout(req.Context(), cmd.timeout)
@@ -229,12 +240,28 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	if cmd.policySelect == nil ||
 		(cmd.policySelect != nil && len(cmd.policySelect.Apply) == 0) {
 		// Run Default policy
+		var policyErrs, errs []error
+		var errMsg string
 		for _, image := range images {
-			err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, co, cmd.cfg.Valint, cmd.logger)
+
+			err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, includeTargetName, co, cmd.cfg.Valint, cmd.logger)
+
 			if err != nil {
-				utils.SendResponse(nil, fmt.Sprintf("ERROR: %v", err), http.StatusOK, false, w)
+				policyErrs = append(policyErrs, errs...)
+				policyErrMsg := []string{}
+				for _, e := range errs {
+					cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
+					policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
+				}
+				errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
 			}
 		}
+
+		if len(policyErrs) > 0 {
+			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.policySelect.Warning)
+			return
+		}
+
 	} else if cmd.policySelect != nil {
 		if cmd.policySelect.Gate != "" && cmd.cfg.Valint.Context.Gate == "" {
 			cmd.cfg.Valint.Context.Gate = cmd.policySelect.Gate
@@ -248,7 +275,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		var errMsg string
 		for _, image := range images {
 
-			errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
+			errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, includeTargetName, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
 			if len(errs) > 0 {
 				policyErrs = append(policyErrs, errs...)
 				policyErrMsg := []string{}
@@ -261,7 +288,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if len(policyErrs) > 0 {
-			utils.SendResponse(nil, errMsg, http.StatusOK, false, w)
+			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.policySelect.Warning)
 			return
 		}
 
@@ -269,7 +296,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		cmd.logger.Warnf("no policy run on request")
 	}
 
-	utils.SendResponse(&results, "", http.StatusOK, false, w)
+	utils.SendResponseWithWarning(&results, "", http.StatusOK, false, w, cmd.policySelect.Warning)
 }
 
 type ContextHandler func(w http.ResponseWriter, r *http.Request) error
@@ -289,12 +316,13 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 
 		select {
 		case <-ctx.Done():
+			klog.Infof("operation timed out after duration %v", duration)
 			err = fmt.Errorf("operation timed out after duration %v", duration)
 		case <-processDone:
 		}
 
 		if err != nil {
-			utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
+			err = utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
 		}
 	}
 }
