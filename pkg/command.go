@@ -192,7 +192,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	}
 	useTag := cmd.policySelect.UseTag
 	ignoreImageID := cmd.policySelect.IgnoreImageID
-	includeTargetName := cmd.policySelect.IncludeTargetName
+	targetFallbackRepoDigest := cmd.policySelect.TargetFallbackRepoDigest
 	images, labels, namespace, name, kind, operation, err := cmd.decodeKeys(providerRequest)
 	if err != nil {
 		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), http.StatusOK, false, w)
@@ -243,8 +243,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		var policyErrs, errs []error
 		var errMsg string
 		for _, image := range images {
-
-			err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, includeTargetName, co, cmd.cfg.Valint, cmd.logger)
+			err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
 
 			if err != nil {
 				policyErrs = append(policyErrs, errs...)
@@ -275,7 +274,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		var errMsg string
 		for _, image := range images {
 
-			errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, includeTargetName, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
+			errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
 			if len(errs) > 0 {
 				policyErrs = append(policyErrs, errs...)
 				policyErrMsg := []string{}
