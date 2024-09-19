@@ -273,8 +273,14 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 		var policyErrs []error
 		var errMsg string
+		_, bundleDir, err := valintPkg.BundleClone(&cmd.cfg.Valint.Attest)
+		if err == nil {
+			cmd.cfg.Valint.Attest.BundlePath = bundleDir
+			cmd.logger.Infof("Admission Setting bundle path to %s", bundleDir)
+		} else {
+			cmd.logger.Infof("Admission bundle error %s", err)
+		}
 		for _, image := range images {
-
 			errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
 			if len(errs) > 0 {
 				policyErrs = append(policyErrs, errs...)
@@ -329,7 +335,8 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 
 		if err != nil {
 			klog.Warningf("Operation error: %v", err)
-			utils.SendResponseWithWarning(nil, err.Error(), http.StatusOK, false, w, GlobalIsWarning)
+			// Maybe this should be http.StatusOK ?
+			utils.SendResponseWithWarning(nil, err.Error(), http.StatusInternalServerError, false, w, GlobalIsWarning)
 		}
 	}
 }
