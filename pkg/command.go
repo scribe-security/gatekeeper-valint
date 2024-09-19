@@ -236,6 +236,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	os.Setenv("PULL_BUNDLE", "true")
+	SetGlobalIsWarning(cmd.policySelect.Warning)
 
 	if cmd.policySelect == nil ||
 		(cmd.policySelect != nil && len(cmd.policySelect.Apply) == 0) {
@@ -300,6 +301,12 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 type ContextHandler func(w http.ResponseWriter, r *http.Request) error
 
+var GlobalIsWarning bool
+
+func SetGlobalIsWarning(isWarning bool) {
+	GlobalIsWarning = isWarning
+}
+
 func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), duration)
@@ -321,7 +328,8 @@ func processTimeout(h http.HandlerFunc, duration time.Duration) http.HandlerFunc
 		}
 
 		if err != nil {
-			err = utils.SendResponse(nil, err.Error(), http.StatusInternalServerError, false, w)
+			klog.Warningf("Operation error: %v", err)
+			utils.SendResponseWithWarning(nil, err.Error(), http.StatusOK, false, w, GlobalIsWarning)
 		}
 	}
 }
