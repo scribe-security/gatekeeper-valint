@@ -57,6 +57,7 @@ func SendResponse(results *[]externaldata.Item, systemErr string, respCode int, 
 	if results != nil {
 		response.Response.Items = *results
 	} else {
+		klog.Infof("Response system error %v %d", response, respCode)
 		response.Response.SystemError = systemErr
 	}
 
