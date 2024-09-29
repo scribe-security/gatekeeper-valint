@@ -1259,8 +1259,8 @@ github.com/scribe-security/cocosign v0.0.0-20240918130110-766387955356 h1:YIRnX8
 github.com/scribe-security/cocosign v0.0.0-20240918130110-766387955356/go.mod h1:yrZv2698fCNi8NVsgweVvgXEn4VxWXHGc15VXWIvTSE=
 github.com/scribe-security/syft v0.20.1-0.20240818074515-b587e039aa72 h1:phXhUnahy8ZKZWiOgfGEJMx2C2JZ9JGGe69Sb/skec8=
 github.com/scribe-security/syft v0.20.1-0.20240818074515-b587e039aa72/go.mod h1:zZMy0Wtz0uaFFUZKwD03OnC827vzfmSourdKMjS7N+Y=
-github.com/scribe-security/valint v1.5.10-0.20240926075132-2f164673086c h1:naTzhM7PBbKh4B90M6/fFFhvNEfpye+fN9SEVaX5MBk=
-github.com/scribe-security/valint v1.5.10-0.20240926075132-2f164673086c/go.mod h1:oMTk9o/722dU5b9I6l/RutbwjefamqTP7N/pBcCmrdw=
+github.com/scribe-security/valint v1.5.10-0.20240929085140-04f693b4f138 h1:qymxWbhylBBcwY+5zt6sVc9dqnaohqA4oSbYMDP0erA=
+github.com/scribe-security/valint v1.5.10-0.20240929085140-04f693b4f138/go.mod h1:oMTk9o/722dU5b9I6l/RutbwjefamqTP7N/pBcCmrdw=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e h1:7q6NSFZDeGfvvtIRwBrU/aegEYJYmvev0cHAwo17zZQ=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e/go.mod h1:DkpGd78rljTxKAnTDPFqXSGxvETQnJyuSOQwsHycqfs=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
