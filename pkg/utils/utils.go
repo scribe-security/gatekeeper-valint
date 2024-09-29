@@ -30,7 +30,9 @@ func SendResponseWithWarning(results *[]externaldata.Item, systemErr string, res
 		if systemErr != "" {
 			klog.Errorf("Warning Policy - Pre-approve admission: %s", systemErr)
 		}
-		return nil
+		klog.Infof("Response Admission passed")
+		emptyResults := make([]externaldata.Item, 0)
+		return SendResponse(&emptyResults, "", http.StatusOK, false, w)
 	}
 
 	return SendResponse(results, systemErr, respCode, isMutation, w)

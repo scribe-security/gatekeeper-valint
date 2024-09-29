@@ -168,7 +168,7 @@ func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]
 }
 
 func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
-	cmd.logger.Info("validating request")
+	// cmd.logger.Info("validating request")
 
 	// only accept POST requests
 	if req.Method != http.MethodPost {
