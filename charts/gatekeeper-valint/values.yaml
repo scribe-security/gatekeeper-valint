@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag: v1.5.9-2
+  tag: tmp-dev-latest
   imagePullPolicy: Always
 certs:
   caBundle: ""

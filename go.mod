@@ -462,7 +462,7 @@ require (
 
 // replace github.com/scribe-security/valint => ../valint
 
-// replace github.com/scribe-security/cocosign => ../cocosign
+replace github.com/scribe-security/cocosign => ../cocosign
 
 // replace github.com/scribe-security/basecli => ../basecli
 
