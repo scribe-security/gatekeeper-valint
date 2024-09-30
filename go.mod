@@ -12,7 +12,7 @@ require (
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20240802234259-aa99306df54e
 	github.com/scribe-security/basecli v0.0.0-20240918130216-0ecd34ff96d4
 	github.com/scribe-security/cocosign v0.0.0-20240918130110-766387955356
-	github.com/scribe-security/valint v1.5.11-0.20240930101946-e5c57bf3eced
+	github.com/scribe-security/valint v1.5.11-0.20240930103101-d594b36fee13
 	github.com/sigstore/cosign/v2 v2.3.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
