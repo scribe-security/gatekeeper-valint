@@ -44,6 +44,12 @@ spec:
           value: "/docker"
         - name: GATEKEEPER_VALINT_SCRIBE_RETRY_TIMEOUT
           value: 180s
+        - name: GATEKEEPER_VALINT_SCRIBE_RETRY_BACKOFF
+          value: 10s
+        - name: GATEKEEPER_VALINT_SCRIBE_RETRY_EXP
+          value: "true"
+        - name: GATEKEEPER_VALINT_SCRIBE_RETRY_JITTER
+          value: "90s"
         - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
@@ -56,10 +62,10 @@ spec:
               key: scribe_url
               name: valint-scribe-cred-secret
         {{- end }}
-        - name: GATEKEEPER_VALINT_SCRIBE_ENABLE
+        - name: GATEKEEPER_VALINT_SCRIBE_DISABLE
           valueFrom:
             secretKeyRef:
-              key: scribe_enable
+              key: scribe_disable
               name: valint-scribe-cred-secret
         - name: ATTEST_CA
           valueFrom:
