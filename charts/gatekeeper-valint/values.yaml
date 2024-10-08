@@ -29,8 +29,9 @@ constraint:
 scribe:
   # -- Scribe Client Secret
   client_secret: ""
-    # -- Scribe Client Enable
-  enable: false
+  # -- Scribe Client Enable
+  #enable: false
+  disable: false
 
 x509:
   cert: "" 
