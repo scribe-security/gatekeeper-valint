@@ -213,6 +213,7 @@ e2e_oci: clean-test ## Run e2e test with oci
 
 .PHONY: e2e_scribe
 e2e_scribe: clean-test ## Run e2e test with scribe
+	docker pull alpine:latest || true
 	go test --tags=e2e_scribe -timeout 120m -count=1 -p 1 -v ./test/...
 
 

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/scribe-security/basecli/logger"
@@ -236,6 +237,8 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	os.Setenv("PULL_BUNDLE", "true")
+	os.Setenv("CONCURRENT_UPLOAD", "true")
+	// os.Setenv("GATEKEEPER_VALINT_SCRIBE_RETRY_EXP", "true")
 	SetGlobalIsWarning(cmd.policySelect.Warning)
 
 	if cmd.policySelect == nil ||
@@ -243,19 +246,30 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		// Run Default policy
 		var policyErrs, errs []error
 		var errMsg string
-		for _, image := range images {
-			err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
+		var wg sync.WaitGroup
+		var mu sync.Mutex
+		// Run Policy Concurrently
 
-			if err != nil {
-				policyErrs = append(policyErrs, errs...)
-				policyErrMsg := []string{}
-				for _, e := range errs {
-					cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
-					policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
+		for _, image := range images {
+			wg.Add(1)
+			go func(image string) {
+				defer wg.Done()
+				err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
+				if err != nil {
+					mu.Lock()
+					policyErrs = append(policyErrs, errs...)
+					policyErrMsg := []string{}
+					for _, e := range errs {
+						cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
+						policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
+					}
+					errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
+					mu.Unlock()
 				}
-				errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
-			}
+			}(image)
 		}
+
+		wg.Wait()
 
 		if len(policyErrs) > 0 {
 			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.policySelect.Warning)
@@ -273,6 +287,9 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 		var policyErrs []error
 		var errMsg string
+		var wg sync.WaitGroup
+		var mu sync.Mutex
+
 		_, bundleDir, err := valintPkg.BundleClone(&cmd.cfg.Valint.Attest)
 		if err == nil {
 			cmd.cfg.Valint.Attest.BundlePath = bundleDir
@@ -281,17 +298,25 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			cmd.logger.Infof("Admission bundle error %s", err)
 		}
 		for _, image := range images {
-			errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
-			if len(errs) > 0 {
-				policyErrs = append(policyErrs, errs...)
-				policyErrMsg := []string{}
-				for _, e := range errs {
-					cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
-					policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
+			wg.Add(1)
+			go func(image string) {
+				errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
+				if len(errs) > 0 {
+					mu.Lock()
+					policyErrs = append(policyErrs, errs...)
+					policyErrMsg := []string{}
+					for _, e := range errs {
+						cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
+						policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
+					}
+					errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
+					mu.Unlock()
 				}
-				errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
-			}
+				wg.Done()
+			}(image)
 		}
+
+		wg.Wait()
 
 		if len(policyErrs) > 0 {
 			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.policySelect.Warning)
