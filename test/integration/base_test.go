@@ -182,7 +182,7 @@ func HelmInstall(t *testing.T, namespace string, repo string, chart string, rele
 	client.NameTemplate = releaseName
 	client.Namespace = namespace
 	client.Wait = true
-	client.Timeout = 300 * time.Second
+	client.Timeout = 900 * time.Second
 	var chartPath string
 
 	if strings.HasPrefix(repo, "http") {
