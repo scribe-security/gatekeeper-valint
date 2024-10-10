@@ -1245,6 +1245,8 @@ github.com/scribe-security/basecli v0.0.0-20241006123633-fdd4d5028b58 h1:lMmLhwp
 github.com/scribe-security/basecli v0.0.0-20241006123633-fdd4d5028b58/go.mod h1:Drx4JqZEaJW5Pgm4F+NsbYtWDLMQWixCEbauBUc7NvM=
 github.com/scribe-security/basecli v0.0.0-20241007135218-858a6d47204d h1:sRjiphEGVoC7/F+X26ZqHkknFHuOs6QoJezOJKv4noM=
 github.com/scribe-security/basecli v0.0.0-20241007135218-858a6d47204d/go.mod h1:Drx4JqZEaJW5Pgm4F+NsbYtWDLMQWixCEbauBUc7NvM=
+github.com/scribe-security/basecli v0.0.0-20241010095542-08c488f45368 h1:UvVqR4ur0LVnIsLJzZKlLpFYrNzRDHoLwggtayZsYE0=
+github.com/scribe-security/basecli v0.0.0-20241010095542-08c488f45368/go.mod h1:Drx4JqZEaJW5Pgm4F+NsbYtWDLMQWixCEbauBUc7NvM=
 github.com/scribe-security/cocosign v0.0.0-20241006123519-d65046e09a7c h1:aCQg/fJle1uqv2L5lEuMX/dOdrUHbh1uKMuyBqgZRCY=
 github.com/scribe-security/cocosign v0.0.0-20241006123519-d65046e09a7c/go.mod h1:h6rKB41xY5i7xqS1+1rOfSUjCJTLl+AmWXYaKP2Zxtk=
 github.com/scribe-security/syft v0.20.1-0.20240818074515-b587e039aa72 h1:phXhUnahy8ZKZWiOgfGEJMx2C2JZ9JGGe69Sb/skec8=
@@ -1253,6 +1255,8 @@ github.com/scribe-security/valint v1.5.11-0.20241006123814-2e63a32c7d56 h1:Wky9D
 github.com/scribe-security/valint v1.5.11-0.20241006123814-2e63a32c7d56/go.mod h1:8Ds0UnaaBgLiluP0jAoPwC9HjaQABuu40sf/+T10aeY=
 github.com/scribe-security/valint v1.5.11-0.20241008111242-8cb6538d4e37 h1:qWYVLHauAqK9w7315wAuWyvGF+4oeFjq1709+USAInI=
 github.com/scribe-security/valint v1.5.11-0.20241008111242-8cb6538d4e37/go.mod h1:MADQUrnJXj7jM1/D4Wn1jK0MVZquwibjYNJ35LOEg5s=
+github.com/scribe-security/valint v1.5.11 h1:o/zNc6vPd3Gbh6UAsuR+E06iS2CC+VTSXLqpTiV13WU=
+github.com/scribe-security/valint v1.5.11/go.mod h1:llVl/XAlcmmIj3Fg6BEylTal2UVa5+aAZZq+vu0Ey4c=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e h1:7q6NSFZDeGfvvtIRwBrU/aegEYJYmvev0cHAwo17zZQ=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e/go.mod h1:DkpGd78rljTxKAnTDPFqXSGxvETQnJyuSOQwsHycqfs=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
