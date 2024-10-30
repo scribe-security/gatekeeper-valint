@@ -43,13 +43,13 @@ spec:
         - name: DOCKER_CONFIG
           value: "/docker"
         - name: GATEKEEPER_VALINT_SCRIBE_RETRY_TIMEOUT
-          value: 180s
+          value: 90s
         - name: GATEKEEPER_VALINT_SCRIBE_RETRY_BACKOFF
-          value: 10s
+          value: 0.5s
         - name: GATEKEEPER_VALINT_SCRIBE_RETRY_EXP
           value: "true"
         - name: GATEKEEPER_VALINT_SCRIBE_RETRY_JITTER
-          value: "90s"
+          value: "1s"
         - name: GATEKEEPER_VALINT_SCRIBE_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
