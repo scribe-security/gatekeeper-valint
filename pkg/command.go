@@ -105,13 +105,14 @@ func (cmd *ProviderCmd) Run() error {
 
 	cmd.logger.Infof("timeouts, webhook:%s, process:%s...\n", cmd.timeout, timeoutWithOverhead)
 
-	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeoutWithOverhead))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/validate", processTimeout(cmd.Validate, timeoutWithOverhead))
 
 	srv := &http.Server{
-		Addr:              fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
-		ReadTimeout:       100 * time.Second,
-		WriteTimeout:      cmd.timeout,
-		ReadHeaderTimeout: 100 * time.Second,
+		Addr: fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
+		// WriteTimeout:      cmd.timeout,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	if err := srv.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
