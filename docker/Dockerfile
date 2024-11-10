@@ -1,5 +1,6 @@
-FROM alpine:latest AS build
-RUN apk --no-cache add ca-certificates coreutils
+FROM cgr.dev/chainguard/wolfi-base:latest AS build
+RUN apk --no-cache add ca-certificates su-exec
+RUN rm -rf /usr/sbin/useradd /usr/sbin/groupadd;apk --no-cache add shadow
 
 FROM scratch
 
