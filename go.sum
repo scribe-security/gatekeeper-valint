@@ -1309,10 +1309,14 @@ github.com/scribe-security/basecli v0.0.0-20241010095542-08c488f45368 h1:UvVqR4u
 github.com/scribe-security/basecli v0.0.0-20241010095542-08c488f45368/go.mod h1:Drx4JqZEaJW5Pgm4F+NsbYtWDLMQWixCEbauBUc7NvM=
 github.com/scribe-security/basecli v0.0.0-20241110105115-8d8c0ad82ea5 h1:kd0nrz/lk8aqfm0bFnk1ZVpckNPxk1j72rV075Tz6rI=
 github.com/scribe-security/basecli v0.0.0-20241110105115-8d8c0ad82ea5/go.mod h1:Xteip1cn6okkkq0N1MaICoNocImN8lqwWbTCp6Myp7s=
+github.com/scribe-security/basecli v0.0.0-20241110134524-33d46992799b h1:fi3EGN5T6k1Nlb4Q5rxL8cR4qGOxyVKJgJcK870RBSY=
+github.com/scribe-security/basecli v0.0.0-20241110134524-33d46992799b/go.mod h1:K/+48BwDqZVv8I4mBFnD3R/wC37xRWVmLOum4Mx4nwQ=
 github.com/scribe-security/cocosign v0.0.0-20241006123519-d65046e09a7c h1:aCQg/fJle1uqv2L5lEuMX/dOdrUHbh1uKMuyBqgZRCY=
 github.com/scribe-security/cocosign v0.0.0-20241006123519-d65046e09a7c/go.mod h1:h6rKB41xY5i7xqS1+1rOfSUjCJTLl+AmWXYaKP2Zxtk=
 github.com/scribe-security/cocosign v0.0.0-20241110095945-caeb3c777d0d h1:WPExUqu8+4j36ydOGhg/IDnbsIwsO3xk08ZasdtLJ9I=
 github.com/scribe-security/cocosign v0.0.0-20241110095945-caeb3c777d0d/go.mod h1:I+lY3uKyPIC2OfXXvuYI4aA1wTxPnJTx5IWKckNqLMU=
+github.com/scribe-security/cocosign v0.0.0-20241110134419-4f8e3db172c7 h1:Rtqzc/uAH2CR9Cqcen9Abpx3cAzfE0wnJZCrSYfzACY=
+github.com/scribe-security/cocosign v0.0.0-20241110134419-4f8e3db172c7/go.mod h1:I+lY3uKyPIC2OfXXvuYI4aA1wTxPnJTx5IWKckNqLMU=
 github.com/scribe-security/syft v0.20.1-0.20240818074515-b587e039aa72 h1:phXhUnahy8ZKZWiOgfGEJMx2C2JZ9JGGe69Sb/skec8=
 github.com/scribe-security/syft v0.20.1-0.20240818074515-b587e039aa72/go.mod h1:zZMy0Wtz0uaFFUZKwD03OnC827vzfmSourdKMjS7N+Y=
 github.com/scribe-security/valint v1.5.11-0.20241006123814-2e63a32c7d56 h1:Wky9DkxHwYW6FB9jw7r2G93MOBIqpD+OTxE/McN3lYk=
@@ -1323,6 +1327,8 @@ github.com/scribe-security/valint v1.5.11 h1:o/zNc6vPd3Gbh6UAsuR+E06iS2CC+VTSXLq
 github.com/scribe-security/valint v1.5.11/go.mod h1:llVl/XAlcmmIj3Fg6BEylTal2UVa5+aAZZq+vu0Ey4c=
 github.com/scribe-security/valint v1.5.14-0.20241110133126-40bdf14184c2 h1:fnl8vqvUoVHCGOlQAwHXb+VSSEholPsQQiSEDtLgdIU=
 github.com/scribe-security/valint v1.5.14-0.20241110133126-40bdf14184c2/go.mod h1:Y/qo0MUHBcZLQs3eqKVeoezyyi3x00P4W8GyBt6qQpc=
+github.com/scribe-security/valint v1.5.14-0.20241110134613-36bb4e8aeb70 h1:FmPoNN8fgbjfciXMg7f04CUotb67g2K/WJgntrsYerA=
+github.com/scribe-security/valint v1.5.14-0.20241110134613-36bb4e8aeb70/go.mod h1:imohMykdlMnm1q8duzoDqKgZlenrXUXDXBIA3g4LMMk=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e h1:7q6NSFZDeGfvvtIRwBrU/aegEYJYmvev0cHAwo17zZQ=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e/go.mod h1:DkpGd78rljTxKAnTDPFqXSGxvETQnJyuSOQwsHycqfs=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
