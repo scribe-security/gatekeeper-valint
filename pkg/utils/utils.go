@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/open-policy-agent/frameworks/constraint/pkg/externaldata"
+	"github.com/scribe-security/basecli/logger"
 	"k8s.io/klog/v2"
 )
 
@@ -30,9 +31,10 @@ func SendResponseWithWarning(results *[]externaldata.Item, systemErr string, res
 		if systemErr != "" {
 			klog.Errorf("Warning Policy - Pre-approve admission: %s", systemErr)
 		}
-		klog.Infof("Response Admission passed")
-		emptyResults := make([]externaldata.Item, 0)
-		return SendResponse(&emptyResults, "", http.StatusOK, false, w)
+		// klog.Infof("Response Admission passed")
+		// emptyResults := make([]externaldata.Item, 0)
+		// return SendResponse(&emptyResults, "", http.StatusOK, false, w)
+		return nil
 	}
 
 	return SendResponse(results, systemErr, respCode, isMutation, w)
@@ -62,6 +64,9 @@ func SendResponse(results *[]externaldata.Item, systemErr string, respCode int, 
 		klog.Infof("Response system error %v %d", response, respCode)
 		response.Response.SystemError = systemErr
 	}
+
+	responseObj, _ := json.MarshalIndent(response, "", "  ")
+	logger.Debugf("Sending response %s", string(responseObj))
 
 	w.WriteHeader(respCode)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
