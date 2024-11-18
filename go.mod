@@ -1,8 +1,6 @@
 module github.com/scribe-security/gatekeeper-valint
 
-go 1.22.7
-
-toolchain go1.22.8
+go 1.22.8
 
 // toolchain go1.21.3
 
@@ -10,9 +8,9 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/google/go-containerregistry v0.20.2
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20240802234259-aa99306df54e
-	github.com/scribe-security/basecli v0.0.0-20241110105115-8d8c0ad82ea5
-	github.com/scribe-security/cocosign v0.0.0-20241110095945-caeb3c777d0d
-	github.com/scribe-security/valint v1.5.14-0.20241110133126-40bdf14184c2
+	github.com/scribe-security/basecli v0.0.0-20241113131952-3205edb2d60e
+	github.com/scribe-security/cocosign v0.0.0-20241113130848-32bfee0ba16a
+	github.com/scribe-security/valint v1.5.14-0.20241118082323-efe3c19be7dc
 	github.com/sigstore/cosign/v2 v2.4.1
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
@@ -133,7 +131,6 @@ require (
 	cuelang.org/go v0.9.2 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
-	github.com/AliyunContainerService/ack-ram-tool/pkg/credentials/alibabacloudsdkgo/helper v0.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -159,7 +156,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/ThalesIgnite/crypto11 v1.2.5 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
-	github.com/adrg/xdg v0.5.0 // indirect
+	github.com/adrg/xdg v0.5.3 // indirect
 	github.com/agnivade/levenshtein v1.2.0 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.4 // indirect
 	github.com/alibabacloud-go/cr-20160607 v1.0.1 // indirect
@@ -216,13 +213,13 @@ require (
 	github.com/coreos/go-oidc/v3 v3.11.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/cyberphone/json-canonicalization v0.0.0-20231011164504-785e29786b46 // indirect
-	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/deitch/magic v0.0.0-20230404182410-1ff89d7342da // indirect
 	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
 	github.com/digitorus/timestamp v0.0.0-20231217203849-220c5c2851b7 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
-	github.com/docker/cli v27.1.1+incompatible // indirect
+	github.com/docker/cli v27.3.1+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/docker v27.3.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.0 // indirect
@@ -244,7 +241,7 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
-	github.com/go-git/go-billy/v5 v5.5.0 // indirect
+	github.com/go-git/go-billy/v5 v5.6.0 // indirect
 	github.com/go-git/go-git/v5 v5.12.0 // indirect
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -372,7 +369,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sigstore/fulcio v1.6.3 // indirect
 	github.com/sigstore/rekor v1.3.6 // indirect
-	github.com/sigstore/sigstore v1.8.9 // indirect
+	github.com/sigstore/sigstore v1.8.10 // indirect
 	github.com/sigstore/timestamp-authority v1.2.2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skeema/knownhosts v1.2.2 // indirect
@@ -422,15 +419,15 @@ require (
 	go.step.sm/crypto v0.51.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
-	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/net v0.29.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/oauth2 v0.23.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/term v0.24.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/term v0.25.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/api v0.196.0 // indirect
