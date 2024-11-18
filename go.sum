@@ -1258,6 +1258,8 @@ github.com/scribe-security/valint v1.5.14-0.20241110183558-0ac15f29479d h1:3+zga
 github.com/scribe-security/valint v1.5.14-0.20241110183558-0ac15f29479d/go.mod h1:lzFPYn6kXRqQ9zIk8XvuB2wVJUM11IApO9UsQvG2BlI=
 github.com/scribe-security/valint v1.5.14-0.20241114093510-575d74b633a0 h1:6OjtzWHp2hd7kBzWoJZGHFk93CkxWV/Em0o17i4iAE8=
 github.com/scribe-security/valint v1.5.14-0.20241114093510-575d74b633a0/go.mod h1:qEZ9NZzROqzBZHy4RMeQkgyIt7XPnOGfjDW/G6alJNM=
+github.com/scribe-security/valint v1.5.14-0.20241118082323-efe3c19be7dc h1:yd65suI0gjWiXrn2kIF8Hp0VZqtTH1k6uRt5aXJJFXQ=
+github.com/scribe-security/valint v1.5.14-0.20241118082323-efe3c19be7dc/go.mod h1:qEZ9NZzROqzBZHy4RMeQkgyIt7XPnOGfjDW/G6alJNM=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e h1:7q6NSFZDeGfvvtIRwBrU/aegEYJYmvev0cHAwo17zZQ=
 github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e/go.mod h1:DkpGd78rljTxKAnTDPFqXSGxvETQnJyuSOQwsHycqfs=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
