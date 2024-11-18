@@ -33,6 +33,7 @@ const (
 	requestKeyPrefix = "request:"
 	objectKeyPrefix  = "object:"
 	reviewKeyPrefix  = "review:"
+	inputKeyPrefix   = "input:"
 )
 
 type Metadata struct {
@@ -105,14 +106,23 @@ func (cmd *ProviderCmd) Run() error {
 
 	cmd.logger.Infof("timeouts, webhook:%s, process:%s...\n", cmd.timeout, timeoutWithOverhead)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/validate", processTimeout(cmd.Validate, timeoutWithOverhead))
+	// mux := http.NewServeMux()
+	// mux.HandleFunc("/validate", processTimeout(cmd.Validate, timeoutWithOverhead))
+
+	// srv := &http.Server{
+	// 	Addr: fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
+	// 	// WriteTimeout:      cmd.timeout,
+	// 	Handler:           mux,
+	// 	ReadHeaderTimeout: 5 * time.Second,
+	// }
+
+	http.HandleFunc("/validate", processTimeout(cmd.Validate, timeoutWithOverhead))
 
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
-		// WriteTimeout:      cmd.timeout,
-		Handler:           mux,
-		ReadHeaderTimeout: 5 * time.Second,
+		Addr:              fmt.Sprintf(":%d", cmd.cfg.Provider.Port),
+		ReadTimeout:       100 * time.Second,
+		WriteTimeout:      cmd.timeout,
+		ReadHeaderTimeout: 100 * time.Second,
 	}
 
 	if err := srv.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
@@ -144,14 +154,20 @@ func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]
 	var namespace, name, kind, operation string
 	var admissionRequest AdmissionReview
 	for _, key := range providerReq.Request.Keys {
-		if strings.HasPrefix(key, reviewKeyPrefix) {
+		if strings.HasPrefix(key, inputKeyPrefix) {
+			base := strings.TrimPrefix(key, inputKeyPrefix)
+			data, err := base64.StdEncoding.DecodeString(base)
+			if err == nil {
+				m := make(map[string]interface{})
+				json.Unmarshal(data, &m)
+				v, _ := json.MarshalIndent(m, "", "  ")
+				cmd.logger.Debugf("Constraint input: %s", string(v))
+			}
+		} else if strings.HasPrefix(key, reviewKeyPrefix) {
 			base := strings.TrimPrefix(key, reviewKeyPrefix)
 			data, err := base64.StdEncoding.DecodeString(base)
 			if err == nil {
 				err := json.Unmarshal(data, &admissionRequest)
-				v, _ := json.MarshalIndent(admissionRequest, "", "  ")
-				cmd.logger.Debugf("Admission request: %s", v)
-
 				if err == nil {
 					object := admissionRequest.Object
 					labels = object.Metadata.Labels
@@ -159,6 +175,11 @@ func (cmd *ProviderCmd) decodeKeys(providerReq externaldata.ProviderRequest) ([]
 					namespace = object.Metadata.Namespace
 					kind = object.Kind
 					operation = admissionRequest.Operation
+					if operation != "" {
+						v, _ := json.MarshalIndent(admissionRequest, "", "  ")
+						cmd.logger.Debugf("Admission request: %s", string(v))
+					}
+
 				}
 			}
 		} else {
@@ -201,18 +222,23 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if len(images) == 0 {
+		cmd.logger.Debugf("Skipping API Call, no images found in resource, Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", labels, namespace, name, kind, operation)
+		emptyResults := make([]externaldata.Item, 0)
+		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
+		return
+	}
+
 	onlyCreate, found := os.LookupEnv("ONLY_CREATE")
 	if found && strings.ToLower(onlyCreate) == "true" && operation != "CREATE" {
-		cmd.logger.Debugf("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
-		cmd.logger.Debug("Skipping API Call, only operation CREATE is supported")
+		cmd.logger.Debugf("Skipping API Call, only operation CREATE is supported, Images (%d): %s, Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 		emptyResults := make([]externaldata.Item, 0)
 		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
 		return
 	}
 
 	if operation != "CREATE" && operation != "UPDATE" {
-		cmd.logger.Debugf("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
-		cmd.logger.Debug("Skipping API Call, only operation CREATE or UPDATE is supported")
+		cmd.logger.Debug("Skipping API Call, only operation CREATE is supported, Images (%d): %s, Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 		emptyResults := make([]externaldata.Item, 0)
 		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
 		return
@@ -283,7 +309,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if cmd.cfg.Valint.Context.Gate != "" {
-			cmd.logger.Infof("evaluating gate %s", cmd.cfg.Valint.Context.Gate)
+			cmd.logger.Infof("evaluating '%s' on gate '%s'", images, cmd.cfg.Valint.Context.Gate)
 		}
 
 		var policyErrs []error
@@ -301,6 +327,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		for _, image := range images {
 			wg.Add(1)
 			go func(image string) {
+				cmd.logger.Debugf("Image admission thread %s", image)
 				errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
 				if len(errs) > 0 {
 					mu.Lock()
