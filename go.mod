@@ -8,9 +8,9 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/google/go-containerregistry v0.20.2
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20240802234259-aa99306df54e
-	github.com/scribe-security/basecli v0.0.0-20241110183520-e47bbbcc97a3
-	github.com/scribe-security/cocosign v0.0.0-20241110141517-6bf4434a77d3
-	github.com/scribe-security/valint v1.5.14-0.20241110183558-0ac15f29479d
+	github.com/scribe-security/basecli v0.0.0-20241113131952-3205edb2d60e
+	github.com/scribe-security/cocosign v0.0.0-20241113130848-32bfee0ba16a
+	github.com/scribe-security/valint v1.5.14-0.20241114093510-575d74b633a0
 	github.com/sigstore/cosign/v2 v2.4.1
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
