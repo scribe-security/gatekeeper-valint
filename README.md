@@ -777,3 +777,4 @@ Upon successful deployment, you'll see a detailed evaluation summary in the admi
 │ AGGREGATE POLICY RESULT │        │                        │ PASSED            │                                            │
 └─────────────────────────┴────────┴────────────────────────┴───────────────────┴────────────────────────────────────────────┘
 ```
+
