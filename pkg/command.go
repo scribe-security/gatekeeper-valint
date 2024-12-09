@@ -281,6 +281,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			wg.Add(1)
 			go func(image string) {
 				defer wg.Done()
+				cmd.logger.Infof("Starting admission thread for '%s'", image)
 				err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
 				if err != nil {
 					mu.Lock()
