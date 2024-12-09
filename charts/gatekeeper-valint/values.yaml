@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag: v1.5.11-2
+  tag: v1.5.14
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -43,7 +43,7 @@ select:
   # -- Gate name
   gate: default_gate
   # -- Set all rules as warning
-  warning: false
+  warning: true
   # -- Run policy dry run mode
   dry-run: false
   # -- Use repo digest when image is not accessible

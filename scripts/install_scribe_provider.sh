@@ -23,7 +23,7 @@ else
       --set "certs.tlsCrt=$(cat $CERTS_PATH/tls.crt)" \
       --set "certs.tlsKey=$(cat $CERTS_PATH/tls.key)" \
       --set "scribe.enable=true" \
-      --set "scribe.client_secret=$SCRIBE_CLIENT_SECRET" \
+      --set "scribe.client_secret=$SCRIBE_TOKEN" \
       --set "scribe.url=$SCRIBE_URL" \
       --set "image.bundlePullSecrets=$BUNDLE_PULL_SECRET" \
       --set "image.imagePullSecrets=$(cat ~/.docker/config.json | base64 | tr -d '\n')"
