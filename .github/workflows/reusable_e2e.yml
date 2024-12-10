@@ -92,7 +92,9 @@ jobs:
         
       - name: Build binary
         # if: steps.tool-cache.outputs.cache-hit != 'true'
-        run: make binary
+        run: make build
+        env:
+          IsDev: true
 
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.9.0
