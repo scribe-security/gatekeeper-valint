@@ -305,12 +305,12 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		}
 
 	} else if cmd.policySelect != nil {
-		if cmd.policySelect.Gate != "" && cmd.cfg.Valint.Context.Gate == "" {
-			cmd.cfg.Valint.Context.Gate = cmd.policySelect.Gate
+		if cmd.policySelect.GateType != "" && cmd.cfg.Valint.Context.GateTypeField == "" {
+			cmd.cfg.Valint.Context.GateTypeField = cmd.policySelect.GateType
 		}
 
-		if cmd.cfg.Valint.Context.Gate != "" {
-			cmd.logger.Infof("evaluating '%s' on gate '%s'", images, cmd.cfg.Valint.Context.Gate)
+		if cmd.cfg.Valint.Context.GateTypeField != "" {
+			cmd.logger.Infof("evaluating '%s' on gate '%s'", images, cmd.cfg.Valint.Context.GateTypeField)
 		}
 
 		var policyErrs []error
