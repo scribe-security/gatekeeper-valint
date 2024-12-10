@@ -245,7 +245,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	}
 
 	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
-
+	cmd.logger.Infof("############## TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT 1")
 	if cmd.policySelect.Warning {
 		cmd.logger.Infof("warning policy is enabled return response")
 		emptyResults := make([]externaldata.Item, 0)
@@ -311,6 +311,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 		if cmd.cfg.Valint.Context.GateTypeField != "" {
 			cmd.logger.Infof("evaluating '%s' on gate '%s'", images, cmd.cfg.Valint.Context.GateTypeField)
+			cmd.logger.Infof("###### T#TTTTTTTTTTTTTTTTTTTTTTTTTTTTT 2")
 		}
 
 		var policyErrs []error
