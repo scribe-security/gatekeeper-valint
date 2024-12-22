@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag:  v1.5.16
+  tag:  v1.5.17
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -24,10 +24,7 @@ gatekeeperValint:
 
 constraint:
   namespaces:
-  - "dev"
-  - "dev2"
-  - "test"
-  - "staging"
+  - "default"
 
 scribe:
   # -- Scribe Client Secret
@@ -44,7 +41,7 @@ x509:
 # By Default the Signature Policy is Run on all images set to warning.
 select:
   # -- Gate name
-  gate: scribe-dogfooding-gate
+  gate: default_gate  
   # -- Set all rules as warning
   warning: true
   # -- Run policy dry run mode
