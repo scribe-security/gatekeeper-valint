@@ -292,7 +292,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			go func(image string) {
 				defer wg.Done()
 				cmd.logger.Infof("Starting admission thread for '%s'", image)
-				err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
+				err := valintPkg.RunInitiative(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
 				if err != nil {
 					mu.Lock()
 					initiativeErrs = append(initiativeErrs, errs...)
@@ -347,7 +347,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			wg.Add(1)
 			go func(image string) {
 				cmd.logger.Debugf("Image admission thread %s", image)
-				errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.initiativeSelect.Apply, cmd.initiativeSelect.Warning, cmd.cfg.Valint, cmd.logger)
+				errs := valintPkg.RunInitiativeSelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.initiativeSelect.Apply, cmd.initiativeSelect.Warning, cmd.cfg.Valint, cmd.logger)
 				if len(errs) > 0 {
 					mu.Lock()
 					initiativeErrs = append(initiativeErrs, errs...)
