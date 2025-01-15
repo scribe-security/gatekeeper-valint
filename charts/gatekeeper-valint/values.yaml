@@ -41,7 +41,9 @@ x509:
 # By Default the Signature Policy is Run on all images set to warning.
 select:
   # -- Gate name
-  gate: default_gate
+  gate-name: Scribe Admission Gate
+  gate-type: admission
+
   # -- Set all rules as warning
   warning: true
   # -- Run policy dry run mode
@@ -59,6 +61,9 @@ select:
     # -- filter evidence by scope, options<product, pipeline, target>
     filter-by:
     - target
+    # -- Evaluate initiative on Latest Image Product
+    # - product 
+
     # -- Select policy rules and arguments to evaluate
     initiative:
       name: Image integrity
