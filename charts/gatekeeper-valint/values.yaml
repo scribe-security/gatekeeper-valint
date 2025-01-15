@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag:  v1.5.18
+  tag: sh-5802_initiatives_config
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -60,13 +60,18 @@ select:
     filter-by:
     - target
     # -- Select policy rules and arguments to evaluate
-    policy:
-      # -- Policy name
-      name: image_integrity
-      rules:
-      - name: warn_on_unsigned_image
-        uses: sbom/artifact-signed@v1
-        level: "warning"
+    initiative:
+      name: Image integrity
+      id: image_integrity
+      # -- Initiative name
+      controls:
+      - name: Signed Image Control
+        id: unsigned_image_control
+        rules:
+        - name: warn_on_unsigned_image
+          uses: sbom/artifact-signed@v2/rules
+          level: "warning"     
+
 
 valint:
   logger:

@@ -53,11 +53,11 @@ type AdmissionReview struct {
 }
 
 type ProviderCmd struct {
-	cfg          *config.Application
-	ctx          context.Context
-	logger       logger.Logger
-	policySelect *valintPkg.PolicySelectStruct
-	timeout      time.Duration
+	cfg              *config.Application
+	ctx              context.Context
+	logger           logger.Logger
+	initiativeSelect *valintPkg.InitiativeSelectStruct
+	timeout          time.Duration
 }
 
 func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd, error) {
@@ -81,15 +81,18 @@ func NewProviderCmd(ctx context.Context, cfg *config.Application) (*ProviderCmd,
 		timeout: timeout,
 	}
 
-	var policySelect *valintPkg.PolicySelectStruct
-	if _, err := os.Stat(cfg.Provider.PolicySelect); err == nil {
-		policySelect, err = ReadPolicySelectStruct(cfg.Provider.PolicySelect)
+	var initiativeSelect *valintPkg.InitiativeSelectStruct
+	l.Debugf("initiative select file: %s", cfg.Provider.InitiativeSelect)
+	if _, err := os.Stat(cfg.Provider.InitiativeSelect); err == nil {
+		initiativeSelect, err = ReadInitiativeSelectStruct(cfg.Provider.InitiativeSelect)
 		if err != nil {
-			l.Warnf("issue reading policy select list, Err: %s", err)
+			l.Warnf("issue reading initiative select list, Err: %s", err)
 			return nil, err
 		}
-		provider.policySelect = policySelect
-		utils.SetDryRun(provider.policySelect.DryRun)
+		provider.initiativeSelect = initiativeSelect
+		utils.SetDryRun(provider.initiativeSelect.DryRun)
+	} else {
+		l.Warnf("initiative select file not found, %s", cfg.Provider.InitiativeSelect)
 	}
 
 	return provider, nil
@@ -132,19 +135,19 @@ func (cmd *ProviderCmd) Run() error {
 	return nil
 }
 
-func ReadPolicySelectStruct(file string) (*valintPkg.PolicySelectStruct, error) {
-	var policySelect valintPkg.PolicySelectStruct
+func ReadInitiativeSelectStruct(file string) (*valintPkg.InitiativeSelectStruct, error) {
+	var initiativeSelect valintPkg.InitiativeSelectStruct
 	yamlFile, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
-	err = yaml.Unmarshal(yamlFile, &policySelect)
+	err = yaml.Unmarshal(yamlFile, &initiativeSelect)
 	if err != nil {
 		return nil, err
 	}
 
-	return &policySelect, nil
+	return &initiativeSelect, nil
 
 }
 
@@ -213,9 +216,16 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		utils.SendResponse(nil, fmt.Sprintf("unable to unmarshal request body: %v", err), http.StatusOK, false, w)
 		return
 	}
-	useTag := cmd.policySelect.UseTag
-	ignoreImageID := cmd.policySelect.IgnoreImageID
-	targetFallbackRepoDigest := cmd.policySelect.TargetFallbackRepoDigest
+
+	if cmd.initiativeSelect == nil {
+		cmd.logger.Warnf("initiative select not found")
+		utils.SendResponse(nil, "initiative select not found", http.StatusOK, false, w)
+		return
+	}
+
+	useTag := cmd.initiativeSelect.UseTag
+	ignoreImageID := cmd.initiativeSelect.IgnoreImageID
+	targetFallbackRepoDigest := cmd.initiativeSelect.TargetFallbackRepoDigest
 	images, labels, namespace, name, kind, operation, err := cmd.decodeKeys(providerRequest)
 	if err != nil {
 		utils.SendResponse(nil, fmt.Sprintf("unable to decode provider keys: %v", err), http.StatusOK, false, w)
@@ -246,8 +256,8 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 	cmd.logger.Infof("evaluating (%d) '%s', Labels: %s, Namespace: %s, Name: %s, Kind: %s, Operation: %s", len(images), images, labels, namespace, name, kind, operation)
 
-	if cmd.policySelect.Warning {
-		cmd.logger.Infof("warning policy is enabled return response")
+	if cmd.initiativeSelect.Warning {
+		cmd.logger.Infof("warning initiative is enabled return response")
 		emptyResults := make([]externaldata.Item, 0)
 		utils.SendResponse(&emptyResults, "", http.StatusOK, false, w)
 	}
@@ -266,12 +276,12 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 	os.Setenv("PULL_BUNDLE", "true")
 	os.Setenv("CONCURRENT_UPLOAD", "true")
 	// os.Setenv("GATEKEEPER_VALINT_SCRIBE_RETRY_EXP", "true")
-	SetGlobalIsWarning(cmd.policySelect.Warning)
+	SetGlobalIsWarning(cmd.initiativeSelect.Warning)
 
-	if cmd.policySelect == nil ||
-		(cmd.policySelect != nil && len(cmd.policySelect.Apply) == 0) {
-		// Run Default policy
-		var policyErrs, errs []error
+	if cmd.initiativeSelect == nil ||
+		(cmd.initiativeSelect != nil && len(cmd.initiativeSelect.Apply) == 0) {
+		// Run Default Initiative
+		var initiativeErrs, errs []error
 		var errMsg string
 		var wg sync.WaitGroup
 		var mu sync.Mutex
@@ -285,13 +295,13 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 				err := valintPkg.RunPolicy(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
 				if err != nil {
 					mu.Lock()
-					policyErrs = append(policyErrs, errs...)
-					policyErrMsg := []string{}
+					initiativeErrs = append(initiativeErrs, errs...)
+					initiativeErrMsg := []string{}
 					for _, e := range errs {
 						cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
-						policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
+						initiativeErrMsg = append(initiativeErrMsg, fmt.Sprintf("\n- %s", e))
 					}
-					errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
+					errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(initiativeErrMsg, ""))
 					mu.Unlock()
 				}
 			}(image)
@@ -299,21 +309,29 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 		wg.Wait()
 
-		if len(policyErrs) > 0 {
-			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.policySelect.Warning)
+		if len(initiativeErrs) > 0 {
+			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.initiativeSelect.Warning)
 			return
 		}
 
-	} else if cmd.policySelect != nil {
-		if cmd.policySelect.Gate != "" && cmd.cfg.Valint.Context.Gate == "" {
-			cmd.cfg.Valint.Context.Gate = cmd.policySelect.Gate
+	} else if cmd.initiativeSelect != nil {
+		if cmd.initiativeSelect.GateNameField != "" && cmd.cfg.Valint.Context.GateNameField == "" {
+			cmd.cfg.Valint.Context.GateNameField = cmd.initiativeSelect.GateNameField
 		}
 
-		if cmd.cfg.Valint.Context.Gate != "" {
-			cmd.logger.Infof("evaluating '%s' on gate '%s'", images, cmd.cfg.Valint.Context.Gate)
+		if cmd.cfg.Valint.Context.GateNameField != "" {
+			cmd.logger.Infof("evaluating '%s' on gate '%s'", images, cmd.cfg.Valint.Context.GateNameField)
 		}
 
-		var policyErrs []error
+		if cmd.initiativeSelect.GateTypeField != "" && cmd.cfg.Valint.Context.GateTypeField == "" {
+			cmd.cfg.Valint.Context.GateTypeField = cmd.initiativeSelect.GateTypeField
+		}
+
+		if cmd.cfg.Valint.Context.GateNameField != "" {
+			cmd.logger.Infof("evaluating '%s' on gate type '%s'", images, cmd.cfg.Valint.Context.GateTypeField)
+		}
+
+		var initiativeErrs []error
 		var errMsg string
 		var wg sync.WaitGroup
 		var mu sync.Mutex
@@ -329,16 +347,16 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 			wg.Add(1)
 			go func(image string) {
 				cmd.logger.Debugf("Image admission thread %s", image)
-				errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.policySelect.Apply, cmd.policySelect.Warning, cmd.cfg.Valint, cmd.logger)
+				errs := valintPkg.RunPolicySelectWithError(w, image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.initiativeSelect.Apply, cmd.initiativeSelect.Warning, cmd.cfg.Valint, cmd.logger)
 				if len(errs) > 0 {
 					mu.Lock()
-					policyErrs = append(policyErrs, errs...)
-					policyErrMsg := []string{}
+					initiativeErrs = append(initiativeErrs, errs...)
+					initiativeErrMsg := []string{}
 					for _, e := range errs {
 						cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
-						policyErrMsg = append(policyErrMsg, fmt.Sprintf("\n- %s", e))
+						initiativeErrMsg = append(initiativeErrMsg, fmt.Sprintf("\n- %s", e))
 					}
-					errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(policyErrMsg, ""))
+					errMsg = errMsg + fmt.Sprintf("\nScribe Admission refused '%s' deployment to '%s'.\n%s", image, namespace, strings.Join(initiativeErrMsg, ""))
 					mu.Unlock()
 				}
 				wg.Done()
@@ -347,16 +365,16 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 
 		wg.Wait()
 
-		if len(policyErrs) > 0 {
-			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.policySelect.Warning)
+		if len(initiativeErrs) > 0 {
+			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.initiativeSelect.Warning)
 			return
 		}
 
 	} else {
-		cmd.logger.Warnf("no policy run on request")
+		cmd.logger.Warnf("no initiative run on request")
 	}
 
-	utils.SendResponseWithWarning(&results, "", http.StatusOK, false, w, cmd.policySelect.Warning)
+	utils.SendResponseWithWarning(&results, "", http.StatusOK, false, w, cmd.initiativeSelect.Warning)
 }
 
 type ContextHandler func(w http.ResponseWriter, r *http.Request) error
