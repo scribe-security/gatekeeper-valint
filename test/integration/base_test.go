@@ -126,7 +126,7 @@ func runImageAdmissionTest(t *testing.T, test runImageAdmissionTestStruct, clien
 
 		debug, found := os.LookupEnv("DEBUG")
 		if found && strings.ToLower(debug) == "true" {
-			t.Logf(out)
+			t.Log(out)
 		}
 		require.NoError(t, err)
 	}
