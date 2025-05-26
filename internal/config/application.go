@@ -39,14 +39,14 @@ func (cfg *Application) PostInit() error {
 type ProviderConfig struct {
 	ImagePullSecrets []string `yaml:"image-pull-secrets,omitempty" json:"image-pull-secrets,omitempty" mapstructure:"image-pull-secrets"`
 	Port             int      `yaml:"port,omitempty" json:"port,omitempty" mapstructure:"port"`
-	PolicySelect     string   `yaml:"policy_map,omitempty" json:"policy_map,omitempty" mapstructure:"policy_map"`
+	InitiativeSelect string   `yaml:"initiative_map,omitempty" json:"initiative_map,omitempty" mapstructure:"initiative_map"`
 	Timeout          string   `yaml:"timeout,omitempty" json:"timeout,omitempty" mapstructure:"timeout"`
 }
 
 var ProviderCommandArguments = basecli.Arguments{
 	{ConfigID: "provider.image-pull-secrets", LongName: "image-pull-secrets", ShortName: "", Message: "The names of the secrets used to pull evidence from registries", Default: []string{}},
 	{ConfigID: "provider.port", LongName: "port", ShortName: "", Message: "Port for the server to listen on", Default: defaultPort},
-	{ConfigID: "provider.policy_map", LongName: "policy-map", ShortName: "", Message: "Path to policy select configuration", Default: "/policies/map.yaml"},
+	{ConfigID: "provider.initiative_map", LongName: "initiative-map", ShortName: "", Message: "Path to Initiative select configuration", Default: "/initiatives/map.yaml"},
 	{ConfigID: "provider.timeout", LongName: "timeout", ShortName: "", Message: "Evaluation timeout", Default: "300s"},
 }
 

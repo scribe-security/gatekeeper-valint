@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag:  v1.5.18
+  tag: dev-latest
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -41,7 +41,9 @@ x509:
 # By Default the Signature Policy is Run on all images set to warning.
 select:
   # -- Gate name
-  gate: default_gate
+  gate-name: Scribe Admission Gate
+  gate-type: admission
+
   # -- Set all rules as warning
   warning: true
   # -- Run policy dry run mode
@@ -59,14 +61,8 @@ select:
     # -- filter evidence by scope, options<product, pipeline, target>
     filter-by:
     - target
-    # -- Select policy rules and arguments to evaluate
-    policy:
-      # -- Policy name
-      name: image_integrity
-      rules:
-      - name: warn_on_unsigned_image
-        uses: sbom/artifact-signed@v1
-        level: "warning"
+    # -- Evaluate initiative on Latest Image Product
+    # - product 
 
 valint:
   logger:
