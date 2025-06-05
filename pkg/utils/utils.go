@@ -42,8 +42,6 @@ func SendResponseWithWarning(results *[]externaldata.Item, systemErr string, res
 
 // sendResponse sends back the response to Gatekeeper.
 func SendResponse(results *[]externaldata.Item, systemErr string, respCode int, isMutation bool, w http.ResponseWriter) error {
-	klog.Infof("#################### SendResponse %s %s %s", results, systemErr, respCode)
-
 	emptyResults := make([]externaldata.Item, 0)
 	if DryRunGlobal && results == nil && systemErr != "" {
 		klog.InfoS("dry run mocking success, Failed with", systemErr)
