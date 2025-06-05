@@ -61,7 +61,7 @@ select:
     # -- filter evidence by scope, options<product, pipeline, target>
     filter-by:
     - target
-    - product
+    # - product
     # -- Evaluate initiative by ref
     # initiative-ref: sp-800-190@v2
 
