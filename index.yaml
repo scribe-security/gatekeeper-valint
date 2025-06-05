@@ -18,6 +18,39 @@ entries:
       artifacthub.io/vendor: Scribe security, Inc.
     apiVersion: v2
     appVersion: v2.0.1-1
+    created: "2025-06-05T10:47:44.468837342Z"
+    description: 'A Helm chart for Valint GateKeeper provider to enforce enforce a
+      variety of supply chain policies, including signed image verification. '
+    digest: d828fc476b38deae3ec0812468298d410cdd89b80606464a8d16e650701ca88a
+    home: https://scribesecurity.com
+    icon: https://raw.githubusercontent.com/scribe-security/misc/master/assets/logo-white.jpg
+    maintainers:
+    - email: mikey@scribesecurity.com
+      name: Mikey Strauss
+      url: https://scribesecurity.com
+    name: gatekeeper-valint
+    sources:
+    - https://github.com/scribe-security/gatekeeper-valint.git
+    urls:
+    - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v2.0.3/gatekeeper-valint-v2.0.3.tgz
+    version: v2.0.3
+  - annotations:
+      artifacthub.io/category: security
+      artifacthub.io/images: |
+        - name: gatekeeper-valint
+          image: scribesecurity/valint@
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Homepage
+          url: https://scribesecurity.com
+        - name: Source
+          url: https://github.com/scribe-security/gatekeeper-valint.git
+        - name: Documentation
+          url: https://scribe-security.netlify.app/docs/integrating-scribe/admission-controller/gatekeeper-provider
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/vendor: Scribe security, Inc.
+    apiVersion: v2
+    appVersion: v2.0.1-1
     created: "2025-06-05T09:52:50.115128324Z"
     description: 'A Helm chart for Valint GateKeeper provider to enforce enforce a
       variety of supply chain policies, including signed image verification. '
@@ -1103,4 +1136,4 @@ entries:
     urls:
     - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-7/gatekeeper-valint-v1.2.0-7.tgz
     version: v1.2.0-7
-generated: "2025-06-05T09:52:50.115496486Z"
+generated: "2025-06-05T10:47:44.469328151Z"
