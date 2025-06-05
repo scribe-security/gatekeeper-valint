@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag: v2.0.0
+  tag: v2.0.4
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -61,8 +61,25 @@ select:
     # -- filter evidence by scope, options<product, pipeline, target>
     filter-by:
     - target
-    # -- Evaluate initiative on Latest Image Product
-    # - product 
+    # - product
+    # -- Evaluate initiative by ref
+    # initiative-ref: sp-800-190@v2
+
+    # -- Evaluate custom initiative 
+    # initiative:
+    #   config-type: initiative
+    #   id: "admission-initiative"
+    #   version: "1.0.0"
+    #   name: "Custom Admission Initiative"
+    #   controls:
+    #     - id: "admission-control"
+    #       name: "Admission Control"
+    #       description: "Custom control for admission policies"
+    #       rules:
+    #         - uses: sbom/artifact-signed@v2
+    #           name: "warn on unsigned artifacts"
+    #           level: error
+              
 
 valint:
   logger:
