@@ -1,6 +1,6 @@
 image:
   repository: scribesecurity/gatekeeper-valint
-  tag: v2.0.2
+  tag: dev-latest
   imagePullPolicy: Always
 certs:
   caBundle: ""
@@ -78,7 +78,7 @@ select:
     #       rules:
     #         - uses: sbom/artifact-signed@v2
     #           name: "warn on unsigned artifacts"
-    #           level: warning
+    #           level: error
               
 
 valint:

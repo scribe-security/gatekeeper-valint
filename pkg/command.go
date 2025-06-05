@@ -295,7 +295,7 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 				err := valintPkg.RunInitiative(image, labels, namespace, name, kind, useTag, ignoreImageID, targetFallbackRepoDigest, co, cmd.cfg.Valint, cmd.logger)
 				if err != nil {
 					mu.Lock()
-					initiativeErrs = append(initiativeErrs, errs...)
+					initiativeErrs = append(initiativeErrs, err)
 					initiativeErrMsg := []string{}
 					for _, e := range errs {
 						cmd.logger.Warnf("Scribe Admission refused '%s' deployment to '%s' namespace.%s", image, namespace, e)
@@ -308,7 +308,6 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		}
 
 		wg.Wait()
-
 		if len(initiativeErrs) > 0 {
 			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.initiativeSelect.Warning)
 			return
@@ -364,7 +363,6 @@ func (cmd *ProviderCmd) Validate(w http.ResponseWriter, req *http.Request) {
 		}
 
 		wg.Wait()
-
 		if len(initiativeErrs) > 0 {
 			utils.SendResponseWithWarning(nil, errMsg, http.StatusOK, false, w, cmd.initiativeSelect.Warning)
 			return

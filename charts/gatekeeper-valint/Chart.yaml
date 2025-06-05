@@ -2,7 +2,7 @@ apiVersion: v2
 description: |
   A Helm chart for Valint GateKeeper provider to enforce enforce a variety of supply chain policies, including signed image verification.
 name: gatekeeper-valint
-version: v2.0.2
+version: v2.0.3
 home: https://scribesecurity.com
 sources:
   - https://github.com/scribe-security/gatekeeper-valint.git
