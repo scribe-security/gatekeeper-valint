@@ -17,6 +17,39 @@ entries:
       artifacthub.io/prerelease: "true"
       artifacthub.io/vendor: Scribe security, Inc.
     apiVersion: v2
+    appVersion: v2.0.1-1
+    created: "2025-06-05T09:17:53.662671947Z"
+    description: 'A Helm chart for Valint GateKeeper provider to enforce enforce a
+      variety of supply chain policies, including signed image verification. '
+    digest: 16818db9b08ffac3661320361aaab8f6e40da612bdac5eb652b2d24f2209412e
+    home: https://scribesecurity.com
+    icon: https://raw.githubusercontent.com/scribe-security/misc/master/assets/logo-white.jpg
+    maintainers:
+    - email: mikey@scribesecurity.com
+      name: Mikey Strauss
+      url: https://scribesecurity.com
+    name: gatekeeper-valint
+    sources:
+    - https://github.com/scribe-security/gatekeeper-valint.git
+    urls:
+    - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v2.0.1/gatekeeper-valint-v2.0.1.tgz
+    version: v2.0.1
+  - annotations:
+      artifacthub.io/category: security
+      artifacthub.io/images: |
+        - name: gatekeeper-valint
+          image: scribesecurity/valint@
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Homepage
+          url: https://scribesecurity.com
+        - name: Source
+          url: https://github.com/scribe-security/gatekeeper-valint.git
+        - name: Documentation
+          url: https://scribe-security.netlify.app/docs/integrating-scribe/admission-controller/gatekeeper-provider
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/vendor: Scribe security, Inc.
+    apiVersion: v2
     appVersion: v1.5.14-7
     created: "2024-12-22T11:49:52.193705298Z"
     description: 'A Helm chart for Valint GateKeeper provider to enforce enforce a
@@ -1037,4 +1070,4 @@ entries:
     urls:
     - https://github.com/scribe-security/gatekeeper-valint/releases/download/gatekeeper-valint-v1.2.0-7/gatekeeper-valint-v1.2.0-7.tgz
     version: v1.2.0-7
-generated: "2024-12-22T11:49:52.19405215Z"
+generated: "2025-06-05T09:17:53.66309894Z"
