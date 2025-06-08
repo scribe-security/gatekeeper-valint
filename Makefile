@@ -199,7 +199,15 @@ clean_namespace: clean ## Delete provider namespace
 accept_test: ## Accept test 
 	kubectl delete -f policy/examples/multi.yaml || true
 	kubectl delete -f policy/examples/valid.yaml || true
+	kubectl delete -f policy/examples/error.yaml || true
 	kubectl apply -f policy/examples/valid.yaml
+
+.PHONY: error_test
+error_test: ## Accept test 
+	kubectl delete -f policy/examples/multi.yaml || true
+	kubectl delete -f policy/examples/valid.yaml || true
+	kubectl delete -f policy/examples/error.yaml || true
+	kubectl apply -f policy/examples/error.yaml
 
 .PHONY: multi_test
 multi_test: ## Multi test 
