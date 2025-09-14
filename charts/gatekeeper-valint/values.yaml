@@ -1,5 +1,5 @@
 image:
-  repository: scribesecurity/gatekeeper-valint
+  repository: ghcr.io/scribe-security/gatekeeper-valint
   tag: v2.0.4
   imagePullPolicy: Always
 certs:

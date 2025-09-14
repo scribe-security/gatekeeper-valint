@@ -3,8 +3,6 @@ name: .e2e
 
 env:
   GITHUB_USER: "houdini91" # TODO CHANGE TO A SCRIBE USER.
-  RELEASE_ARTIFACTORY_USERNAME: mikey@scribesecurity.com
-  ARTIFACTORY_URL: "https://scribesecuriy.jfrog.io"
   GOPRIVATE: "github.com/scribe-security/*"
   GO_VERSION: "1.21"
   SCRIBE_OCI_REPO: scribesecuriy.jfrog.io/scribe-docker-local/attestation/e2e
@@ -14,11 +12,9 @@ on:
     secrets:
       RELEASE_GITHUB_TOKEN:
         required: true
-      RELEASE_ARTIFACTORY_TOKEN:
+      READ_PRIVATE_GO_REPOS:
         required: true
       SCRIBE_CLIENT_SECRET:
-        required: true
-      SLACK_WEBHOOK_URL:
         required: true
     inputs:
       SCRIBE_URL:
@@ -26,9 +22,6 @@ on:
         required: true
         default: https://api.dev.scribesecurity.com 
       GITHUB_USER:
-        type: string
-        required: true
-      RELEASE_ARTIFACTORY_USERNAME:
         type: string
         required: true
       ENV:
@@ -71,9 +64,9 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.ARTIFACTORY_URL }}
-          username: ${{ inputs.RELEASE_ARTIFACTORY_USERNAME }}
-          password: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
+          registry: ghcr.io
+          username: scribe-security
+          password: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
       - name: Set Registry secret
         run: |
@@ -83,7 +76,7 @@ jobs:
 
       - name: Configure git for private modules
         env:
-          TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          TOKEN: ${{ secrets.READ_PRIVATE_GO_REPOS }}
         run: git config --global url."https://${{ inputs.GITHUB_USER }}:${TOKEN}@github.com".insteadOf "https://github.com"
 
       - name: Bootstrap

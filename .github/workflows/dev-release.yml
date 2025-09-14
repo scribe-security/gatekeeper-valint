@@ -16,11 +16,8 @@ jobs:
   call-release:
     uses: ./.github/workflows/reusable_release.yml
     secrets:
-      RELEASE_GITHUB_TOKEN: ${{ secrets.READ_PRIVATE_GO_REPOS }} ## needed to pull our private go libraries
-      RELEASE_ARTIFACTORY_TOKEN: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
-      RELEASE_DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      READ_PRIVATE_GO_REPOS: ${{ secrets.READ_PRIVATE_GO_REPOS }} ## needed to pull our private go libraries
+      RELEASE_GITHUB_TOKEN: ${{ secrets.GHCR_GITHUB_RELEASE }}
     with:
-      RELEASE_ARTIFACTORY_USERNAME: mikey@scribesecurity.com
       GITHUB_USER: houdini91
-      RELEASE_DOCKERHUB_USERNAME: scribesecurity
       IS_DEV: true

@@ -2,7 +2,6 @@ name: .release
 
 env:
   GOPRIVATE: "github.com/scribe-security/*"
-  ARTIFACTORY_URL: "https://scribesecuriy.jfrog.io"
   GO_VERSION: "1.21"
 
 on:
@@ -10,18 +9,10 @@ on:
     secrets:
       RELEASE_GITHUB_TOKEN:
         required: true
-      RELEASE_ARTIFACTORY_TOKEN:
-        required: true   
-      RELEASE_DOCKERHUB_TOKEN:
-        required: true   
+      READ_PRIVATE_GO_REPOS:
+        required: true
     inputs:
       GITHUB_USER:
-        type: string
-        required: true
-      RELEASE_ARTIFACTORY_USERNAME:
-        type: string
-        required: true
-      RELEASE_DOCKERHUB_USERNAME:
         type: string
         required: true
       IS_DEV:
@@ -64,7 +55,7 @@ jobs:
       - name: Configure git for private modules
         if: steps.go-cache.outputs.cache-hit != 'true'
         env:
-          TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          TOKEN: ${{ secrets.READ_PRIVATE_GO_REPOS }}
         run: git config --global url."https://${{ inputs.GITHUB_USER }}:${TOKEN}@github.com".insteadOf "https://github.com"
 
       - name: Bootstrap
@@ -74,21 +65,13 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.ARTIFACTORY_URL }}
-          username: ${{ inputs.RELEASE_ARTIFACTORY_USERNAME }}
-          password: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          username: ${{ inputs.RELEASE_DOCKERHUB_USERNAME }}
-          password: ${{ secrets.RELEASE_DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: scribe-security
+          password: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
       - name: Build & publish release artifacts
         run: make release
         env:
-          ARTIFACTORY_GENERIC_USERNAME:  ${{ inputs.RELEASE_ARTIFACTORY_USERNAME }}
-          ARTIFACTORY_GENERIC_SECRET: ${{ secrets.RELEASE_ARTIFACTORY_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           IsDev: ${{ inputs.IS_DEV }}
 

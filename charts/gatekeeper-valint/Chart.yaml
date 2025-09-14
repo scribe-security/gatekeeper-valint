@@ -17,7 +17,7 @@ annotations:
   artifacthub.io/category: security
   artifacthub.io/images: |
     - name: gatekeeper-valint
-      image: scribesecurity/valint@
+      image: ghcr.io/scribe-security/valint@
   artifacthub.io/links: |
     - name: Homepage
       url: https://scribesecurity.com
