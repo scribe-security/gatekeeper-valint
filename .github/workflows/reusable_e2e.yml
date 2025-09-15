@@ -5,7 +5,7 @@ env:
   GITHUB_USER: "houdini91" # TODO CHANGE TO A SCRIBE USER.
   GOPRIVATE: "github.com/scribe-security/*"
   GO_VERSION: "1.21"
-  SCRIBE_OCI_REPO: scribesecuriy.jfrog.io/scribe-docker-local/attestation/e2e
+  SCRIBE_OCI_REPO: ghcr.io/scribe-security/attestations_e2e/gatekeeper
 
 on:
   workflow_call:
